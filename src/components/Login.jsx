@@ -1,11 +1,23 @@
 import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-function Login() {
-  const [apelido, setApelido] = useState("");
+function Login({ abrirCadastro, loginSucesso }) {
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const entrar = () => {
-    alert(`Login: ${apelido}`);
+  const entrar = async () => {
+    try {
+      const credencial = await signInWithEmailAndPassword(
+        auth,
+        email,
+        senha
+      );
+
+      loginSucesso(credencial.user);
+    } catch (error) {
+      alert("E-mail ou senha inválidos.");
+    }
   };
 
   return (
@@ -29,8 +41,18 @@ function Login() {
           boxShadow: "0 0 20px rgba(0,0,0,0.4)",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <div style={{ fontSize: "60px", marginBottom: "10px" }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "60px",
+              marginBottom: "10px",
+            }}
+          >
             🏆
           </div>
 
@@ -43,22 +65,21 @@ function Login() {
             Terceirizados Mil Grau
           </h1>
 
-          <h3 style={{ marginTop: "10px" }}>
+          <h3
+            style={{
+              marginTop: "10px",
+            }}
+          >
             Bolão Copa 2026
           </h3>
         </div>
 
         <input
-          type="text"
-          placeholder="Apelido"
-          value={apelido}
-          onChange={(e) => setApelido(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "14px",
-            marginBottom: "12px",
-            boxSizing: "border-box",
-          }}
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={inputStyle}
         />
 
         <input
@@ -66,39 +87,63 @@ function Login() {
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "14px",
-            marginBottom: "15px",
-            boxSizing: "border-box",
-          }}
+          style={inputStyle}
         />
 
         <button
           onClick={entrar}
-          style={{
-            width: "100%",
-            padding: "14px",
-            backgroundColor: "#28a745",
-            border: "none",
-            borderRadius: "8px",
-            color: "white",
-          }}
+          style={buttonStyle}
         >
           Entrar
         </button>
 
         <p
+          onClick={abrirCadastro}
           style={{
             textAlign: "center",
             marginTop: "20px",
+            color: "#28a745",
+            cursor: "pointer",
           }}
         >
           Criar Conta
+        </p>
+
+        <p
+          style={{
+            textAlign: "center",
+            marginTop: "30px",
+            fontSize: "12px",
+            color: "#666",
+          }}
+        >
+          Terceirizados Mil Grau © 2026
         </p>
       </div>
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  padding: "14px",
+  marginBottom: "12px",
+  boxSizing: "border-box",
+  borderRadius: "8px",
+  border: "1px solid #555",
+  backgroundColor: "#333",
+  color: "white",
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: "14px",
+  backgroundColor: "#28a745",
+  border: "none",
+  borderRadius: "8px",
+  color: "white",
+  cursor: "pointer",
+  fontSize: "16px",
+};
 
 export default Login;

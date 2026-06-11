@@ -1,13 +1,48 @@
 import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
-function Cadastro() {
+function Cadastro({ voltarLogin }) {
   const [nome, setNome] = useState("");
   const [apelido, setApelido] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const cadastrar = () => {
-    alert(`Usuário ${apelido} cadastrado!`);
+  const cadastrar = async () => {
+    try {
+      const credencial = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        senha
+      );
+
+      await setDoc(
+        doc(db, "usuarios", credencial.user.uid),
+        {
+          nome,
+          apelido,
+          email,
+          tipoUsuario: "participante",
+          pagamento: false,
+          pontos: 0,
+          dataCadastro: new Date().toISOString(),
+        }
+      );
+
+      alert("Conta criada com sucesso!");
+
+      setNome("");
+      setApelido("");
+      setEmail("");
+      setSenha("");
+
+      if (voltarLogin) {
+        voltarLogin();
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const inputStyle = {
@@ -19,6 +54,17 @@ function Cadastro() {
     border: "1px solid #555",
     backgroundColor: "#333",
     color: "white",
+  };
+
+  const buttonStyle = {
+    width: "100%",
+    padding: "14px",
+    backgroundColor: "#28a745",
+    border: "none",
+    borderRadius: "8px",
+    color: "white",
+    cursor: "pointer",
+    fontSize: "16px",
   };
 
   return (
@@ -57,23 +103,11 @@ function Cadastro() {
             🏆
           </div>
 
-          <h1
-            style={{
-              margin: "0",
-              fontSize: "32px",
-              lineHeight: "1.2",
-            }}
-          >
+          <h1 style={{ margin: "0", fontSize: "32px" }}>
             Terceirizados Mil Grau
           </h1>
 
-          <h3
-            style={{
-              marginTop: "15px",
-              color: "#d9d9d9",
-              fontWeight: "normal",
-            }}
-          >
+          <h3 style={{ marginTop: "15px" }}>
             Cadastro de Participante
           </h3>
         </div>
@@ -110,19 +144,7 @@ function Cadastro() {
           style={inputStyle}
         />
 
-        <button
-          onClick={cadastrar}
-          style={{
-            width: "100%",
-            padding: "14px",
-            backgroundColor: "#28a745",
-            border: "none",
-            borderRadius: "8px",
-            color: "white",
-            cursor: "pointer",
-            fontSize: "16px",
-          }}
-        >
+        <button onClick={cadastrar} style={buttonStyle}>
           Criar Conta
         </button>
 
@@ -137,6 +159,7 @@ function Cadastro() {
         </p>
 
         <p
+          onClick={voltarLogin}
           style={{
             textAlign: "center",
             color: "#28a745",
