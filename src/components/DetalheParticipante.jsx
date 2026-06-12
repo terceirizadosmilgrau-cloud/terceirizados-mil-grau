@@ -75,6 +75,24 @@ function DetalheParticipante({
           📊 Diferença para o líder:{" "}
           {participante.diferencaLider} pts
         </p>
+        <p>
+  🎯 Acertos exatos:
+  {" "}
+  {participante.acertosExatos}
+</p>
+
+<p>
+  ⚽ Acertos parciais:
+  {" "}
+  {participante.acertosParciais}
+</p>
+
+<p>
+  📈 Aproveitamento:
+  {" "}
+  {participante.aproveitamento}
+  %
+</p>
 
         {participante.premiacao >
         0 ? (

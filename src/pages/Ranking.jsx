@@ -128,28 +128,65 @@ listaRanking.forEach(
     Object.keys(
       participante.resultados || {}
     ).forEach((grupo) => {
-      participante.detalhes[
-        grupo
-      ] = {
-        palpite:
-          participante.palpites?.[
-            grupo
-          ] || {},
+     const palpiteGrupo =
+  participante.palpites?.[
+    grupo
+  ] || {};
 
-        resultado:
-          participante.resultados?.[
-            grupo
-          ] || {},
+const resultadoGrupo =
+  participante.resultados?.[
+    grupo
+  ] || {};
 
-        pontos: calcularPontuacao(
-          participante.palpites?.[
-            grupo
-          ],
-          participante.resultados?.[
-            grupo
-          ]
-        ),
-      };
+let acertosExatos = 0;
+let acertosParciais = 0;
+
+[
+  "primeiro",
+  "segundo",
+  "terceiro",
+  "quarto",
+].forEach((posicao) => {
+  const palpite =
+    palpiteGrupo[posicao];
+
+  const resultado =
+    resultadoGrupo[posicao];
+
+  if (palpite === resultado) {
+    acertosExatos++;
+  } else {
+    const existe = [
+      "primeiro",
+      "segundo",
+      "terceiro",
+      "quarto",
+    ].some(
+      (p) =>
+        resultadoGrupo[p] ===
+        palpite
+    );
+
+    if (existe) {
+      acertosParciais++;
+    }
+  }
+});
+
+participante.detalhes[
+  grupo
+] = {
+  palpite: palpiteGrupo,
+  resultado: resultadoGrupo,
+
+  pontos: calcularPontuacao(
+    palpiteGrupo,
+    resultadoGrupo
+  ),
+
+  acertosExatos,
+  acertosParciais,
+};
     });
 
     participante.posicao =
@@ -173,6 +210,33 @@ listaRanking.forEach(
     } else {
       participante.premiacao = 0;
     }
+    participante.acertosExatos = 0;
+participante.acertosParciais = 0;
+
+Object.values(
+  participante.detalhes
+).forEach((grupo) => {
+  participante.acertosExatos +=
+    grupo.acertosExatos || 0;
+
+  participante.acertosParciais +=
+    grupo.acertosParciais || 0;
+});
+
+const totalPossivel =
+  Object.keys(
+    participante.detalhes
+  ).length * 4;
+
+participante.aproveitamento =
+  totalPossivel > 0
+    ? (
+        ((participante.acertosExatos +
+          participante.acertosParciais) /
+          totalPossivel) *
+        100
+      ).toFixed(1)
+    : 0;
   }
 );
 
