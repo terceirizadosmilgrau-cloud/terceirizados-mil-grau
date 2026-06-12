@@ -310,7 +310,6 @@ const resultadoGrupo =
   ] || {};
 
 let acertosExatos = 0;
-let acertosParciais = 0;
 
 [
   "primeiro",
@@ -325,34 +324,18 @@ let acertosParciais = 0;
     resultadoGrupo[posicao];
 
   if (
-  palpite &&
-  resultado &&
-  palpite === resultado
-) {
-  acertosExatos++;
-} else {
-    const existe =
-  palpite &&
-  [
-    "primeiro",
-    "segundo",
-    "terceiro",
-    "quarto",
-  ].some(
-    (p) =>
-      resultadoGrupo[p] ===
-      palpite
-  );
-
-    if (existe) {
-      acertosParciais++;
-    }
+    palpite &&
+    resultado &&
+    palpite === resultado
+  ) {
+    acertosExatos++;
   }
 });
 
+const acertosParciais = 0;
+
 const acertosGrupo =
-  acertosExatos +
-  acertosParciais;
+  acertosExatos;
 
 participante.detalhes[
   grupo
@@ -398,16 +381,20 @@ let pontosMaximos = 0;
 Object.values(
   participante.resultados || {}
 ).forEach((grupo) => {
-  [
-    "primeiro",
-    "segundo",
-    "terceiro",
-    "quarto",
-  ].forEach((posicao) => {
-    if (grupo?.[posicao]) {
-      pontosMaximos += 10;
-    }
-  });
+
+  if (grupo?.primeiro)
+    pontosMaximos += 10;
+
+  if (grupo?.segundo)
+    pontosMaximos += 10;
+
+  if (grupo?.terceiro)
+    pontosMaximos += 3;
+
+  if (grupo?.quarto)
+    pontosMaximos += 2;
+
+  pontosMaximos += 10; // bônus grupo perfeito
 });
 
 if (resultadoMataMata) {
