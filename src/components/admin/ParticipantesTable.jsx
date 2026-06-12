@@ -1,6 +1,7 @@
 function ParticipantesTable({
   participantes,
   isSuperAdmin,
+  isAdmin,
   confirmarPagamento,
   tornarAdmin,
   removerAdmin,
@@ -71,8 +72,8 @@ function ParticipantesTable({
       minWidth: "120px",
     }}
   >
-    {isSuperAdmin && (
-      <>
+    {(isAdmin || isSuperAdmin) && (
+<>
                     {!p.pagamento && (
                       <button
                         style={botaoVerde}
@@ -101,8 +102,9 @@ function ParticipantesTable({
                       </button>
                     )}
 
-                    {p.tipoUsuario ===
-                      "participante" && (
+                    {isSuperAdmin &&
+ p.tipoUsuario ===
+  "participante" && (
                       <button
                         style={botaoAzul}
                         onClick={() =>
@@ -113,8 +115,9 @@ function ParticipantesTable({
                       </button>
                     )}
 
-                    {p.tipoUsuario ===
-                      "admin" && (
+                    {isSuperAdmin &&
+ p.tipoUsuario ===
+  "admin" && (
                       <button
                         style={botaoVermelho}
                         onClick={() =>
@@ -125,8 +128,9 @@ function ParticipantesTable({
                       </button>
                     )}
 
-                    {p.tipoUsuario !==
-                      "superadmin" && (
+                                         {isSuperAdmin &&
+ p.tipoUsuario !==
+  "superadmin" && (
                       <button
                         style={botaoExcluir}
                         onClick={() =>
@@ -139,8 +143,8 @@ function ParticipantesTable({
                         🗑 Excluir
                       </button>
                     )}
-                                    </>
-                )}
+                  </>
+)}
   </div>
 </td>
             </tr>

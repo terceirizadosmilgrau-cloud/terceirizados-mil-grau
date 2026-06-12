@@ -33,6 +33,8 @@ const [filtro, setFiltro] =
 
   const isSuperAdmin =
     usuario?.email === "ardcost4@icloud.com";
+    const isAdmin =
+  usuario?.tipoUsuario === "admin";
 
   useEffect(() => {
     carregarConfiguracoes();
@@ -546,12 +548,13 @@ const [filtro, setFiltro] =
   participantes={
     participantesFiltrados
   }
-        isSuperAdmin={isSuperAdmin}
-        confirmarPagamento={confirmarPagamento}
-        tornarAdmin={tornarAdmin}
-        removerAdmin={removerAdmin}
-        excluirParticipante={excluirParticipante}
-      />
+  isSuperAdmin={isSuperAdmin}
+  isAdmin={isAdmin}
+  confirmarPagamento={confirmarPagamento}
+  tornarAdmin={tornarAdmin}
+  removerAdmin={removerAdmin}
+  excluirParticipante={excluirParticipante}
+/>
     </div>
   );
 }
