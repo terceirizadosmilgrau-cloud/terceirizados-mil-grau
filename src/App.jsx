@@ -9,6 +9,8 @@ import ResumoPalpites from "./pages/ResumoPalpites";
 import Resultados from "./pages/Resultados";
 import Ranking from "./pages/Ranking";
 import CentralPalpites from "./pages/CentralPalpites";
+import PalpitesMataMata from "./pages/PalpitesMataMata";
+import CentralMataMata from "./pages/CentralMataMata";
 
 function App() {
   const [tela, setTela] = useState("login");
@@ -39,6 +41,21 @@ function App() {
       />
     );
   }
+
+  if (
+  tela === "centralMataMata" &&
+  isSuperAdmin
+) {
+  return (
+    <CentralMataMata
+      voltar={() =>
+        setTela(
+          "dashboard"
+        )
+      }
+    />
+  );
+}
 
   if (tela === "ranking") {
     return (
@@ -73,6 +90,16 @@ function App() {
       />
     );
   }
+  if (tela === "mataMata") {
+  return (
+    <PalpitesMataMata
+      usuario={usuario}
+      voltar={() =>
+        setTela("dashboard")
+      }
+    />
+  );
+}
 
   if (tela === "palpites") {
     return (
@@ -91,23 +118,39 @@ function App() {
   if (tela === "dashboard") {
     return (
       <Dashboard
-        usuario={usuario}
-        sair={sair}
-        abrirPalpites={() =>
-          setTela("palpites")
-        }
-        abrirResultados={() =>
-          setTela("resultados")
-        }
-        abrirRanking={() =>
-          setTela("ranking")
-        }
-        abrirCentralPalpites={() =>
-          setTela("centralPalpites")
-        }
-      />
+  usuario={usuario}
+  sair={sair}
+
+  abrirPalpites={() =>
+    setTela("palpites")
+  }
+
+  abrirMataMata={() =>
+    setTela("mataMata")
+  }
+
+  abrirResultados={() =>
+    setTela("resultados")
+  }
+
+  abrirRanking={() =>
+    setTela("ranking")
+  }
+
+  abrirCentralPalpites={() =>
+    setTela("centralPalpites")
+  }
+
+  abrirCentralMataMata={() =>
+  setTela(
+    "centralMataMata"
+  )
+}
+/>
     );
   }
+
+  
 
   if (tela === "cadastro") {
     return (

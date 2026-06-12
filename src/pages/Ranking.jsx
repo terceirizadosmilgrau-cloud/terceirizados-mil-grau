@@ -9,9 +9,14 @@ import {
 import { db } from "../firebase";
 import { calcularPontuacao } from "../utils/calcularPontuacao";
 import DetalheParticipante from "../components/DetalheParticipante";
+import { calcularPontuacaoMataMata }
+  from "../utils/calcularPontuacaoMataMata";
 
 function Ranking({ voltar }) {
   const [ranking, setRanking] = useState([]);
+
+  const [arrecadacao, setArrecadacao] =
+  useState(0);
 
   const [busca, setBusca] =
   useState("");
@@ -20,8 +25,6 @@ function Ranking({ voltar }) {
   participanteSelecionado,
   setParticipanteSelecionado,
 ] = useState(null);
-  const [arrecadacao, setArrecadacao] =
-    useState(0);
 
   const [estatisticas, setEstatisticas] =
     useState({
@@ -45,6 +48,20 @@ function Ranking({ voltar }) {
 
       if (!resultadoSnapshot.exists())
         return;
+
+      const resultadoMataMataSnapshot =
+  await getDoc(
+    doc(
+      db,
+      "resultados",
+      "mataMata"
+    )
+  );
+
+const resultadoMataMata =
+  resultadoMataMataSnapshot.exists()
+    ? resultadoMataMataSnapshot.data()
+    : null;
 
       const resultados =
         resultadoSnapshot.data();
@@ -79,6 +96,9 @@ function Ranking({ voltar }) {
   );
 
 let pontos = 0;
+let pontosGrupos = 0;
+let pontosMataMata = 0;
+let detalhesMataMata = null;
 
 if (palpiteSnapshot.exists()) {
   comPalpite++;
@@ -89,21 +109,132 @@ if (palpiteSnapshot.exists()) {
   Object.keys(resultados).forEach(
   (grupo) => {
     const pontosGrupo =
-      calcularPontuacao(
-        palpites[grupo],
-        resultados[grupo]
-      );
+      pontosGrupos +=
+  calcularPontuacao(
+    palpites[grupo],
+    resultados[grupo]
+  );
 
     pontos += pontosGrupo;
   }
 );
+
+const mataMataSnapshot =
+  await getDoc(
+    doc(
+      db,
+      "palpitesMataMata",
+      usuarioDoc.id
+    )
+  );
+
+let detalhesMataMata = null;
+
+if (
+  mataMataSnapshot.exists() &&
+  resultadoMataMata
+) {
+  const palpiteMataMata =
+    mataMataSnapshot.data();
+
+  const contarAcertos = (
+    palpites,
+    oficiais
+  ) => {
+    if (
+      !Array.isArray(palpites) ||
+      !Array.isArray(oficiais)
+    ) {
+      return 0;
+    }
+
+    return palpites.filter(
+      (time) =>
+        oficiais.some(
+          (oficial) =>
+            oficial
+              ?.toLowerCase()
+              .trim() ===
+            time
+              ?.toLowerCase()
+              .trim()
+        )
+    ).length;
+  };
+
+  const acertosOitavas =
+    contarAcertos(
+      palpiteMataMata.oitavas,
+      resultadoMataMata.oitavas
+    );
+
+  const acertosQuartas =
+    contarAcertos(
+      palpiteMataMata.quartas,
+      resultadoMataMata.quartas
+    );
+
+  const acertosSemi =
+    contarAcertos(
+      palpiteMataMata.semifinal,
+      resultadoMataMata.semifinal
+    );
+
+  const acertosFinal =
+    contarAcertos(
+      palpiteMataMata.final,
+      resultadoMataMata.final
+    );
+
+  const campeaoCorreto =
+    palpiteMataMata.campeao
+      ?.toLowerCase()
+      .trim() ===
+    resultadoMataMata.campeao
+      ?.toLowerCase()
+      .trim();
+
+  detalhesMataMata = {
+    oitavas:
+      acertosOitavas * 1,
+
+    quartas:
+      acertosQuartas * 2,
+
+    semifinal:
+      acertosSemi * 3,
+
+    final:
+      acertosFinal * 5,
+
+    campeao:
+      campeaoCorreto
+        ? 10
+        : 0,
+  };
+
+  pontosMataMata =
+    calcularPontuacaoMataMata(
+      palpiteMataMata,
+      resultadoMataMata
+    );
+}
 }
 
 listaRanking.push({
   nome:
     usuario.apelido ||
     usuario.nome,
-  pontos,
+
+  pontos:
+    pontosGrupos +
+    pontosMataMata,
+
+  pontosGrupos,
+  pontosMataMata,
+
+  detalhesMataMata,
+
   diferencaLider: 0,
   posicao: 0,
   premiacao: 0,
@@ -450,6 +581,8 @@ const maisAcertos =
     borderRadius: "12px",
     marginBottom: "20px",
   }}
+
+  
 >
   <h2>
     🔥 Destaques

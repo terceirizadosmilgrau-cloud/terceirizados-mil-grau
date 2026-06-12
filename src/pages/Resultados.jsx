@@ -1,12 +1,94 @@
-import { useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  useState,
+  useEffect
+} from "react";
 
 import { db } from "../firebase";
 import { grupos } from "../data/grupos";
+import {
+  doc,
+  setDoc,
+  getDoc
+} from "firebase/firestore";
 
 function Resultados({ voltar }) {
   const [resultados, setResultados] =
     useState({});
+
+    const [mataMata, setMataMata] =
+  useState({
+    oitavas: "",
+    quartas: "",
+    semifinal: "",
+    final: "",
+    campeao: "",
+  });
+  useEffect(() => {
+  carregarResultados();
+}, []);
+
+const carregarResultados =
+  async () => {
+    try {
+      const gruposSnapshot =
+        await getDoc(
+          doc(
+            db,
+            "resultados",
+            "grupos"
+          )
+        );
+
+      if (gruposSnapshot.exists()) {
+        setResultados(
+          gruposSnapshot.data()
+        );
+      }
+
+      const mataMataSnapshot =
+        await getDoc(
+          doc(
+            db,
+            "resultados",
+            "mataMata"
+          )
+        );
+
+      if (
+        mataMataSnapshot.exists()
+      ) {
+        const dados =
+          mataMataSnapshot.data();
+
+        setMataMata({
+          oitavas:
+            dados.oitavas?.join(
+              ", "
+            ) || "",
+
+          quartas:
+            dados.quartas?.join(
+              ", "
+            ) || "",
+
+          semifinal:
+            dados.semifinal?.join(
+              ", "
+            ) || "",
+
+          final:
+            dados.final?.join(
+              ", "
+            ) || "",
+
+          campeao:
+            dados.campeao || "",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const alterarResultado = (
     grupo,
@@ -23,6 +105,16 @@ function Resultados({ voltar }) {
     }));
   };
 
+  const alterarMataMata = (
+  campo,
+  valor
+) => {
+  setMataMata((anterior) => ({
+    ...anterior,
+    [campo]: valor,
+  }));
+};
+
   const salvarResultados = async () => {
     try {
       await setDoc(
@@ -33,6 +125,38 @@ function Resultados({ voltar }) {
         ),
         resultados
       );
+
+      await setDoc(
+  doc(
+    db,
+    "resultados",
+    "mataMata"
+  ),
+  {
+    oitavas:
+      mataMata.oitavas
+        .split(",")
+        .map((s) => s.trim()),
+
+    quartas:
+      mataMata.quartas
+        .split(",")
+        .map((s) => s.trim()),
+
+    semifinal:
+      mataMata.semifinal
+        .split(",")
+        .map((s) => s.trim()),
+
+    final:
+      mataMata.final
+        .split(",")
+        .map((s) => s.trim()),
+
+    campeao:
+      mataMata.campeao,
+  }
+);
 
       alert(
         "Resultados salvos com sucesso!"
@@ -104,25 +228,111 @@ function Resultados({ voltar }) {
                   Selecione...
                 </option>
 
-                {selecoes.map(
-                  (selecao) => (
-                    <option
-                      key={
-                        selecao
-                      }
-                      value={
-                        selecao
-                      }
-                    >
-                      {selecao}
-                    </option>
-                  )
-                )}
+                {selecoes
+  .filter((selecao) => {
+    const escolhas =
+      Object.values(
+        resultados[grupo] || {}
+      );
+
+    const atual =
+      resultados[grupo]?.[
+        posicao
+      ];
+
+    return (
+      !escolhas.includes(
+        selecao
+      ) ||
+      selecao === atual
+    );
+  })
+  .map((selecao) => (
+    <option
+      key={selecao}
+      value={selecao}
+    >
+      {selecao}
+    </option>
+  ))}
               </select>
             ))}
           </div>
         )
       )}
+
+      <div
+  style={{
+    backgroundColor: "#1a1a1a",
+    padding: "20px",
+    borderRadius: "12px",
+    marginBottom: "20px",
+  }}
+>
+  <h2>
+    🏆 Resultados Mata-Mata
+  </h2>
+
+  <input
+    placeholder="Oitavas (separadas por vírgula)"
+    value={mataMata.oitavas}
+    onChange={(e) =>
+      alterarMataMata(
+        "oitavas",
+        e.target.value
+      )
+    }
+    style={selectStyle}
+  />
+
+  <input
+    placeholder="Quartas"
+    value={mataMata.quartas}
+    onChange={(e) =>
+      alterarMataMata(
+        "quartas",
+        e.target.value
+      )
+    }
+    style={selectStyle}
+  />
+
+  <input
+    placeholder="Semifinal"
+    value={mataMata.semifinal}
+    onChange={(e) =>
+      alterarMataMata(
+        "semifinal",
+        e.target.value
+      )
+    }
+    style={selectStyle}
+  />
+
+  <input
+    placeholder="Final"
+    value={mataMata.final}
+    onChange={(e) =>
+      alterarMataMata(
+        "final",
+        e.target.value
+      )
+    }
+    style={selectStyle}
+  />
+
+  <input
+    placeholder="Campeão"
+    value={mataMata.campeao}
+    onChange={(e) =>
+      alterarMataMata(
+        "campeao",
+        e.target.value
+      )
+    }
+    style={selectStyle}
+  />
+</div>
 
       <button
         style={botaoSalvar}

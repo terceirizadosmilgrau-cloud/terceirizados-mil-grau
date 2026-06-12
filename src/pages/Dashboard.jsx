@@ -15,9 +15,11 @@ function Dashboard({
   usuario,
   sair,
   abrirPalpites,
+  abrirMataMata,
   abrirResultados,
   abrirRanking,
   abrirCentralPalpites,
+  abrirCentralMataMata,
 }) {
   const [participantes, setParticipantes] = useState([]);
   const [palpitesLiberados, setPalpitesLiberados] =
@@ -201,6 +203,13 @@ function Dashboard({
           </button>
 
           <button
+  onClick={abrirMataMata}
+  style={botaoDourado}
+>
+  🏆 Mata-Mata
+</button>
+
+          <button
             onClick={abrirRanking}
             style={botaoVerde}
           >
@@ -215,6 +224,15 @@ function Dashboard({
               >
                 📊 Central de Palpites
               </button>
+
+              <button
+  onClick={
+    abrirCentralMataMata
+  }
+  style={botaoRoxo}
+>
+  🏆 Central Mata-Mata
+</button>
 
               <button
                 onClick={abrirResultados}
@@ -343,6 +361,16 @@ const botaoAzul = {
 const botaoVerde = {
   backgroundColor: "#198754",
   color: "white",
+  border: "none",
+  padding: "10px 20px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  marginRight: "10px",
+};
+
+const botaoDourado = {
+  backgroundColor: "#ffc107",
+  color: "#000",
   border: "none",
   padding: "10px 20px",
   borderRadius: "8px",

@@ -88,10 +88,22 @@ function DetalheParticipante({
   }}
 >
   <p>
-    🏆 Pontos:
-    {" "}
-    {participante.pontos}
-  </p>
+  🏆 Pontos Totais:
+  {" "}
+  {participante.pontos}
+</p>
+
+<p>
+  🏆 Pontos Grupos:
+  {" "}
+  {participante.pontosGrupos || 0}
+</p>
+
+<p>
+  ⚽ Pontos Mata-Mata:
+  {" "}
+  {participante.pontosMataMata || 0}
+</p>
 
   <p>
     📍 Posição:
@@ -154,6 +166,84 @@ function DetalheParticipante({
     )
   )}
 </div>
+
+{participante.detalhesMataMata && (
+  <div
+    style={{
+      backgroundColor: "#222",
+      padding: "15px",
+      borderRadius: "10px",
+      marginBottom: "15px",
+    }}
+  >
+    <h3>
+      🏆 Mata-Mata
+    </h3>
+
+    <p>
+      ⚽ Pontos Mata-Mata:
+      {" "}
+      {
+        participante.pontosMataMata
+      }
+    </p>
+
+    <p>
+      Oitavas:
+      {" "}
+      {
+        participante
+          .detalhesMataMata
+          .oitavas
+      }
+      {" "}pts
+    </p>
+
+    <p>
+      Quartas:
+      {" "}
+      {
+        participante
+          .detalhesMataMata
+          .quartas
+      }
+      {" "}pts
+    </p>
+
+    <p>
+      Semifinal:
+      {" "}
+      {
+        participante
+          .detalhesMataMata
+          .semifinal
+      }
+      {" "}pts
+    </p>
+
+    <p>
+      Final:
+      {" "}
+      {
+        participante
+          .detalhesMataMata
+          .final
+      }
+      {" "}pts
+    </p>
+
+    <p>
+      Campeão:
+      {" "}
+      {
+        participante
+          .detalhesMataMata
+          .campeao
+      }
+      {" "}pts
+    </p>
+  </div>
+)}
 
         {participante.premiacao >
         0 ? (

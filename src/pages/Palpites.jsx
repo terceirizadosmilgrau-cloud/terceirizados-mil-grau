@@ -17,11 +17,83 @@ function Palpites({
   const [palpites, setPalpites] = useState({});
   const [liberado, setLiberado] =
     useState(true);
+  const [dataLimite, setDataLimite] =
+  useState(null);
+
+  const [tempoRestante, setTempoRestante] =
+  useState("");
 
   useEffect(() => {
     carregarConfiguracoes();
     carregarPalpites();
   }, []);
+
+  useEffect(() => {
+  if (!dataLimite) return;
+
+  const atualizarTempo = () => {
+    const agora =
+      new Date();
+
+    const limite =
+      new Date(dataLimite);
+
+    const diferenca =
+      limite - agora;
+
+    if (diferenca <= 0) {
+      setTempoRestante(
+        "Encerrado"
+      );
+      return;
+    }
+
+    const dias =
+      Math.floor(
+        diferenca /
+          (1000 *
+            60 *
+            60 *
+            24)
+      );
+
+    const horas =
+      Math.floor(
+        (diferenca %
+          (1000 *
+            60 *
+            60 *
+            24)) /
+          (1000 *
+            60 *
+            60)
+      );
+
+    const minutos =
+      Math.floor(
+        (diferenca %
+          (1000 *
+            60 *
+            60)) /
+          (1000 * 60)
+      );
+
+    setTempoRestante(
+      `${dias}d ${horas}h ${minutos}min`
+    );
+  };
+
+  atualizarTempo();
+
+  const intervalo =
+    setInterval(
+      atualizarTempo,
+      60000
+    );
+
+  return () =>
+    clearInterval(intervalo);
+}, [dataLimite]);
 
   const carregarConfiguracoes =
     async () => {
@@ -34,16 +106,29 @@ function Palpites({
           )
         );
 
-        if (snapshot.exists()) {
-          setLiberado(
-            snapshot.data()
-              .palpitesLiberados
-          );
-        }
+       if (snapshot.exists()) {
+  const config =
+    snapshot.data();
+
+  setLiberado(
+    config.palpitesLiberados
+  );
+
+  setDataLimite(
+    config.dataLimitePalpites ||
+      null
+  );
+}
       } catch (error) {
         console.error(error);
       }
     };
+
+  const palpitesEncerrados =
+  dataLimite
+    ? new Date() >
+      new Date(dataLimite)
+    : false;
 
   const carregarPalpites = async () => {
     try {
@@ -80,7 +165,10 @@ function Palpites({
   };
 
   const salvarPalpites = async () => {
-    if (!liberado) {
+    if (
+  !liberado ||
+  palpitesEncerrados
+) {
       alert(
         "Os palpites estão encerrados."
       );
@@ -123,7 +211,28 @@ function Palpites({
         ⚽ Palpites Copa 2026
       </h1>
 
-      {!liberado && (
+      {dataLimite &&
+  !palpitesEncerrados && (
+    <div
+      style={{
+        backgroundColor:
+          "#0d6efd",
+        padding: "12px",
+        borderRadius: "8px",
+        marginTop: "15px",
+        marginBottom: "20px",
+        fontWeight: "bold",
+      }}
+    >
+      ⏳ Encerramento dos
+      palpites em:
+      {" "}
+      {tempoRestante}
+    </div>
+)}
+
+      {(!liberado ||
+  palpitesEncerrados) && (
         <div
           style={{
             backgroundColor:
