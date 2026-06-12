@@ -17,7 +17,7 @@ export const grupos = {
     "🇧🇷 Brasil",
     "🇲🇦 Marrocos",
     "🇭🇹 Haiti",
-    "🏴 Escócia",
+    " Escócia",
   ],
 
   D: [
@@ -77,7 +77,7 @@ export const grupos = {
   ],
 
   L: [
-    "🏴 Inglaterra",
+    " Inglaterra",
     "🇭🇷 Croácia",
     "🇵🇦 Panamá",
     "🇬🇭 Gana",
