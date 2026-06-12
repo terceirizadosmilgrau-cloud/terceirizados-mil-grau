@@ -413,6 +413,7 @@ participante.aproveitamento =
     participante.medalhas = [];
   }
 );
+
 listaRanking.sort((a, b) => {
 
   if (b.pontos !== a.pontos) {
