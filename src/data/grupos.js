@@ -1,43 +1,85 @@
 export const grupos = {
   A: [
-    "🇧🇷 Brasil",
-    "🇲🇦 Marrocos",
-    "🏴 Escócia",
-    "🇭🇹 Haiti",
+    "🇲🇽 México",
+    "🇿🇦 África do Sul",
+    "🇰🇷 Coreia do Sul",
+    "🇨🇿 República Tcheca",
   ],
 
   B: [
-    "🇦🇷 Argentina",
-    "🇩🇪 Alemanha",
-    "🇺🇸 Estados Unidos",
-    "🇰🇷 Coreia do Sul",
+    "🇨🇦 Canadá",
+    "🇧🇦 Bósnia e Herzegovina",
+    "🇶🇦 Catar",
+    "🇨🇭 Suíça",
   ],
 
   C: [
-    "🇫🇷 França",
-    "🇲🇽 México",
-    "🇯🇵 Japão",
-    "🇳🇬 Nigéria",
+    "🇧🇷 Brasil",
+    "🇲🇦 Marrocos",
+    "🇭🇹 Haiti",
+    "🏴 Escócia",
   ],
 
   D: [
-    "🇵🇹 Portugal",
-    "🇺🇾 Uruguai",
-    "🇨🇦 Canadá",
-    "🇪🇬 Egito",
+    "🇺🇸 Estados Unidos",
+    "🇵🇾 Paraguai",
+    "🇦🇺 Austrália",
+    "🇹🇷 Turquia",
   ],
 
   E: [
-    "🇪🇸 Espanha",
-    "🇨🇭 Suíça",
-    "🇨🇴 Colômbia",
-    "🇦🇺 Austrália",
+    "🇩🇪 Alemanha",
+    "🇨🇼 Curaçao",
+    "🇨🇮 Costa do Marfim",
+    "🇪🇨 Equador",
   ],
 
   F: [
-    "🏴 Inglaterra",
     "🇳🇱 Holanda",
+    "🇯🇵 Japão",
     "🇸🇪 Suécia",
-    "🇨🇱 Chile",
+    "🇹🇳 Tunísia",
+  ],
+
+  G: [
+    "🇧🇪 Bélgica",
+    "🇪🇬 Egito",
+    "🇮🇷 Irã",
+    "🇳🇿 Nova Zelândia",
+  ],
+
+  H: [
+    "🇪🇸 Espanha",
+    "🇨🇻 Cabo Verde",
+    "🇸🇦 Arábia Saudita",
+    "🇺🇾 Uruguai",
+  ],
+
+  I: [
+    "🇫🇷 França",
+    "🇸🇳 Senegal",
+    "🇳🇴 Noruega",
+    "🇮🇶 Iraque",
+  ],
+
+  J: [
+    "🇦🇷 Argentina",
+    "🇦🇹 Áustria",
+    "🇩🇿 Argélia",
+    "🇯🇴 Jordânia",
+  ],
+
+  K: [
+    "🇵🇹 Portugal",
+    "🇨🇴 Colômbia",
+    "🇺🇿 Uzbequistão",
+    "🇨🇩 República Democrática do Congo",
+  ],
+
+  L: [
+    "🏴 Inglaterra",
+    "🇭🇷 Croácia",
+    "🇵🇦 Panamá",
+    "🇬🇭 Gana",
   ],
 };
