@@ -16,13 +16,21 @@ function ParticipantesTable({
     >
       <h2>Participantes</h2>
 
-      <table
-        style={{
-          width: "100%",
-          marginTop: "20px",
-          borderCollapse: "collapse",
-        }}
-      >
+     <div
+  style={{
+    overflowX: "auto",
+    WebkitOverflowScrolling: "touch",
+    width: "100%",
+  }}
+>
+  <table
+    style={{
+      width: "100%",
+      minWidth: "900px",
+      marginTop: "20px",
+      borderCollapse: "collapse",
+    }}
+  >
         <thead>
           <tr>
             <th style={th}>Nome</th>
@@ -55,8 +63,16 @@ function ParticipantesTable({
               </td>
 
               <td style={td}>
-                {isSuperAdmin && (
-                  <>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px",
+      minWidth: "120px",
+    }}
+  >
+    {isSuperAdmin && (
+      <>
                     {!p.pagamento && (
                       <button
                         style={botaoVerde}
@@ -123,15 +139,18 @@ function ParticipantesTable({
                         🗑 Excluir
                       </button>
                     )}
-                  </>
+                                    </>
                 )}
-              </td>
+  </div>
+</td>
             </tr>
           ))}
-        </tbody>
+               </tbody>
       </table>
     </div>
-  );
+
+  </div>
+);
 }
 
 const th = {
@@ -150,9 +169,10 @@ const botaoVerde = {
   color: "white",
   border: "none",
   borderRadius: "6px",
-  padding: "8px 12px",
+  padding: "6px 10px",
+  width: "100%",
+  fontSize: "12px",
   cursor: "pointer",
-  marginRight: "5px",
 };
 
 const botaoLaranja = {
@@ -160,9 +180,10 @@ const botaoLaranja = {
   color: "white",
   border: "none",
   borderRadius: "6px",
-  padding: "8px 12px",
+  padding: "6px 10px",
+  width: "100%",
+  fontSize: "12px",
   cursor: "pointer",
-  marginRight: "5px",
 };
 
 const botaoAzul = {
@@ -170,9 +191,10 @@ const botaoAzul = {
   color: "white",
   border: "none",
   borderRadius: "6px",
-  padding: "8px 12px",
+  padding: "6px 10px",
+  width: "100%",
+  fontSize: "12px",
   cursor: "pointer",
-  marginRight: "5px",
 };
 
 const botaoVermelho = {
@@ -180,9 +202,10 @@ const botaoVermelho = {
   color: "white",
   border: "none",
   borderRadius: "6px",
-  padding: "8px 12px",
+  padding: "6px 10px",
+  width: "100%",
+  fontSize: "12px",
   cursor: "pointer",
-  marginRight: "5px",
 };
 
 const botaoExcluir = {
@@ -190,7 +213,9 @@ const botaoExcluir = {
   color: "white",
   border: "none",
   borderRadius: "6px",
-  padding: "8px 12px",
+  padding: "6px 10px",
+  width: "100%",
+  fontSize: "12px",
   cursor: "pointer",
 };
 

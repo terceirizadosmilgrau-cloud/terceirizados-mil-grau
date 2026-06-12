@@ -241,16 +241,32 @@ const [filtro, setFiltro] =
       }}
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "30px",
-        }}
-      >
-        <h1>🏆 Terceirizados Mil Grau</h1>
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "15px",
+    marginBottom: "30px",
+  }}
+>
+        <h1
+  style={{
+    textAlign: "center",
+    margin: 0,
+  }}
+>
+  🏆 Terceirizados Mil Grau
+</h1>
 
-        <div>
+        <div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "10px",
+    maxWidth: "900px",
+  }}
+>
           <button
             onClick={abrirPalpites}
             style={botaoAzul}
@@ -362,10 +378,14 @@ const [filtro, setFiltro] =
             </p>
 
             <div
-              style={{
-                marginTop: "10px",
-              }}
-            >
+  style={{
+    marginTop: "15px",
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: "10px",
+  }}
+>
               <button
                 onClick={() =>
                   alterarStatusPalpites(
@@ -424,12 +444,14 @@ const [filtro, setFiltro] =
   />
 
   <div
-    style={{
-      display: "flex",
-      gap: "10px",
-      flexWrap: "wrap",
-    }}
-  >
+  style={{
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: "10px",
+  }}
+>
     <button
   onClick={() =>
     setFiltro("todos")
@@ -510,18 +532,14 @@ const [filtro, setFiltro] =
   </div>
 
   <p
-    style={{
-      marginTop: "15px",
-    }}
-  >
-    👥 Exibindo:
-    {" "}
-    {
-      participantesFiltrados.length
-    }
-    {" "}
-    participantes
-  </p>
+  style={{
+    marginTop: "15px",
+    textAlign: "center",
+    fontSize: "18px",
+  }}
+>
+  👥 Exibindo: {participantesFiltrados.length} participantes
+</p>
 </div>
 
       <ParticipantesTable
@@ -542,59 +560,60 @@ const botaoAzul = {
   backgroundColor: "#0d6efd",
   color: "white",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "10px",
+  minWidth: "180px",
 };
 
 const botaoVerde = {
   backgroundColor: "#198754",
   color: "white",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "10px",
+  minWidth: "180px",
 };
 
 const botaoDourado = {
   backgroundColor: "#ffc107",
   color: "#000",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "10px",
+  minWidth: "180px",
 };
 
 const botaoRoxo = {
   backgroundColor: "#6f42c1",
   color: "white",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "10px",
+  minWidth: "180px",
 };
 
 const botaoLaranja = {
   backgroundColor: "#fd7e14",
   color: "white",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  marginRight: "10px",
+  minWidth: "180px",
 };
 
 const botaoVermelho = {
   backgroundColor: "#dc3545",
   color: "white",
   border: "none",
-  padding: "10px 20px",
+  padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
+  minWidth: "180px",
 };
 
 const botaoLiberar = {
