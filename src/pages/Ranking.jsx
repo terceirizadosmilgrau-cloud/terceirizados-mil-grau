@@ -8,9 +8,15 @@ import {
 
 import { db } from "../firebase";
 import { calcularPontuacao } from "../utils/calcularPontuacao";
+import DetalheParticipante from "../components/DetalheParticipante";
 
 function Ranking({ voltar }) {
   const [ranking, setRanking] = useState([]);
+
+  const [
+  participanteSelecionado,
+  setParticipanteSelecionado,
+] = useState(null);
   const [arrecadacao, setArrecadacao] =
     useState(0);
 
@@ -360,8 +366,13 @@ listaRanking.push({
             index
           ) => (
             <div
-              key={index}
-              style={{
+  key={index}
+  onClick={() =>
+    setParticipanteSelecionado(
+      participante
+    )
+  }
+  style={{
                 padding: "12px",
                 borderBottom:
                   "1px solid #333",
@@ -369,6 +380,8 @@ listaRanking.push({
                   index === 0
                     ? "#2b2b2b"
                     : "transparent",
+
+                    cursor: "pointer",
               }}
             >
               <strong>
@@ -392,6 +405,16 @@ listaRanking.push({
         )}
       </div>
 
+<DetalheParticipante
+  participante={
+    participanteSelecionado
+  }
+  fechar={() =>
+    setParticipanteSelecionado(
+      null
+    )
+  }
+/>
       <button
         onClick={voltar}
         style={{

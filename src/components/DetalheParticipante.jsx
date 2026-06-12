@@ -4,10 +4,6 @@ function DetalheParticipante({
 }) {
   if (!participante) return null;
 
-  const grupos = Object.keys(
-    participante.detalhes || {}
-  );
-
   return (
     <div
       style={{
@@ -22,18 +18,19 @@ function DetalheParticipante({
         justifyContent: "center",
         alignItems: "center",
         zIndex: 9999,
-        overflowY: "auto",
         padding: "20px",
       }}
     >
       <div
         style={{
-          width: "900px",
+          width: "500px",
           maxWidth: "100%",
-          backgroundColor: "#1a1a1a",
+          backgroundColor:
+            "#1a1a1a",
           borderRadius: "12px",
           padding: "25px",
           color: "white",
+          textAlign: "center",
         }}
       >
         <h1>
@@ -41,143 +38,8 @@ function DetalheParticipante({
         </h1>
 
         <h2>
-          Total: {participante.pontos} pts
+          {participante.pontos} pts
         </h2>
-
-        {grupos.map((grupo) => (
-          <div
-            key={grupo}
-            style={{
-              backgroundColor:
-                "#262626",
-              padding: "15px",
-              borderRadius: "10px",
-              marginTop: "15px",
-            }}
-          >
-            <h3>
-              Grupo {grupo}
-            </h3>
-
-            <p>
-              <strong>
-                Pontuação:
-              </strong>{" "}
-              {
-                participante
-                  .detalhes[grupo]
-                  ?.pontos
-              }{" "}
-              pts
-            </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "30px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <h4>Palpite</h4>
-
-                <p>
-                  1º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.palpite
-                      ?.primeiro
-                  }
-                </p>
-
-                <p>
-                  2º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.palpite
-                      ?.segundo
-                  }
-                </p>
-
-                <p>
-                  3º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.palpite
-                      ?.terceiro
-                  }
-                </p>
-
-                <p>
-                  4º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.palpite
-                      ?.quarto
-                  }
-                </p>
-              </div>
-
-              <div>
-                <h4>
-                  Resultado Oficial
-                </h4>
-
-                <p>
-                  1º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.resultado
-                      ?.primeiro
-                  }
-                </p>
-
-                <p>
-                  2º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.resultado
-                      ?.segundo
-                  }
-                </p>
-
-                <p>
-                  3º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.resultado
-                      ?.terceiro
-                  }
-                </p>
-
-                <p>
-                  4º{" "}
-                  {
-                    participante
-                      .detalhes[
-                      grupo
-                    ]?.resultado
-                      ?.quarto
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
 
         <button
           onClick={fechar}
