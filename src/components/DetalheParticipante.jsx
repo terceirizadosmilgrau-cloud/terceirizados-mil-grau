@@ -62,37 +62,98 @@ function DetalheParticipante({
           🏆 {participante.nome}
         </h1>
 
-        <h2>
-          {participante.pontos} pts
-        </h2>
+        <div
+  style={{
+    backgroundColor: "#262626",
+    padding: "15px",
+    borderRadius: "10px",
+    marginBottom: "15px",
+  }}
+>
+  <h2
+    style={{
+      margin: 0,
+    }}
+  >
+    📊 Estatísticas Gerais
+  </h2>
+</div>
 
-        <p>
-          📍 Posição:{" "}
-          {participante.posicao}º
-        </p>
+       <div
+  style={{
+    backgroundColor: "#222",
+    padding: "15px",
+    borderRadius: "10px",
+    marginBottom: "15px",
+  }}
+>
+  <p>
+    🏆 Pontos:
+    {" "}
+    {participante.pontos}
+  </p>
 
-        <p>
-          📊 Diferença para o líder:{" "}
-          {participante.diferencaLider} pts
-        </p>
-        <p>
-  🎯 Acertos exatos:
-  {" "}
-  {participante.acertosExatos}
-</p>
+  <p>
+    📍 Posição:
+    {" "}
+    {participante.posicao}º
+  </p>
 
-<p>
-  ⚽ Acertos parciais:
-  {" "}
-  {participante.acertosParciais}
-</p>
+  <p>
+    📊 Diferença para líder:
+    {" "}
+    {participante.diferencaLider}
+    {" "}
+    pts
+  </p>
 
-<p>
-  📈 Aproveitamento:
-  {" "}
-  {participante.aproveitamento}
-  %
-</p>
+  <p>
+    🎯 Acertos exatos:
+    {" "}
+    {participante.acertosExatos}
+  </p>
+
+  <p>
+    ⚽ Acertos parciais:
+    {" "}
+    {participante.acertosParciais}
+  </p>
+
+  <p>
+    📈 Aproveitamento:
+    {" "}
+    {participante.aproveitamento}
+    %
+  </p>
+</div>
+        
+<div
+  style={{
+    backgroundColor: "#222",
+    padding: "15px",
+    borderRadius: "10px",
+    marginBottom: "15px",
+  }}
+>
+  <h3>
+    🏅 Medalhas
+  </h3>
+
+  {participante.medalhas?.map(
+    (medalha, index) => (
+      <p
+        key={index}
+        style={{
+          fontWeight: "bold",
+          color: "#ffc107",
+          margin: "5px 0",
+        }}
+      >
+        {medalha}
+      </p>
+    )
+  )}
+</div>
 
         {participante.premiacao >
         0 ? (
@@ -123,6 +184,20 @@ function DetalheParticipante({
         {grupos.map((grupo) => {
           const aberto =
             grupoAberto === grupo;
+            const pontosGrupo =
+  participante.detalhes[
+    grupo
+  ]?.pontos || 0;
+
+let statusGrupo = "🔴";
+
+if (pontosGrupo >= 30) {
+  statusGrupo = "🟢";
+} else if (
+  pontosGrupo >= 15
+) {
+  statusGrupo = "🟡";
+}
 
           return (
             <div
@@ -154,11 +229,12 @@ function DetalheParticipante({
                 }}
               >
                 <strong>
-                  {aberto
-                    ? "▲"
-                    : "▼"}{" "}
-                  Grupo {grupo}
-                </strong>
+  {aberto
+    ? "▲"
+    : "▼"}{" "}
+  {statusGrupo} Grupo{" "}
+  {grupo}
+</strong>
 
                 <span>
                   {
@@ -172,22 +248,47 @@ function DetalheParticipante({
               </div>
 
               {aberto && (
-                <div
-                  style={{
-                    padding:
-                      "0 15px 15px 15px",
-                    borderTop:
-                      "1px solid #444",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "1fr 1fr",
-                      gap: "20px",
-                      marginTop: "15px",
-                    }}
+  <div
+    style={{
+      padding:
+        "0 15px 15px 15px",
+      borderTop:
+        "1px solid #444",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "25px",
+        marginTop: "15px",
+        marginBottom: "15px",
+        flexWrap: "wrap",
+      }}
+    >
+      <span>
+        🏆 Pontuação:{" "}
+        {participante.detalhes[grupo]?.pontos} pts
+      </span>
+
+      <span>
+        🎯 Acertos Exatos:{" "}
+        {participante.detalhes[grupo]?.acertosExatos ?? 0}
+      </span>
+
+      <span>
+        ⚽ Acertos Parciais:{" "}
+        {participante.detalhes[grupo]?.acertosParciais ?? 0}
+      </span>
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns:
+          "1fr 1fr",
+      }}
+    
                   >
                     <div>
                       <h4>

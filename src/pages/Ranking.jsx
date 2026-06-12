@@ -13,6 +13,9 @@ import DetalheParticipante from "../components/DetalheParticipante";
 function Ranking({ voltar }) {
   const [ranking, setRanking] = useState([]);
 
+  const [busca, setBusca] =
+  useState("");
+
   const [
   participanteSelecionado,
   setParticipanteSelecionado,
@@ -173,6 +176,10 @@ let acertosParciais = 0;
   }
 });
 
+const acertosGrupo =
+  acertosExatos +
+  acertosParciais;
+
 participante.detalhes[
   grupo
 ] = {
@@ -186,6 +193,7 @@ participante.detalhes[
 
   acertosExatos,
   acertosParciais,
+  acertosGrupo,
 };
     });
 
@@ -237,9 +245,56 @@ participante.aproveitamento =
         100
       ).toFixed(1)
     : 0;
+    participante.medalhas = [];
   }
 );
+const melhorAproveitamento =
+  [...listaRanking].sort(
+    (a, b) =>
+      Number(
+        b.aproveitamento || 0
+      ) -
+      Number(
+        a.aproveitamento || 0
+      )
+  )[0];
 
+const reiDosAcertos =
+  [...listaRanking].sort(
+    (a, b) =>
+      (b.acertosExatos || 0) -
+      (a.acertosExatos || 0)
+  )[0];
+
+if (listaRanking[0]) {
+  listaRanking[0].medalhas.push(
+    "🥇 Líder Atual"
+  );
+}
+
+if (melhorAproveitamento) {
+  melhorAproveitamento.medalhas.push(
+    "📈 Melhor Aproveitamento"
+  );
+}
+
+if (reiDosAcertos) {
+  reiDosAcertos.medalhas.push(
+    "🎯 Rei dos Acertos"
+  );
+}
+
+listaRanking.forEach(
+  (participante) => {
+    if (
+      participante.posicao <= 3
+    ) {
+      participante.medalhas.push(
+        "💰 Em Zona de Premiação"
+      );
+    }
+  }
+);
       setRanking(listaRanking);
 
       setArrecadacao(
@@ -271,6 +326,26 @@ participante.aproveitamento =
 
   const premio3 =
     arrecadacao * 0.2;
+
+    const lider = ranking[0];
+
+const melhorAproveitamento =
+  [...ranking].sort(
+    (a, b) =>
+      Number(
+        b.aproveitamento || 0
+      ) -
+      Number(
+        a.aproveitamento || 0
+      )
+  )[0];
+
+const maisAcertos =
+  [...ranking].sort(
+    (a, b) =>
+      (b.acertosExatos || 0) -
+      (a.acertosExatos || 0)
+  )[0];
 
   const liderPontos =
     ranking.length > 0
@@ -369,11 +444,64 @@ participante.aproveitamento =
       </div>
 
       <div
-        style={{
-          marginBottom: "25px",
-        }}
-      >
-        <h2>🏆 Pódio</h2>
+  style={{
+    backgroundColor: "#1a1a1a",
+    padding: "20px",
+    borderRadius: "12px",
+    marginBottom: "20px",
+  }}
+>
+  <h2>
+    🔥 Destaques
+  </h2>
+
+  <p>
+    🥇 Líder:
+    {" "}
+    {lider?.nome || "-"}
+    {" "}
+    ({lider?.pontos || 0}
+    pts)
+  </p>
+
+  <p>
+    📈 Melhor Aproveitamento:
+    {" "}
+    {melhorAproveitamento?.nome ||
+      "-"}
+    {" "}
+    (
+    {melhorAproveitamento?.aproveitamento ||
+      0}
+    %)
+  </p>
+
+  <p>
+    🎯 Mais Acertos Exatos:
+    {" "}
+    {maisAcertos?.nome || "-"}
+    {" "}
+    (
+    {maisAcertos?.acertosExatos ||
+      0}
+    )
+  </p>
+
+  <p>
+    💰 Premiação Atual:
+    {" "}
+    R$
+    {" "}
+    {premio1.toFixed(2)}
+  </p>
+</div>
+
+<div
+  style={{
+    marginBottom: "25px",
+  }}
+>
+  <h2>🏆 Pódio</h2>
 
         <div
           style={{
@@ -495,11 +623,36 @@ participante.aproveitamento =
           📋 Classificação Completa
         </h2>
 
-        {ranking.map(
-          (
-            participante,
-            index
-          ) => (
+        <input
+  type="text"
+  placeholder="🔎 Buscar participante..."
+  value={busca}
+  onChange={(e) =>
+    setBusca(e.target.value)
+  }
+  style={{
+    width: "100%",
+    padding: "12px",
+    marginBottom: "20px",
+    borderRadius: "8px",
+    border: "none",
+    fontSize: "16px",
+  }}
+/>
+
+        {ranking
+  .filter((participante) =>
+    participante.nome
+      ?.toLowerCase()
+      .includes(
+        busca.toLowerCase()
+      )
+  )
+  .map(
+    (
+      participante,
+      index
+    ) => (
             <div
   key={index}
   onClick={() =>
