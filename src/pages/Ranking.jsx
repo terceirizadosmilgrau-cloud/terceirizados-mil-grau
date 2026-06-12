@@ -610,6 +610,27 @@ const maisAcertos =
       <h1>🏆 Ranking Geral</h1>
 
       <div
+  style={{
+    marginBottom: "20px",
+  }}
+>
+  <button
+    onClick={carregarRanking}
+    style={{
+      backgroundColor: "#198754",
+      color: "white",
+      border: "none",
+      padding: "10px 16px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+    🔄 Atualizar Ranking
+  </button>
+</div>
+
+      <div
         style={{
           backgroundColor: "#1a1a1a",
           padding: "20px",
