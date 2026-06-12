@@ -21,13 +21,15 @@ export function calcularPontuacaoMataMata(
 
     return palpites.filter(
       (time) =>
+        time &&
         oficiais.some(
           (oficial) =>
+            oficial &&
             oficial
-              ?.toLowerCase()
+              .toLowerCase()
               .trim() ===
             time
-              ?.toLowerCase()
+              .toLowerCase()
               .trim()
         )
     ).length;
@@ -58,11 +60,13 @@ export function calcularPontuacaoMataMata(
     ) * 5;
 
   if (
+    palpite.campeao &&
+    resultado.campeao &&
     palpite.campeao
-      ?.toLowerCase()
+      .toLowerCase()
       .trim() ===
     resultado.campeao
-      ?.toLowerCase()
+      .toLowerCase()
       .trim()
   ) {
     pontos += 10;

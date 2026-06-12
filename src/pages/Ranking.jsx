@@ -109,15 +109,16 @@ if (palpiteSnapshot.exists()) {
   Object.keys(resultados).forEach(
   (grupo) => {
     const pontosGrupo =
-      pontosGrupos +=
   calcularPontuacao(
     palpites[grupo],
     resultados[grupo]
   );
 
-    pontos += pontosGrupo;
+pontosGrupos += pontosGrupo;
+pontos += pontosGrupo;
   }
 );
+}
 
 const mataMataSnapshot =
   await getDoc(
@@ -128,7 +129,21 @@ const mataMataSnapshot =
     )
   );
 
-let detalhesMataMata = null;
+  console.log(
+  "USUARIO:",
+  usuario.nome
+);
+
+console.log(
+  "TEM PALPITE MATA MATA:",
+  mataMataSnapshot.exists()
+);
+
+console.log(
+  "TEM RESULTADO MATA MATA:",
+  !!resultadoMataMata
+);
+
 
 if (
   mataMataSnapshot.exists() &&
@@ -136,6 +151,11 @@ if (
 ) {
   const palpiteMataMata =
     mataMataSnapshot.data();
+
+    console.log(
+  "PALPITE MATA MATA:",
+  palpiteMataMata
+);
 
   const contarAcertos = (
     palpites,
@@ -214,11 +234,28 @@ if (
   };
 
   pontosMataMata =
-    calcularPontuacaoMataMata(
-      palpiteMataMata,
-      resultadoMataMata
-    );
-}
+  calcularPontuacaoMataMata(
+    palpiteMataMata,
+    resultadoMataMata
+  );
+
+  pontos += pontosMataMata;
+
+console.log(
+  "PONTOS MATA-MATA:",
+  usuario.nome,
+  pontosMataMata
+);
+
+console.log(
+  "PALPITE:",
+  palpiteMataMata
+);
+
+console.log(
+  "RESULTADO:",
+  resultadoMataMata
+);
 }
 
 listaRanking.push({
@@ -287,19 +324,25 @@ let acertosParciais = 0;
   const resultado =
     resultadoGrupo[posicao];
 
-  if (palpite === resultado) {
-    acertosExatos++;
-  } else {
-    const existe = [
-      "primeiro",
-      "segundo",
-      "terceiro",
-      "quarto",
-    ].some(
-      (p) =>
-        resultadoGrupo[p] ===
-        palpite
-    );
+  if (
+  palpite &&
+  resultado &&
+  palpite === resultado
+) {
+  acertosExatos++;
+} else {
+    const existe =
+  palpite &&
+  [
+    "primeiro",
+    "segundo",
+    "terceiro",
+    "quarto",
+  ].some(
+    (p) =>
+      resultadoGrupo[p] ===
+      palpite
+  );
 
     if (existe) {
       acertosParciais++;
@@ -332,6 +375,112 @@ participante.detalhes[
       index + 1;
 
     participante.diferencaLider =
+  listaRanking.length > 0
+    ? listaRanking[0].pontos -
+      participante.pontos
+    : 0;
+
+participante.acertosExatos = 0;
+participante.acertosParciais = 0;
+
+Object.values(
+  participante.detalhes
+).forEach((grupo) => {
+  participante.acertosExatos +=
+    grupo.acertosExatos || 0;
+
+  participante.acertosParciais +=
+    grupo.acertosParciais || 0;
+});
+
+let pontosMaximos = 0;
+
+Object.values(
+  participante.resultados || {}
+).forEach((grupo) => {
+  [
+    "primeiro",
+    "segundo",
+    "terceiro",
+    "quarto",
+  ].forEach((posicao) => {
+    if (grupo?.[posicao]) {
+      pontosMaximos += 10;
+    }
+  });
+});
+
+if (resultadoMataMata) {
+  pontosMaximos +=
+    (resultadoMataMata.oitavas?.length || 0) *
+      1 +
+    (resultadoMataMata.quartas?.length || 0) *
+      2 +
+    (resultadoMataMata.semifinal?.length || 0) *
+      3 +
+    (resultadoMataMata.final?.length || 0) *
+      5 +
+    (resultadoMataMata.campeao ? 10 : 0);
+}
+
+participante.aproveitamento =
+  pontosMaximos > 0
+    ? (
+        (participante.pontos /
+          pontosMaximos) *
+        100
+      ).toFixed(1)
+    : 0;
+
+    participante.medalhas = [];
+  }
+);
+listaRanking.sort((a, b) => {
+
+  if (b.pontos !== a.pontos) {
+    return b.pontos - a.pontos;
+  }
+
+  if (
+    (b.acertosExatos || 0) !==
+    (a.acertosExatos || 0)
+  ) {
+    return (
+      (b.acertosExatos || 0) -
+      (a.acertosExatos || 0)
+    );
+  }
+
+  if (
+    Number(
+      b.aproveitamento || 0
+    ) !==
+    Number(
+      a.aproveitamento || 0
+    )
+  ) {
+    return (
+      Number(
+        b.aproveitamento || 0
+      ) -
+      Number(
+        a.aproveitamento || 0
+      )
+    );
+  }
+
+  return a.nome.localeCompare(
+    b.nome
+  );
+});
+
+listaRanking.forEach(
+  (participante, index) => {
+
+    participante.posicao =
+      index + 1;
+
+    participante.diferencaLider =
       listaRanking.length > 0
         ? listaRanking[0].pontos -
           participante.pontos
@@ -349,36 +498,10 @@ participante.detalhes[
     } else {
       participante.premiacao = 0;
     }
-    participante.acertosExatos = 0;
-participante.acertosParciais = 0;
-
-Object.values(
-  participante.detalhes
-).forEach((grupo) => {
-  participante.acertosExatos +=
-    grupo.acertosExatos || 0;
-
-  participante.acertosParciais +=
-    grupo.acertosParciais || 0;
-});
-
-const totalPossivel =
-  Object.keys(
-    participante.detalhes
-  ).length * 4;
-
-participante.aproveitamento =
-  totalPossivel > 0
-    ? (
-        ((participante.acertosExatos +
-          participante.acertosParciais) /
-          totalPossivel) *
-        100
-      ).toFixed(1)
-    : 0;
-    participante.medalhas = [];
   }
 );
+
+
 const melhorAproveitamento =
   [...listaRanking].sort(
     (a, b) =>

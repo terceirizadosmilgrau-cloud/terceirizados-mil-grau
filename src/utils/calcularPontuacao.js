@@ -19,11 +19,13 @@ export function calcularPontuacao(
       resultado?.[posicao];
 
     if (
+      resultadoValor &&
       palpiteValor === resultadoValor
     ) {
       pontos += 10;
     } else {
       const existeNoGrupo =
+        palpiteValor &&
         posicoes.some(
           (p) =>
             resultado?.[p] ===
