@@ -25,6 +25,12 @@ function Dashboard({
   const [palpitesLiberados, setPalpitesLiberados] =
     useState(true);
 
+    const [busca, setBusca] =
+  useState("");
+
+const [filtro, setFiltro] =
+  useState("todos");
+
   const isSuperAdmin =
     usuario?.email === "ardcost4@icloud.com";
 
@@ -45,6 +51,56 @@ function Dashboard({
 
     return () => unsubscribe();
   }, []);
+
+  const participantesFiltrados =
+  participantes.filter((p) => {
+    const nome =
+      (
+        p.apelido ||
+        p.nome ||
+        ""
+      ).toLowerCase();
+
+    const buscaOk =
+      nome.includes(
+        busca.toLowerCase()
+      );
+
+    let filtroOk = true;
+
+    if (filtro === "pagos") {
+      filtroOk = p.pagamento;
+    }
+
+    if (
+      filtro === "pendentes"
+    ) {
+      filtroOk = !p.pagamento;
+    }
+
+    if (
+      filtro === "admins"
+    ) {
+      filtroOk =
+        p.tipoUsuario ===
+        "admin" ||
+        p.tipoUsuario ===
+        "superadmin";
+    }
+
+    if (
+      filtro ===
+      "participantes"
+    ) {
+      filtroOk =
+        p.tipoUsuario ===
+        "participante";
+    }
+
+    return (
+      buscaOk && filtroOk
+    );
+  });
 
   const carregarConfiguracoes =
     async () => {
@@ -336,8 +392,142 @@ function Dashboard({
         )}
       </div>
 
+      <div
+  style={{
+    backgroundColor:
+      "#1a1a1a",
+    padding: "20px",
+    borderRadius: "12px",
+    marginBottom: "20px",
+  }}
+>
+  <h2>
+    🔎 Buscar Participantes
+  </h2>
+
+  <input
+    type="text"
+    placeholder="Buscar por nome ou apelido..."
+    value={busca}
+    onChange={(e) =>
+      setBusca(
+        e.target.value
+      )
+    }
+    style={{
+      width: "100%",
+      padding: "10px",
+      borderRadius: "8px",
+      border: "none",
+      marginBottom: "15px",
+    }}
+  />
+
+  <div
+    style={{
+      display: "flex",
+      gap: "10px",
+      flexWrap: "wrap",
+    }}
+  >
+    <button
+  onClick={() =>
+    setFiltro("todos")
+  }
+  style={{
+    ...botaoFiltro,
+    backgroundColor:
+      filtro === "todos"
+        ? "#0d6efd"
+        : "#343a40",
+  }}
+>
+  Todos
+</button>
+
+<button
+  onClick={() =>
+    setFiltro("pagos")
+  }
+  style={{
+    ...botaoFiltro,
+    backgroundColor:
+      filtro === "pagos"
+        ? "#198754"
+        : "#343a40",
+  }}
+>
+  Pagos
+</button>
+
+<button
+  onClick={() =>
+    setFiltro("pendentes")
+  }
+  style={{
+    ...botaoFiltro,
+    backgroundColor:
+      filtro === "pendentes"
+        ? "#dc3545"
+        : "#343a40",
+  }}
+>
+  Pendentes
+</button>
+
+<button
+  onClick={() =>
+    setFiltro("admins")
+  }
+  style={{
+    ...botaoFiltro,
+    backgroundColor:
+      filtro === "admins"
+        ? "#6f42c1"
+        : "#343a40",
+  }}
+>
+  Admins
+</button>
+
+<button
+  onClick={() =>
+    setFiltro(
+      "participantes"
+    )
+  }
+  style={{
+    ...botaoFiltro,
+    backgroundColor:
+      filtro ===
+      "participantes"
+        ? "#fd7e14"
+        : "#343a40",
+  }}
+>
+  Participantes
+</button>
+  </div>
+
+  <p
+    style={{
+      marginTop: "15px",
+    }}
+  >
+    👥 Exibindo:
+    {" "}
+    {
+      participantesFiltrados.length
+    }
+    {" "}
+    participantes
+  </p>
+</div>
+
       <ParticipantesTable
-        participantes={participantes}
+  participantes={
+    participantesFiltrados
+  }
         isSuperAdmin={isSuperAdmin}
         confirmarPagamento={confirmarPagamento}
         tornarAdmin={tornarAdmin}
@@ -424,6 +614,16 @@ const botaoEncerrar = {
   padding: "10px 15px",
   borderRadius: "8px",
   cursor: "pointer",
+};
+
+const botaoFiltro = {
+  backgroundColor: "#343a40",
+  color: "white",
+  border: "none",
+  padding: "8px 14px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
 };
 
 export default Dashboard;
