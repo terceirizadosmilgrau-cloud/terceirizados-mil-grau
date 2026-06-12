@@ -41,6 +41,38 @@ function DetalheParticipante({
           {participante.pontos} pts
         </h2>
 
+      <p>
+  📍 Posição:
+  {" "}
+  {participante.posicao}º
+</p>
+
+<p>
+  📊 Diferença para o líder:
+  {" "}
+  {participante.diferencaLider}
+  {" "}
+  pts
+</p>
+
+{participante.premiacao >
+0 ? (
+  <p>
+    💰 Premiação projetada:
+    {" "}
+    R$
+    {" "}
+    {participante.premiacao.toFixed(
+      2
+    )}
+  </p>
+) : (
+  <p>
+    ❌ Fora da zona de
+    premiação
+  </p>
+)}
+
         <button
           onClick={fechar}
           style={{

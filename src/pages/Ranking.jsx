@@ -98,12 +98,41 @@ listaRanking.push({
     usuario.apelido ||
     usuario.nome,
   pontos,
+  diferencaLider: 0,
+  posicao: 0,
+  premiacao: 0,
 });
       }
 
       listaRanking.sort(
-        (a, b) => b.pontos - a.pontos
-      );
+  (a, b) => b.pontos - a.pontos
+);
+
+listaRanking.forEach(
+  (participante, index) => {
+    participante.posicao =
+      index + 1;
+
+    participante.diferencaLider =
+      listaRanking.length > 0
+        ? listaRanking[0].pontos -
+          participante.pontos
+        : 0;
+
+    if (index === 0) {
+      participante.premiacao =
+        arrecadacaoTotal * 0.5;
+    } else if (index === 1) {
+      participante.premiacao =
+        arrecadacaoTotal * 0.3;
+    } else if (index === 2) {
+      participante.premiacao =
+        arrecadacaoTotal * 0.2;
+    } else {
+      participante.premiacao = 0;
+    }
+  }
+);
 
       setRanking(listaRanking);
 
