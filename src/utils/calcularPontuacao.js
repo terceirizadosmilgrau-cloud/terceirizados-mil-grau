@@ -11,6 +11,8 @@ export function calcularPontuacao(
     "quarto",
   ];
 
+  let grupoCompleto = true;
+
   posicoes.forEach((posicao) => {
     const palpiteValor =
       palpite?.[posicao];
@@ -18,25 +20,34 @@ export function calcularPontuacao(
     const resultadoValor =
       resultado?.[posicao];
 
+    // Acerto exato
     if (
       resultadoValor &&
       palpiteValor === resultadoValor
     ) {
-      pontos += 10;
-    } else {
-      const existeNoGrupo =
-        palpiteValor &&
-        posicoes.some(
-          (p) =>
-            resultado?.[p] ===
-            palpiteValor
-        );
-
-      if (existeNoGrupo) {
-        pontos += 5;
+      if (
+        posicao === "primeiro" ||
+        posicao === "segundo"
+      ) {
+        pontos += 10;
+      } else if (
+        posicao === "terceiro"
+      ) {
+        pontos += 3;
+      } else if (
+        posicao === "quarto"
+      ) {
+        pontos += 2;
       }
+    } else {
+      grupoCompleto = false;
     }
   });
+
+  // Bônus grupo completo
+  if (grupoCompleto) {
+    pontos += 10;
+  }
 
   return pontos;
 }
