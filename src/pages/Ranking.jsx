@@ -84,13 +84,16 @@ if (palpiteSnapshot.exists()) {
     palpiteSnapshot.data();
 
   Object.keys(resultados).forEach(
-    (grupo) => {
-      pontos += calcularPontuacao(
+  (grupo) => {
+    const pontosGrupo =
+      calcularPontuacao(
         palpites[grupo],
         resultados[grupo]
       );
-    }
-  );
+
+    pontos += pontosGrupo;
+  }
+);
 }
 
 listaRanking.push({
@@ -101,6 +104,15 @@ listaRanking.push({
   diferencaLider: 0,
   posicao: 0,
   premiacao: 0,
+
+  detalhes: {},
+
+  palpites:
+    palpiteSnapshot.exists()
+      ? palpiteSnapshot.data()
+      : {},
+
+  resultados,
 });
       }
 
@@ -110,6 +122,36 @@ listaRanking.push({
 
 listaRanking.forEach(
   (participante, index) => {
+
+    participante.detalhes = {};
+
+    Object.keys(
+      participante.resultados || {}
+    ).forEach((grupo) => {
+      participante.detalhes[
+        grupo
+      ] = {
+        palpite:
+          participante.palpites?.[
+            grupo
+          ] || {},
+
+        resultado:
+          participante.resultados?.[
+            grupo
+          ] || {},
+
+        pontos: calcularPontuacao(
+          participante.palpites?.[
+            grupo
+          ],
+          participante.resultados?.[
+            grupo
+          ]
+        ),
+      };
+    });
+
     participante.posicao =
       index + 1;
 
