@@ -132,22 +132,6 @@ const mataMataSnapshot =
     )
   );
 
-  console.log(
-  "USUARIO:",
-  usuario.nome
-);
-
-console.log(
-  "TEM PALPITE MATA MATA:",
-  mataMataSnapshot.exists()
-);
-
-console.log(
-  "TEM RESULTADO MATA MATA:",
-  !!resultadoMataMata
-);
-
-
 if (
   mataMataSnapshot.exists() &&
   resultadoMataMata
@@ -155,10 +139,6 @@ if (
   const palpiteMataMata =
     mataMataSnapshot.data();
 
-    console.log(
-  "PALPITE MATA MATA:",
-  palpiteMataMata
-);
 
   const contarAcertos = (
     palpites,
@@ -239,21 +219,6 @@ if (
 
   pontos += pontosMataMata;
 
-console.log(
-  "PONTOS MATA-MATA:",
-  usuario.nome,
-  pontosMataMata
-);
-
-console.log(
-  "PALPITE:",
-  palpiteMataMata
-);
-
-console.log(
-  "RESULTADO:",
-  resultadoMataMata
-);
 }
 
 listaRanking.push({
@@ -615,7 +580,14 @@ const maisAcertos =
           "Arial, sans-serif",
       }}
     >
-      <h1>🏆 Ranking Geral</h1>
+      <h1
+  style={{
+    textAlign: "center",
+    fontSize: "clamp(24px, 5vw, 42px)",
+  }}
+>
+  🏆 Ranking Geral
+</h1>
 
       <p
   style={{
@@ -937,8 +909,8 @@ const maisAcertos =
 
         {ranking
   .filter((participante) =>
-    participante.nome
-      ?.toLowerCase()
+    (participante.nome || "")
+  .toLowerCase()
       .includes(
         busca.toLowerCase()
       )
