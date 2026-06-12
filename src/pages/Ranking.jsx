@@ -215,23 +215,18 @@ if (
       .trim();
 
   detalhesMataMata = {
-    oitavas:
-      acertosOitavas * 1,
+  oitavas: acertosOitavas * 2,
 
-    quartas:
-      acertosQuartas * 2,
+  quartas: acertosQuartas * 4,
 
-    semifinal:
-      acertosSemi * 3,
+  semifinal: acertosSemi * 6,
 
-    final:
-      acertosFinal * 5,
+  final: acertosFinal * 10,
 
-    campeao:
-      campeaoCorreto
-        ? 10
-        : 0,
-  };
+  campeao: campeaoCorreto
+    ? 20
+    : 0,
+};
 
   pontosMataMata =
   calcularPontuacaoMataMata(
@@ -399,15 +394,11 @@ Object.values(
 
 if (resultadoMataMata) {
   pontosMaximos +=
-    (resultadoMataMata.oitavas?.length || 0) *
-      1 +
-    (resultadoMataMata.quartas?.length || 0) *
-      2 +
-    (resultadoMataMata.semifinal?.length || 0) *
-      3 +
-    (resultadoMataMata.final?.length || 0) *
-      5 +
-    (resultadoMataMata.campeao ? 10 : 0);
+  (resultadoMataMata.oitavas?.length || 0) * 2 +
+  (resultadoMataMata.quartas?.length || 0) * 4 +
+  (resultadoMataMata.semifinal?.length || 0) * 6 +
+  (resultadoMataMata.final?.length || 0) * 10 +
+  (resultadoMataMata.campeao ? 20 : 0);
 }
 
 participante.aproveitamento =

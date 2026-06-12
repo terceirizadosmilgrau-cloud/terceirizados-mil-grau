@@ -39,25 +39,25 @@ export function calcularPontuacaoMataMata(
     contarAcertos(
       palpite.oitavas,
       resultado.oitavas
-    ) * 1;
+    ) * 2;
 
   pontos +=
     contarAcertos(
       palpite.quartas,
       resultado.quartas
-    ) * 2;
+    ) * 4;
 
   pontos +=
     contarAcertos(
       palpite.semifinal,
       resultado.semifinal
-    ) * 3;
+    ) * 6;
 
   pontos +=
     contarAcertos(
       palpite.final,
       resultado.final
-    ) * 5;
+    ) * 10;
 
   if (
     palpite.campeao &&
@@ -69,7 +69,7 @@ export function calcularPontuacaoMataMata(
       .toLowerCase()
       .trim()
   ) {
-    pontos += 10;
+    pontos += 20;
   }
 
   return pontos;
