@@ -61,39 +61,38 @@ function Ranking({ voltar }) {
         }
 
         const palpiteSnapshot =
-          await getDoc(
-            doc(
-              db,
-              "palpites",
-              usuarioDoc.id
-            )
-          );
+  await getDoc(
+    doc(
+      db,
+      "palpites",
+      usuarioDoc.id
+    )
+  );
 
-        if (!palpiteSnapshot.exists())
-          continue;
+let pontos = 0;
 
-        comPalpite++;
+if (palpiteSnapshot.exists()) {
+  comPalpite++;
 
-        const palpites =
-          palpiteSnapshot.data();
+  const palpites =
+    palpiteSnapshot.data();
 
-        let pontos = 0;
+  Object.keys(resultados).forEach(
+    (grupo) => {
+      pontos += calcularPontuacao(
+        palpites[grupo],
+        resultados[grupo]
+      );
+    }
+  );
+}
 
-        Object.keys(resultados).forEach(
-          (grupo) => {
-            pontos += calcularPontuacao(
-              palpites[grupo],
-              resultados[grupo]
-            );
-          }
-        );
-
-        listaRanking.push({
-          nome:
-            usuario.apelido ||
-            usuario.nome,
-          pontos,
-        });
+listaRanking.push({
+  nome:
+    usuario.apelido ||
+    usuario.nome,
+  pontos,
+});
       }
 
       listaRanking.sort(
