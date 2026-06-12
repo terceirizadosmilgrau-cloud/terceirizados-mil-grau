@@ -35,6 +35,9 @@ function Ranking({ voltar }) {
       semPalpite: 0,
     });
 
+    const [ultimaAtualizacao, setUltimaAtualizacao] =
+  useState("");
+
   useEffect(() => {
     carregarRanking();
   }, []);
@@ -528,6 +531,11 @@ listaRanking.forEach(
     }
   }
 );
+
+setUltimaAtualizacao(
+  new Date().toLocaleString("pt-BR")
+);
+
       setRanking(listaRanking);
 
       setArrecadacao(
@@ -608,6 +616,17 @@ const maisAcertos =
       }}
     >
       <h1>🏆 Ranking Geral</h1>
+
+      <p
+  style={{
+    color: "#999",
+    marginBottom: "20px",
+  }}
+>
+  ⏰ Última atualização:
+  {" "}
+  {ultimaAtualizacao}
+</p>
 
       <div
   style={{
@@ -742,6 +761,26 @@ const maisAcertos =
       0}
     )
   </p>
+
+  <p>
+  ⚽ Mestre do Mata-Mata:
+  {" "}
+  {[...ranking].sort(
+    (a, b) =>
+      (b.pontosMataMata || 0) -
+      (a.pontosMataMata || 0)
+  )[0]?.nome || "-"}
+</p>
+
+<p>
+  🏆 Pontos Mata-Mata:
+  {" "}
+  {[...ranking].sort(
+    (a, b) =>
+      (b.pontosMataMata || 0) -
+      (a.pontosMataMata || 0)
+  )[0]?.pontosMataMata || 0}
+</p>
 
   <p>
     💰 Premiação Atual:
