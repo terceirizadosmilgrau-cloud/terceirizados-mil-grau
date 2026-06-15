@@ -20,10 +20,7 @@ service cloud.firestore {
 
     function isSuperAdmin() {
       return signedIn()
-        && (
-          request.auth.token.email == "ardcost4@icloud.com"
-          || myTipoUsuario() == "superadmin"
-        );
+        && myTipoUsuario() == "superadmin";
     }
 
     function isOwner(uid) {

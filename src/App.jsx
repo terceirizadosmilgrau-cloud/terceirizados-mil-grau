@@ -59,7 +59,7 @@ function App() {
   };
 
   const isSuperAdmin =
-    usuario?.email === "ardcost4@icloud.com";
+    usuario?.tipoUsuario === "superadmin";
 
   if (
     tela === "centralPalpites" &&

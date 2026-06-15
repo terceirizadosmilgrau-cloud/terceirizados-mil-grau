@@ -32,7 +32,7 @@ const [filtro, setFiltro] =
   useState("todos");
 
   const isSuperAdmin =
-    usuario?.email === "ardcost4@icloud.com";
+    usuario?.tipoUsuario === "superadmin";
     const isAdmin =
   usuario?.tipoUsuario === "admin";
 
