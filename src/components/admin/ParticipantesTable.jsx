@@ -18,6 +18,7 @@ function ParticipantesTable({
       <h2>Participantes</h2>
 
      <div
+  className="desktop-only"
   style={{
     overflowX: "auto",
     WebkitOverflowScrolling: "touch",
@@ -151,6 +152,124 @@ function ParticipantesTable({
           ))}
                </tbody>
       </table>
+    </div>
+
+    <div className="mobile-only participantes-mobile-list">
+      {participantes.map((p) => (
+        <div
+          key={p.id}
+          className="participante-mobile-card"
+        >
+          <div className="participante-mobile-header">
+            <strong className="participante-mobile-nome">
+              {p.nome}
+            </strong>
+            <span className="participante-mobile-apelido">
+              @{p.apelido || "sem-apelido"}
+            </span>
+          </div>
+
+          <div className="participante-mobile-info">
+            <span>
+              Perfil:{" "}
+              <strong>
+                {p.tipoUsuario ===
+                "superadmin"
+                  ? "SuperAdmin"
+                  : p.tipoUsuario ===
+                    "admin"
+                  ? "Admin"
+                  : "Participante"}
+              </strong>
+            </span>
+
+            <span>
+              Pagamento:{" "}
+              <strong>
+                {p.pagamento
+                  ? "Pago"
+                  : "Pendente"}
+              </strong>
+            </span>
+          </div>
+
+          <div className="participante-mobile-actions">
+            {(isAdmin || isSuperAdmin) && (
+              <>
+                {!p.pagamento && (
+                  <button
+                    style={botaoVerde}
+                    onClick={() =>
+                      confirmarPagamento(
+                        p.id,
+                        true
+                      )
+                    }
+                  >
+                    Confirmar
+                  </button>
+                )}
+
+                {p.pagamento && (
+                  <button
+                    style={botaoLaranja}
+                    onClick={() =>
+                      confirmarPagamento(
+                        p.id,
+                        false
+                      )
+                    }
+                  >
+                    Pendente
+                  </button>
+                )}
+
+                {isSuperAdmin &&
+ p.tipoUsuario ===
+  "participante" && (
+                  <button
+                    style={botaoAzul}
+                    onClick={() =>
+                      tornarAdmin(p.id)
+                    }
+                  >
+                    Tornar Admin
+                  </button>
+                )}
+
+                {isSuperAdmin &&
+ p.tipoUsuario ===
+  "admin" && (
+                  <button
+                    style={botaoVermelho}
+                    onClick={() =>
+                      removerAdmin(p.id)
+                    }
+                  >
+                    Remover Admin
+                  </button>
+                )}
+
+                {isSuperAdmin &&
+ p.tipoUsuario !==
+  "superadmin" && (
+                  <button
+                    style={botaoExcluir}
+                    onClick={() =>
+                      excluirParticipante(
+                        p.id,
+                        p.nome
+                      )
+                    }
+                  >
+                    Excluir
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
 
   </div>
