@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
 
 import Login from "./components/Login";
 import Cadastro from "./components/Cadastro";
+import { db } from "./firebase";
 
 import Dashboard from "./pages/Dashboard";
 import Palpites from "./pages/Palpites";
@@ -20,6 +22,36 @@ function App() {
     setUsuario(user);
     setTela("dashboard");
   };
+
+  useEffect(() => {
+    if (!usuario?.uid) return;
+
+    const unsubscribe = onSnapshot(
+      doc(db, "usuarios", usuario.uid),
+      (snapshot) => {
+        if (!snapshot.exists()) return;
+
+        setUsuario((usuarioAtual) => {
+          if (
+            !usuarioAtual ||
+            usuarioAtual.uid !== usuario.uid
+          ) {
+            return usuarioAtual;
+          }
+
+          return {
+            ...snapshot.data(),
+            uid: usuarioAtual.uid,
+            email:
+              usuarioAtual.email ||
+              snapshot.data().email,
+          };
+        });
+      }
+    );
+
+    return () => unsubscribe();
+  }, [usuario?.uid]);
 
   const sair = () => {
     setUsuario(null);
