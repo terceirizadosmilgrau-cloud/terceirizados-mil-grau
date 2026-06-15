@@ -1,0 +1,96 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function myUser() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+    }
+
+    function myTipoUsuario() {
+      return myUser().data.tipoUsuario;
+    }
+
+    function isAdmin() {
+      return signedIn() && myTipoUsuario() == "admin";
+    }
+
+    function isSuperAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.email == "ardcost4@icloud.com"
+          || myTipoUsuario() == "superadmin"
+        );
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /usuarios/{uid} {
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly([
+          "nome",
+          "apelido",
+          "email",
+          "tipoUsuario",
+          "pagamento",
+          "pontos",
+          "dataCadastro"
+        ])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.tipoUsuario == "participante"
+        && request.resource.data.pagamento == false;
+
+      allow read: if signedIn();
+
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["pagamento"])
+        && request.resource.data.tipoUsuario == resource.data.tipoUsuario;
+
+      allow update: if isSuperAdmin()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "pagamento",
+          "tipoUsuario"
+        ]);
+
+      allow delete: if isSuperAdmin()
+        && resource.data.tipoUsuario != "superadmin";
+    }
+
+    match /palpites/{uid} {
+      allow read: if signedIn();
+
+      allow create, update: if isOwner(uid);
+
+      allow delete: if isSuperAdmin();
+    }
+
+    match /palpitesMataMata/{uid} {
+      allow read: if signedIn();
+
+      allow create, update: if isOwner(uid);
+
+      allow delete: if isSuperAdmin();
+    }
+
+    match /resultados/{documento} {
+      allow read: if signedIn();
+
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    match /configuracoes/{documento} {
+      allow read: if signedIn();
+
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
