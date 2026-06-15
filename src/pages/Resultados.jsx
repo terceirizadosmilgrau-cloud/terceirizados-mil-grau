@@ -131,7 +131,41 @@ const listarClassificadosMataMata = (
     )
     .filter(Boolean);
 
-function Resultados({ voltar }) {
+const criarResultadosGruposVazios =
+  () =>
+    Object.keys(grupos).reduce(
+      (acc, grupo) => {
+        acc[grupo] = {
+          primeiro: "",
+          segundo: "",
+          terceiro: "",
+          quarto: "",
+        };
+
+        return acc;
+      },
+      {}
+    );
+
+const criarResultadosMataMataVazios =
+  () => ({
+    jogos: {
+      oitavas: [],
+      quartas: [],
+      semifinal: [],
+      final: [],
+    },
+    oitavas: [],
+    quartas: [],
+    semifinal: [],
+    final: [],
+    campeao: "",
+  });
+
+function Resultados({
+  usuario,
+  voltar,
+}) {
   const [resultados, setResultados] =
     useState({});
 
@@ -269,6 +303,60 @@ function Resultados({ voltar }) {
         console.error(error);
         alert(
           "Erro ao salvar resultados."
+        );
+      }
+    };
+
+  const zerarResultadosTeste =
+    async () => {
+      const confirmado = window.confirm(
+        "Tem certeza que deseja zerar os resultados de teste?\n\nEsta acao vai limpar apenas resultados/grupos e resultados/mataMata.\n\nNao altera usuarios, palpites, palpites do Mata-Mata, configuracoes ou permissoes."
+      );
+
+      if (!confirmado) return;
+
+      try {
+        const resultadosGruposVazios =
+          criarResultadosGruposVazios();
+
+        const resultadosMataMataVazios =
+          criarResultadosMataMataVazios();
+
+        await setDoc(
+          doc(
+            db,
+            "resultados",
+            "grupos"
+          ),
+          resultadosGruposVazios
+        );
+
+        await setDoc(
+          doc(
+            db,
+            "resultados",
+            "mataMata"
+          ),
+          resultadosMataMataVazios
+        );
+
+        setResultados(
+          resultadosGruposVazios
+        );
+
+        setMataMata(
+          normalizarJogosMataMata(
+            resultadosMataMataVazios
+          )
+        );
+
+        alert(
+          "Resultados de teste zerados com sucesso."
+        );
+      } catch (error) {
+        console.error(error);
+        alert(
+          "Erro ao zerar resultados de teste."
         );
       }
     };
@@ -479,6 +567,16 @@ function Resultados({ voltar }) {
         Salvar Resultados
       </button>
 
+      {usuario?.tipoUsuario ===
+        "superadmin" && (
+        <button
+          style={botaoZerar}
+          onClick={zerarResultadosTeste}
+        >
+          Zerar Resultados de Teste
+        </button>
+      )}
+
       <button
         style={botaoVoltar}
         onClick={voltar}
@@ -574,6 +672,18 @@ const botaoSalvar = {
   marginRight: "10px",
   marginBottom: "10px",
   width: "min(100%, 190px)",
+};
+
+const botaoZerar = {
+  backgroundColor: "#dc3545",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  cursor: "pointer",
+  marginRight: "10px",
+  marginBottom: "10px",
+  width: "min(100%, 240px)",
 };
 
 const botaoVoltar = {

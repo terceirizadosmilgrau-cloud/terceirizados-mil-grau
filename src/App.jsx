@@ -105,6 +105,7 @@ function App() {
   ) {
     return (
       <Resultados
+        usuario={usuario}
         voltar={() =>
           setTela("dashboard")
         }

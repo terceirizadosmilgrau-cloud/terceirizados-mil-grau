@@ -9,8 +9,80 @@ import {
 import { db } from "../firebase";
 import { calcularPontuacao } from "../utils/calcularPontuacao";
 import DetalheParticipante from "../components/DetalheParticipante";
-import { calcularPontuacaoMataMata }
+import {
+  calcularDetalhesPontuacaoMataMata,
+  calcularPontuacaoMataMata,
+}
   from "../utils/calcularPontuacaoMataMata";
+
+const fasesMataMata = [
+  "oitavas",
+  "quartas",
+  "semifinal",
+  "final",
+];
+
+const temJogosMataMata = (dados) =>
+  dados?.jogos &&
+  fasesMataMata.some((fase) =>
+    Array.isArray(
+      dados.jogos[fase]
+    )
+  );
+
+const placarPreenchido = (jogo) =>
+  jogo?.placarA !== undefined &&
+  jogo?.placarA !== "" &&
+  jogo?.placarB !== undefined &&
+  jogo?.placarB !== "";
+
+const calcularPontosMaximosMataMata = (
+  resultadoMataMata
+) => {
+  if (!resultadoMataMata) {
+    return 0;
+  }
+
+  if (temJogosMataMata(resultadoMataMata)) {
+    return fasesMataMata.reduce(
+      (total, fase) => {
+        const jogos =
+          resultadoMataMata.jogos[
+            fase
+          ] || [];
+
+        return (
+          total +
+          jogos.reduce(
+            (subtotal, jogo) => {
+              let pontos = 0;
+
+              if (placarPreenchido(jogo)) {
+                pontos += 10;
+              }
+
+              if (jogo.classificado) {
+                pontos += 5;
+              }
+
+              return subtotal + pontos;
+            },
+            0
+          )
+        );
+      },
+      0
+    );
+  }
+
+  return (
+    (resultadoMataMata.oitavas?.length || 0) * 2 +
+    (resultadoMataMata.quartas?.length || 0) * 4 +
+    (resultadoMataMata.semifinal?.length || 0) * 6 +
+    (resultadoMataMata.final?.length || 0) * 10 +
+    (resultadoMataMata.campeao ? 20 : 0)
+  );
+};
 
 function Ranking({ voltar }) {
   const [ranking, setRanking] = useState([]);
@@ -139,77 +211,11 @@ if (
   const palpiteMataMata =
     mataMataSnapshot.data();
 
-
-  const contarAcertos = (
-    palpites,
-    oficiais
-  ) => {
-    if (
-      !Array.isArray(palpites) ||
-      !Array.isArray(oficiais)
-    ) {
-      return 0;
-    }
-
-    return palpites.filter(
-      (time) =>
-        oficiais.some(
-          (oficial) =>
-            oficial
-              ?.toLowerCase()
-              .trim() ===
-            time
-              ?.toLowerCase()
-              .trim()
-        )
-    ).length;
-  };
-
-  const acertosOitavas =
-    contarAcertos(
-      palpiteMataMata.oitavas,
-      resultadoMataMata.oitavas
+  detalhesMataMata =
+    calcularDetalhesPontuacaoMataMata(
+      palpiteMataMata,
+      resultadoMataMata
     );
-
-  const acertosQuartas =
-    contarAcertos(
-      palpiteMataMata.quartas,
-      resultadoMataMata.quartas
-    );
-
-  const acertosSemi =
-    contarAcertos(
-      palpiteMataMata.semifinal,
-      resultadoMataMata.semifinal
-    );
-
-  const acertosFinal =
-    contarAcertos(
-      palpiteMataMata.final,
-      resultadoMataMata.final
-    );
-
-  const campeaoCorreto =
-    palpiteMataMata.campeao
-      ?.toLowerCase()
-      .trim() ===
-    resultadoMataMata.campeao
-      ?.toLowerCase()
-      .trim();
-
-  detalhesMataMata = {
-  oitavas: acertosOitavas * 2,
-
-  quartas: acertosQuartas * 4,
-
-  semifinal: acertosSemi * 6,
-
-  final: acertosFinal * 10,
-
-  campeao: campeaoCorreto
-    ? 20
-    : 0,
-};
 
   pontosMataMata =
   calcularPontuacaoMataMata(
@@ -362,11 +368,9 @@ Object.values(
 
 if (resultadoMataMata) {
   pontosMaximos +=
-  (resultadoMataMata.oitavas?.length || 0) * 2 +
-  (resultadoMataMata.quartas?.length || 0) * 4 +
-  (resultadoMataMata.semifinal?.length || 0) * 6 +
-  (resultadoMataMata.final?.length || 0) * 10 +
-  (resultadoMataMata.campeao ? 20 : 0);
+    calcularPontosMaximosMataMata(
+      resultadoMataMata
+    );
 }
 
 participante.aproveitamento =
