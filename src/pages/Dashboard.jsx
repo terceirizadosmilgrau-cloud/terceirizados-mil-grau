@@ -227,10 +227,10 @@ const [filtro, setFiltro] =
   const arrecadacaoConfirmada =
     pagos * 20;
 
-    const lider =
-  participantes.length > 0
-    ? participantes[0]
-    : null;
+  const lider =
+participantes.length > 0
+  ? participantes[0]
+  : null;
 
   return (
     <div
