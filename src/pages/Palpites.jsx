@@ -202,12 +202,22 @@ function Palpites({
         minHeight: "100vh",
         backgroundColor: "#0d0d0d",
         color: "white",
-        padding: "30px",
+        width: "100%",
+        maxWidth: "100%",
+        overflowX: "hidden",
+        padding: "clamp(16px, 4vw, 30px)",
         fontFamily:
           "Arial, sans-serif",
+        boxSizing: "border-box",
       }}
     >
-      <h1>
+      <h1
+        style={{
+          fontSize: "clamp(28px, 6vw, 42px)",
+          lineHeight: 1.15,
+          overflowWrap: "anywhere",
+        }}
+      >
         ⚽ Palpites Copa 2026
       </h1>
 
@@ -222,6 +232,8 @@ function Palpites({
         marginTop: "15px",
         marginBottom: "20px",
         fontWeight: "bold",
+        maxWidth: "100%",
+        overflowWrap: "anywhere",
       }}
     >
       ⏳ Encerramento dos
@@ -242,6 +254,8 @@ function Palpites({
             marginTop: "20px",
             marginBottom: "20px",
             fontWeight: "bold",
+            maxWidth: "100%",
+            overflowWrap: "anywhere",
           }}
         >
           🔒 Os palpites estão
@@ -252,6 +266,9 @@ function Palpites({
       <div
         style={{
           maxWidth: "900px",
+          width: "100%",
+          marginLeft: "auto",
+          marginRight: "auto",
           marginTop: "20px",
         }}
       >
@@ -277,6 +294,7 @@ function Palpites({
             gap: "10px",
             marginTop: "20px",
             flexWrap: "wrap",
+            alignItems: "stretch",
           }}
         >
           <button
@@ -319,6 +337,8 @@ const botaoSalvar = {
   borderRadius: "8px",
   padding: "12px 20px",
   cursor: "pointer",
+  flex: "1 1 180px",
+  maxWidth: "100%",
 };
 
 const botaoResumo = {
@@ -328,6 +348,8 @@ const botaoResumo = {
   borderRadius: "8px",
   padding: "12px 20px",
   cursor: "pointer",
+  flex: "1 1 160px",
+  maxWidth: "100%",
 };
 
 const botaoVoltar = {
@@ -337,6 +359,8 @@ const botaoVoltar = {
   borderRadius: "8px",
   padding: "12px 20px",
   cursor: "pointer",
+  flex: "1 1 140px",
+  maxWidth: "100%",
 };
 
 export default Palpites;

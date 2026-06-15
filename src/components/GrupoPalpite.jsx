@@ -6,12 +6,15 @@ function GrupoPalpite({
 }) {
   const selectStyle = {
     width: "100%",
+    maxWidth: "100%",
     padding: "12px",
     marginBottom: "15px",
     borderRadius: "8px",
     border: "1px solid #444",
     backgroundColor: "#333",
     color: "white",
+    boxSizing: "border-box",
+    fontSize: "16px",
   };
 
   const posicoes = [
@@ -57,15 +60,30 @@ function GrupoPalpite({
     <div
       style={{
         backgroundColor: "#1a1a1a",
-        padding: "20px",
+        width: "100%",
+        maxWidth: "100%",
+        padding: "clamp(16px, 4vw, 20px)",
         borderRadius: "12px",
         marginBottom: "20px",
+        boxSizing: "border-box",
+        overflowWrap: "anywhere",
       }}
     >
-      <h2>Grupo {grupo}</h2>
+      <h2
+        style={{
+          overflowWrap: "anywhere",
+        }}
+      >
+        Grupo {grupo}
+      </h2>
 
       {posicoes.map((posicao) => (
-        <div key={posicao.chave}>
+        <div
+          key={posicao.chave}
+          style={{
+            maxWidth: "100%",
+          }}
+        >
           <label
             style={{
               display: "block",

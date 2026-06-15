@@ -52,11 +52,18 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1126px;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
@@ -108,4 +115,74 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+.dashboard-v37 {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.dashboard-v37-title {
+  overflow-wrap: anywhere;
+}
+
+.dashboard-v37-card {
+  max-width: 100%;
+}
+
+.dashboard-v37-input {
+  max-width: 100%;
+}
+
+.dashboard-v37-actions,
+.dashboard-v37-filters {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  #root {
+    border-inline: 0;
+  }
+
+  .dashboard-v37 {
+    padding: 16px !important;
+  }
+
+  .dashboard-v37-title {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  .dashboard-v37-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    max-width: 100% !important;
+  }
+
+  .dashboard-v37-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .dashboard-v37-card {
+    padding: 16px !important;
+    border-radius: 10px !important;
+  }
+
+  .dashboard-v37-filters {
+    gap: 8px !important;
+  }
+
+  .dashboard-v37-filter-button {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0 !important;
+  }
+
+  .dashboard-v37-input {
+    font-size: 16px;
+  }
+
 }

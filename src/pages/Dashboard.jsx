@@ -234,6 +234,7 @@ participantes.length > 0
 
   return (
     <div
+      className="dashboard-v37"
       style={{
         minHeight: "100vh",
         backgroundColor: "#0d0d0d",
@@ -252,6 +253,7 @@ participantes.length > 0
   }}
 >
         <h1
+  className="dashboard-v37-title"
   style={{
     textAlign: "center",
     margin: 0,
@@ -261,6 +263,7 @@ participantes.length > 0
 </h1>
 
         <div
+  className="dashboard-v37-actions"
   style={{
     display: "flex",
     flexWrap: "wrap",
@@ -270,6 +273,7 @@ participantes.length > 0
   }}
 >
           <button
+            className="dashboard-v37-button"
             onClick={abrirPalpites}
             style={botaoAzul}
           >
@@ -277,6 +281,7 @@ participantes.length > 0
           </button>
 
           <button
+  className="dashboard-v37-button"
   onClick={abrirMataMata}
   style={botaoDourado}
 >
@@ -284,6 +289,7 @@ participantes.length > 0
 </button>
 
           <button
+            className="dashboard-v37-button"
             onClick={abrirRanking}
             style={botaoVerde}
           >
@@ -293,6 +299,7 @@ participantes.length > 0
           {isSuperAdmin && (
             <>
               <button
+                className="dashboard-v37-button"
                 onClick={abrirCentralPalpites}
                 style={botaoRoxo}
               >
@@ -300,6 +307,7 @@ participantes.length > 0
               </button>
 
               <button
+  className="dashboard-v37-button"
   onClick={
     abrirCentralMataMata
   }
@@ -309,6 +317,7 @@ participantes.length > 0
 </button>
 
               <button
+                className="dashboard-v37-button"
                 onClick={abrirResultados}
                 style={botaoLaranja}
               >
@@ -318,6 +327,7 @@ participantes.length > 0
           )}
 
           <button
+            className="dashboard-v37-button"
             onClick={sair}
             style={botaoVermelho}
           >
@@ -327,6 +337,7 @@ participantes.length > 0
       </div>
 
       <div
+        className="dashboard-v37-card"
         style={{
           backgroundColor: "#1a1a1a",
           padding: "25px",
@@ -389,6 +400,7 @@ participantes.length > 0
   }}
 >
               <button
+                className="dashboard-v37-button"
                 onClick={() =>
                   alterarStatusPalpites(
                     true
@@ -400,6 +412,7 @@ participantes.length > 0
               </button>
 
               <button
+                className="dashboard-v37-button"
                 onClick={() =>
                   alterarStatusPalpites(
                     false
@@ -415,6 +428,7 @@ participantes.length > 0
       </div>
 
       <div
+  className="dashboard-v37-card"
   style={{
     backgroundColor:
       "#1a1a1a",
@@ -428,6 +442,7 @@ participantes.length > 0
   </h2>
 
   <input
+    className="dashboard-v37-input"
     type="text"
     placeholder="Buscar por nome ou apelido..."
     value={busca}
@@ -446,6 +461,7 @@ participantes.length > 0
   />
 
   <div
+  className="dashboard-v37-filters"
   style={{
     display: "flex",
     gap: "10px",
@@ -455,6 +471,7 @@ participantes.length > 0
   }}
 >
     <button
+  className="dashboard-v37-filter-button"
   onClick={() =>
     setFiltro("todos")
   }
@@ -470,6 +487,7 @@ participantes.length > 0
 </button>
 
 <button
+  className="dashboard-v37-filter-button"
   onClick={() =>
     setFiltro("pagos")
   }
@@ -485,6 +503,7 @@ participantes.length > 0
 </button>
 
 <button
+  className="dashboard-v37-filter-button"
   onClick={() =>
     setFiltro("pendentes")
   }
@@ -500,6 +519,7 @@ participantes.length > 0
 </button>
 
 <button
+  className="dashboard-v37-filter-button"
   onClick={() =>
     setFiltro("admins")
   }
@@ -515,6 +535,7 @@ participantes.length > 0
 </button>
 
 <button
+  className="dashboard-v37-filter-button"
   onClick={() =>
     setFiltro(
       "participantes"

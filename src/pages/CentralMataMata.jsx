@@ -163,6 +163,7 @@ flexWrap: "wrap",
 gap: "8px",
 marginTop: "8px",
 marginBottom: "15px",
+maxWidth: "100%",
     }}
   >
     {lista.map(
@@ -180,6 +181,8 @@ marginBottom: "15px",
             fontSize: "11px",
             fontWeight:
               "bold",
+            maxWidth: "100%",
+            overflowWrap: "anywhere",
           }}
         >
           {item.toUpperCase()}
@@ -196,10 +199,20 @@ marginBottom: "15px",
         backgroundColor:
           "#0d0d0d",
         color: "white",
-        padding: "30px",
+        width: "100%",
+        maxWidth: "100%",
+        overflowX: "hidden",
+        padding: "clamp(16px, 4vw, 30px)",
+        boxSizing: "border-box",
+        overflowWrap: "anywhere",
       }}
     >
-      <h1>
+      <h1
+        style={{
+          fontSize: "clamp(28px, 6vw, 42px)",
+          lineHeight: 1.15,
+        }}
+      >
         📊 Central Mata-Mata
       </h1>
 
@@ -214,6 +227,7 @@ marginBottom: "15px",
     cursor: "pointer",
     marginBottom: "25px",
     fontWeight: "bold",
+    maxWidth: "100%",
   }}
 >
   ← Voltar ao Dashboard
@@ -223,10 +237,12 @@ marginBottom: "15px",
   style={{
     backgroundColor:
       "#1a1a1a",
-    padding: "20px",
+    padding: "clamp(16px, 4vw, 20px)",
     borderRadius: "12px",
     marginBottom: "25px",
     maxWidth: "700px",
+    width: "100%",
+    boxSizing: "border-box",
     margin:
       "0 auto 25px",
       textAlign: "center",
@@ -339,10 +355,12 @@ marginBottom: "15px",
           }
           style={{
             padding: "10px",
-            width: "300px",
+            width: "min(100%, 300px)",
             borderRadius:
               "8px",
             border: "none",
+            boxSizing: "border-box",
+            fontSize: "16px",
           }}
         />
 
@@ -365,12 +383,15 @@ marginBottom: "15px",
             style={{
   backgroundColor:
     "#1a1a1a",
-  padding: "20px",
+  padding: "clamp(16px, 4vw, 20px)",
   borderRadius:
     "12px",
   marginBottom:
     "15px",
   textAlign: "center",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+  overflowWrap: "anywhere",
 }}
           >
             <h2
@@ -386,8 +407,8 @@ marginBottom: "15px",
   style={{
     display: "grid",
     gridTemplateColumns:
-  "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "20px",
+  "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "clamp(12px, 3vw, 20px)",
     marginTop: "20px",
     textAlign: "center",
   }}

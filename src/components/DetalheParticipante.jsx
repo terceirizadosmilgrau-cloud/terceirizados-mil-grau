@@ -31,6 +31,7 @@ function DetalheParticipante({
 
   return (
     <div
+      className="detail-v37-overlay"
       style={{
         position: "fixed",
         top: 0,
@@ -44,21 +45,30 @@ function DetalheParticipante({
         alignItems: "flex-start",
         zIndex: 9999,
         overflowY: "auto",
-        padding: "20px",
-        paddingTop: "40px",
+        padding: "clamp(12px, 4vw, 20px)",
+        paddingTop: "clamp(16px, 5vw, 40px)",
+        boxSizing: "border-box",
       }}
     >
       <div
+        className="detail-v37-panel"
         style={{
-          width: "900px",
+          width: "min(900px, 100%)",
           maxWidth: "100%",
           backgroundColor: "#1a1a1a",
           borderRadius: "12px",
-          padding: "25px",
+          padding: "clamp(16px, 4vw, 25px)",
           color: "white",
+          boxSizing: "border-box",
+          overflowWrap: "anywhere",
         }}
       >
-        <h1>
+        <h1
+          style={{
+            fontSize: "clamp(26px, 6vw, 42px)",
+            lineHeight: 1.15,
+          }}
+        >
           🏆 {participante.nome}
         </h1>
 
@@ -301,6 +311,7 @@ if (pontosGrupo >= 30) {
               }}
             >
               <div
+                className="detail-v37-header"
                 onClick={() =>
                   setGrupoAberto(
                     aberto
@@ -316,6 +327,8 @@ if (pontosGrupo >= 30) {
                     "space-between",
                   alignItems:
                     "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
                 }}
               >
                 <strong>
@@ -373,10 +386,12 @@ if (pontosGrupo >= 30) {
     </div>
 
     <div
+      className="detail-v37-grid"
       style={{
         display: "grid",
         gridTemplateColumns:
-          "1fr 1fr",
+          "repeat(auto-fit, minmax(180px, 1fr))",
+        gap: "12px",
       }}
     
                   >

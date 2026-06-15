@@ -571,13 +571,18 @@ const maisAcertos =
 
   return (
     <div
+      className="ranking-v37"
       style={{
         minHeight: "100vh",
         backgroundColor: "#0d0d0d",
         color: "white",
-        padding: "30px",
+        width: "100%",
+        maxWidth: "100%",
+        overflowX: "hidden",
+        padding: "clamp(16px, 4vw, 30px)",
         fontFamily:
           "Arial, sans-serif",
+        overflowWrap: "anywhere",
       }}
     >
       <h1
@@ -606,6 +611,7 @@ const maisAcertos =
   }}
 >
   <button
+    className="ranking-v37-button"
     onClick={carregarRanking}
     style={{
       backgroundColor: "#198754",
@@ -615,6 +621,7 @@ const maisAcertos =
       borderRadius: "8px",
       cursor: "pointer",
       fontWeight: "bold",
+      maxWidth: "100%",
     }}
   >
     🔄 Atualizar Ranking
@@ -622,11 +629,13 @@ const maisAcertos =
 </div>
 
       <div
+        className="ranking-v37-card"
         style={{
           backgroundColor: "#1a1a1a",
-          padding: "20px",
+          padding: "clamp(16px, 4vw, 20px)",
           borderRadius: "12px",
           marginBottom: "20px",
+          maxWidth: "100%",
         }}
       >
         <h2>📊 Estatísticas</h2>
@@ -658,11 +667,13 @@ const maisAcertos =
       </div>
 
       <div
+        className="ranking-v37-card"
         style={{
           backgroundColor: "#1a1a1a",
-          padding: "20px",
+          padding: "clamp(16px, 4vw, 20px)",
           borderRadius: "12px",
           marginBottom: "20px",
+          maxWidth: "100%",
         }}
       >
         <h2>💰 Premiação</h2>
@@ -689,11 +700,13 @@ const maisAcertos =
       </div>
 
       <div
+  className="ranking-v37-card"
   style={{
     backgroundColor: "#1a1a1a",
-    padding: "20px",
+    padding: "clamp(16px, 4vw, 20px)",
     borderRadius: "12px",
     marginBottom: "20px",
+    maxWidth: "100%",
   }}
 
   
@@ -771,6 +784,7 @@ const maisAcertos =
   <h2>🏆 Pódio</h2>
 
         <div
+          className="ranking-v37-podium"
           style={{
             display: "flex",
             justifyContent: "center",
@@ -778,15 +792,18 @@ const maisAcertos =
             gap: "15px",
             flexWrap: "wrap",
             marginTop: "20px",
+            maxWidth: "100%",
           }}
         >
           <div
+            className="ranking-v37-podium-card"
             style={{
-              width: "180px",
+              width: "min(100%, 180px)",
               backgroundColor: "#6c757d",
-              padding: "20px",
+              padding: "clamp(16px, 4vw, 20px)",
               borderRadius: "12px",
               textAlign: "center",
+              overflowWrap: "anywhere",
             }}
           >
             <h1>🥈</h1>
@@ -815,13 +832,15 @@ const maisAcertos =
           </div>
 
           <div
+            className="ranking-v37-podium-card"
             style={{
-              width: "220px",
+              width: "min(100%, 220px)",
               backgroundColor: "#ffc107",
               color: "#000",
-              padding: "25px",
+              padding: "clamp(18px, 4vw, 25px)",
               borderRadius: "12px",
               textAlign: "center",
+              overflowWrap: "anywhere",
             }}
           >
             <h1>🥇</h1>
@@ -844,12 +863,14 @@ const maisAcertos =
           </div>
 
           <div
+            className="ranking-v37-podium-card"
             style={{
-              width: "180px",
+              width: "min(100%, 180px)",
               backgroundColor: "#cd7f32",
-              padding: "20px",
+              padding: "clamp(16px, 4vw, 20px)",
               borderRadius: "12px",
               textAlign: "center",
+              overflowWrap: "anywhere",
             }}
           >
             <h1>🥉</h1>
@@ -880,10 +901,12 @@ const maisAcertos =
       </div>
 
       <div
+        className="ranking-v37-card"
         style={{
           backgroundColor: "#1a1a1a",
-          padding: "20px",
+          padding: "clamp(16px, 4vw, 20px)",
           borderRadius: "12px",
+          maxWidth: "100%",
         }}
       >
         <h2>
@@ -891,6 +914,7 @@ const maisAcertos =
         </h2>
 
         <input
+  className="ranking-v37-input"
   type="text"
   placeholder="🔎 Buscar participante..."
   value={busca}
@@ -899,6 +923,7 @@ const maisAcertos =
   }
   style={{
     width: "100%",
+    maxWidth: "100%",
     padding: "12px",
     marginBottom: "20px",
     borderRadius: "8px",
@@ -937,6 +962,8 @@ const maisAcertos =
                     : "transparent",
 
                     cursor: "pointer",
+                overflowWrap: "anywhere",
+                lineHeight: 1.35,
               }}
             >
               <strong>
@@ -971,6 +998,7 @@ const maisAcertos =
   }
 />
       <button
+        className="ranking-v37-button"
         onClick={voltar}
         style={{
           marginTop: "20px",
@@ -981,6 +1009,7 @@ const maisAcertos =
           padding: "12px 20px",
           borderRadius: "8px",
           cursor: "pointer",
+          maxWidth: "100%",
         }}
       >
         Voltar

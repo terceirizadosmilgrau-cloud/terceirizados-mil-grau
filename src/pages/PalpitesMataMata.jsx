@@ -262,10 +262,20 @@ const carregarPalpite =
         minHeight: "100vh",
         backgroundColor: "#0d0d0d",
         color: "white",
-        padding: "30px",
+        width: "100%",
+        maxWidth: "100%",
+        overflowX: "hidden",
+        padding: "clamp(16px, 4vw, 30px)",
+        boxSizing: "border-box",
+        overflowWrap: "anywhere",
       }}
     >
-      <h1>
+      <h1
+        style={{
+          fontSize: "clamp(28px, 6vw, 42px)",
+          lineHeight: 1.15,
+        }}
+      >
         🏆 Mata-Mata
       </h1>
 
@@ -279,6 +289,8 @@ const carregarPalpite =
         borderRadius: "8px",
         marginBottom: "20px",
         fontWeight: "bold",
+        maxWidth: "100%",
+        overflowWrap: "anywhere",
       }}
     >
       ⏳ Encerramento dos
@@ -297,6 +309,8 @@ const carregarPalpite =
       borderRadius: "8px",
       marginBottom: "20px",
       fontWeight: "bold",
+      maxWidth: "100%",
+      overflowWrap: "anywhere",
     }}
   >
     🔒 Os palpites do
@@ -319,6 +333,7 @@ const carregarPalpite =
             e.target.value
           )
         }
+        style={inputStyle}
       />
 
       <br />
@@ -333,6 +348,7 @@ const carregarPalpite =
             e.target.value
           )
         }
+        style={inputStyle}
       />
 
       <br />
@@ -347,6 +363,7 @@ const carregarPalpite =
             e.target.value
           )
         }
+        style={inputStyle}
       />
 
       <br />
@@ -361,6 +378,7 @@ const carregarPalpite =
             e.target.value
           )
         }
+        style={inputStyle}
       />
 
       <br />
@@ -375,25 +393,62 @@ const carregarPalpite =
             e.target.value
           )
         }
+        style={inputStyle}
       />
 
       <br />
       <br />
 
-      <button onClick={salvar}>
+      <button
+        onClick={salvar}
+        style={botaoSalvar}
+      >
         💾 Salvar
       </button>
 
       <button
         onClick={voltar}
-        style={{
-          marginLeft: "10px",
-        }}
+        style={botaoVoltar}
       >
         Voltar
       </button>
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  maxWidth: "720px",
+  padding: "12px",
+  borderRadius: "8px",
+  border: "1px solid #444",
+  backgroundColor: "#333",
+  color: "white",
+  boxSizing: "border-box",
+  fontSize: "16px",
+};
+
+const botaoSalvar = {
+  backgroundColor: "#28a745",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  cursor: "pointer",
+  width: "min(100%, 180px)",
+  marginRight: "10px",
+  marginBottom: "10px",
+};
+
+const botaoVoltar = {
+  backgroundColor: "#6c757d",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  cursor: "pointer",
+  width: "min(100%, 140px)",
+  marginBottom: "10px",
+};
 
 export default PalpitesMataMata;
