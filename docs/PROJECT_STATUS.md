@@ -13,7 +13,7 @@
 
 ## Status Atual
 
-Versao atual: V38.1
+Versao atual: V39
 
 Sistema funcional, responsivo e com regras de seguranca do Firestore preparadas no projeto.
 
@@ -23,6 +23,7 @@ Status das versoes recentes:
 * V37 concluida: Responsividade mobile implementada.
 * V38 concluida: Seguranca Firestore preparada com `firestore.rules`.
 * V38.1 concluida: SuperAdmin padronizado por `tipoUsuario`.
+* V39 concluida: Mata-Mata por jogo implementado nos palpites e na central.
 
 ---
 
@@ -44,6 +45,7 @@ Status das versoes recentes:
 * Melhor aproveitamento
 * Rei dos acertos
 * Mata-Mata
+* Mata-Mata por jogo
 * Central de Palpites
 * Central Mata-Mata
 * Resultados Oficiais
@@ -169,9 +171,12 @@ No desktop, a tabela permanece preservada.
 * SuperAdmin padronizado por `tipoUsuario`.
 * Remocao da dependencia de e-mail hardcoded.
 
-### V39 - Proxima versao
+### V39 - Concluida
 
-* Mata-Mata por jogo.
+* Palpites do Mata-Mata por partida.
+* Cada jogo possui time A, time B, placar previsto e classificado previsto.
+* Central Mata-Mata exibe jogos por participante.
+* Modelo antigo por listas preservado para compatibilidade com ranking atual.
 
 ### V40
 
@@ -199,18 +204,16 @@ No desktop, a tabela permanece preservada.
 
 ---
 
-## Visao Da V39
+## V39 Implementada
 
-O Mata-Mata deve evoluir para estrutura por partida.
+O Mata-Mata evoluiu para estrutura por partida nos palpites dos participantes.
 
-Cada partida devera possuir:
+Cada partida possui:
 
 * Time A
 * Time B
 * Placar previsto
-* Placar oficial
 * Classificado previsto
-* Classificado oficial
 
 Exemplo:
 
@@ -219,14 +222,13 @@ Brasil 2 x 1 Uruguai
 Classificado: Brasil
 ```
 
-Pontuacao prevista:
+Pendencias planejadas para proximas versoes:
 
-* Placar exato.
-* Vencedor correto.
-* Classificado correto.
+* V40: Resultados oficiais por jogo.
+* V41: Pontuacao por jogo.
 
 ---
 
 ## Proxima Tarefa
 
-Iniciar V39: Mata-Mata por jogo.
+Iniciar V40: Resultados oficiais por jogo.

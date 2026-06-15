@@ -12,7 +12,7 @@ Tipo: Bolao da Copa 2026
 
 Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
 
-Proxima versao planejada: V39 - Mata-Mata por jogo.
+Proxima versao planejada: V40 - Resultados oficiais por jogo.
 
 ---
 
@@ -132,11 +132,33 @@ Uso:
 
 Campos atuais:
 
+* `jogos`
 * `oitavas`
 * `quartas`
 * `semifinal`
 * `final`
 * `campeao`
+* `atualizadoEm`
+
+Estrutura de `jogos`:
+
+* `oitavas`
+* `quartas`
+* `semifinal`
+* `final`
+
+Cada item de jogo contem:
+
+* `id`
+* `timeA`
+* `timeB`
+* `placarA`
+* `placarB`
+* `classificado`
+
+Observacao:
+
+Os campos antigos por lista continuam sendo gravados a partir dos classificados para manter o ranking atual compativel ate a V41.
 
 ### `resultados/grupos`
 
@@ -320,26 +342,38 @@ Implementado:
 * `firestore.rules` usa `myTipoUsuario() == "superadmin"`.
 * dependencia de e-mail hardcoded removida da logica ativa.
 
+### V39 - Mata-Mata Por Jogo
+
+Status: concluida.
+
+Implementado:
+
+* `PalpitesMataMata.jsx` passou a cadastrar jogos por fase.
+* Cada jogo possui time A, time B, placar previsto e classificado previsto.
+* `CentralMataMata.jsx` exibe confrontos por participante quando o novo modelo existe.
+* Palpites antigos por lista continuam visiveis como fallback.
+* Campos antigos (`oitavas`, `quartas`, `semifinal`, `final`, `campeao`) continuam salvos para compatibilidade com o ranking atual.
+
 ---
 
 ## Roadmap
 
-### V39 - Proxima versao
+### V39 - Concluida
 
 Mata-Mata por jogo.
 
-Objetivo:
+Implementado:
 
-* substituir ou evoluir o modelo atual de Mata-Mata por listas de classificados para um modelo por partida.
+* modelo por partida nos palpites;
+* central com visualizacao por jogo;
+* compatibilidade com listas antigas para o ranking atual.
 
-Cada jogo deve possuir:
+Cada jogo possui:
 
 * Time A
 * Time B
 * Placar previsto
-* Placar oficial
 * Classificado previsto
-* Classificado oficial
 
 Exemplo:
 
@@ -376,16 +410,16 @@ Estatisticas do bolao.
 
 ## Proxima Tarefa
 
-Iniciar V39 - Mata-Mata por jogo.
+Iniciar V40 - Resultados oficiais por jogo.
 
-Antes de alterar codigo na V39, gerar plano tecnico contendo:
+Antes de alterar codigo na V40, gerar plano tecnico contendo:
 
 * modelo de dados sugerido;
 * colecoes/documentos Firestore envolvidos;
 * telas afetadas;
 * impacto no ranking;
 * impacto em `firestore.rules`;
-* plano de migracao do modelo atual de Mata-Mata;
+* plano de migracao dos resultados atuais de Mata-Mata;
 * etapas pequenas e seguras.
 
 ---
@@ -398,12 +432,12 @@ Ao iniciar um novo chat, enviar este arquivo e pedir:
 Leia CONTINUAR_PROJETO.md e PROJECT_STATUS.md.
 Entenda o estado atual do projeto.
 Nao altere codigo antes de gerar plano tecnico.
-Vamos continuar a partir da V39 - Mata-Mata por jogo.
+Vamos continuar a partir da V40 - Resultados oficiais por jogo.
 ```
 
 Tambem informar:
 
-* V36, V37, V38 e V38.1 estao concluidas.
+* V36, V37, V38, V38.1 e V39 estao concluidas.
 * Nao reabrir problema antigo de Admin.
 * Nao voltar para e-mail hardcoded.
 * Nao fazer deploy sem pedido explicito.
@@ -440,10 +474,10 @@ Regras de seguranca:
 * Admin altera apenas pagamento.
 * SuperAdmin altera configuracoes, resultados e perfis.
 
-Regras para V39:
+Regras para V40:
 
 * Nao quebrar Mata-Mata atual sem plano de migracao.
-* Primeiro propor modelo por jogo.
+* Primeiro propor modelo de resultados oficiais por jogo.
 * Depois implementar em etapas.
 * Validar build a cada etapa importante.
 

@@ -11,200 +11,273 @@ import {
 
 import { db } from "../firebase";
 
+const fases = [
+  {
+    chave: "oitavas",
+    titulo: "Oitavas",
+    quantidade: 8,
+  },
+  {
+    chave: "quartas",
+    titulo: "Quartas",
+    quantidade: 4,
+  },
+  {
+    chave: "semifinal",
+    titulo: "Semifinal",
+    quantidade: 2,
+  },
+  {
+    chave: "final",
+    titulo: "Final",
+    quantidade: 1,
+  },
+];
+
+const criarJogo = (fase, numero) => ({
+  id: `${fase}-${numero}`,
+  timeA: "",
+  timeB: "",
+  placarA: "",
+  placarB: "",
+  classificado: "",
+});
+
+const criarJogosVazios = () =>
+  fases.reduce((acc, fase) => {
+    acc[fase.chave] = Array.from(
+      { length: fase.quantidade },
+      (_, index) =>
+        criarJogo(
+          fase.chave,
+          index + 1
+        )
+    );
+
+    return acc;
+  }, {});
+
+const normalizarJogos = (
+  dadosFirebase = {}
+) => {
+  const jogosSalvos =
+    dadosFirebase.jogos || {};
+
+  return fases.reduce((acc, fase) => {
+    const jogosDaFase =
+      Array.isArray(
+        jogosSalvos[fase.chave]
+      )
+        ? jogosSalvos[fase.chave]
+        : [];
+
+    const classificadosAntigos =
+      Array.isArray(
+        dadosFirebase[fase.chave]
+      )
+        ? dadosFirebase[fase.chave]
+        : [];
+
+    acc[fase.chave] = Array.from(
+      { length: fase.quantidade },
+      (_, index) => {
+        const jogoSalvo =
+          jogosDaFase[index] || {};
+
+        return {
+          ...criarJogo(
+            fase.chave,
+            index + 1
+          ),
+          ...jogoSalvo,
+          classificado:
+            jogoSalvo.classificado ||
+            classificadosAntigos[index] ||
+            "",
+        };
+      }
+    );
+
+    return acc;
+  }, {});
+};
+
+const listarClassificados = (
+  jogos = []
+) =>
+  jogos
+    .map((jogo) =>
+      jogo.classificado.trim()
+    )
+    .filter(Boolean);
+
 function PalpitesMataMata({
   usuario,
   voltar,
 }) {
-const [dados, setDados] =
-  useState({
-    oitavas: "",
-    quartas: "",
-    semifinal: "",
-    final: "",
-    campeao: "",
-  });
+  const [jogos, setJogos] =
+    useState(criarJogosVazios);
+
   const [encerrado, setEncerrado] =
-  useState(false);
+    useState(false);
 
   const [dataLimite, setDataLimite] =
-  useState(null);
+    useState(null);
 
-const [tempoRestante, setTempoRestante] =
-  useState("");
+  const [tempoRestante, setTempoRestante] =
+    useState("");
 
   useEffect(() => {
-  carregarConfiguracoes();
-}, []);
+    carregarConfiguracoes();
+  }, []);
 
-useEffect(() => {
-  carregarPalpite();
-}, []);
+  useEffect(() => {
+    carregarPalpite();
+  }, []);
 
-useEffect(() => {
-  if (!dataLimite) return;
+  useEffect(() => {
+    if (!dataLimite) return;
 
-  const atualizarTempo = () => {
-    const agora =
-      new Date();
+    const atualizarTempo = () => {
+      const agora = new Date();
+      const limite = new Date(dataLimite);
+      const diferenca = limite - agora;
 
-    const limite =
-      new Date(dataLimite);
+      if (diferenca <= 0) {
+        setTempoRestante("Encerrado");
+        return;
+      }
 
-    const diferenca =
-      limite - agora;
-
-    if (diferenca <= 0) {
-      setTempoRestante(
-        "Encerrado"
-      );
-      return;
-    }
-
-    const dias =
-      Math.floor(
+      const dias = Math.floor(
         diferenca /
-          (1000 *
-            60 *
-            60 *
-            24)
+          (1000 * 60 * 60 * 24)
       );
 
-    const horas =
-      Math.floor(
+      const horas = Math.floor(
         (diferenca %
-          (1000 *
-            60 *
-            60 *
-            24)) /
-          (1000 *
-            60 *
-            60)
+          (1000 * 60 * 60 * 24)) /
+          (1000 * 60 * 60)
       );
 
-    const minutos =
-      Math.floor(
+      const minutos = Math.floor(
         (diferenca %
-          (1000 *
-            60 *
-            60)) /
+          (1000 * 60 * 60)) /
           (1000 * 60)
       );
 
-    setTempoRestante(
-      `${dias}d ${horas}h ${minutos}min`
-    );
-  };
+      setTempoRestante(
+        `${dias}d ${horas}h ${minutos}min`
+      );
+    };
 
-  atualizarTempo();
+    atualizarTempo();
 
-  const intervalo =
-    setInterval(
+    const intervalo = setInterval(
       atualizarTempo,
       60000
     );
 
-  return () =>
-    clearInterval(intervalo);
-}, [dataLimite]);
+    return () =>
+      clearInterval(intervalo);
+  }, [dataLimite]);
 
-const carregarPalpite =
-  async () => {
-    try {
-      const snapshot =
-        await getDoc(
-          doc(
-            db,
-            "palpitesMataMata",
-            usuario.uid
-          )
-        );
+  const carregarPalpite =
+    async () => {
+      try {
+        const snapshot =
+          await getDoc(
+            doc(
+              db,
+              "palpitesMataMata",
+              usuario.uid
+            )
+          );
 
-      if (snapshot.exists()) {
-        const dadosFirebase =
-          snapshot.data();
-
-        setDados({
-          oitavas:
-            dadosFirebase.oitavas?.join(
-              ", "
-            ) || "",
-
-          quartas:
-            dadosFirebase.quartas?.join(
-              ", "
-            ) || "",
-
-          semifinal:
-            dadosFirebase.semifinal?.join(
-              ", "
-            ) || "",
-
-          final:
-            dadosFirebase.final?.join(
-              ", "
-            ) || "",
-
-          campeao:
-            dadosFirebase.campeao ||
-            "",
-        });
+        if (snapshot.exists()) {
+          setJogos(
+            normalizarJogos(
+              snapshot.data()
+            )
+          );
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    };
 
   const carregarConfiguracoes =
-  async () => {
-    try {
-      const snapshot =
-        await getDoc(
-          doc(
-            db,
-            "configuracoes",
-            "geral"
-          )
-        );
+    async () => {
+      try {
+        const snapshot =
+          await getDoc(
+            doc(
+              db,
+              "configuracoes",
+              "geral"
+            )
+          );
 
-      if (snapshot.exists()) {
-        const config =
-          snapshot.data();
+        if (snapshot.exists()) {
+          const config =
+            snapshot.data();
 
-        const limite =
-          config.dataLimitePalpites;
+          const limite =
+            config.dataLimitePalpites;
+
           setDataLimite(limite);
 
-        if (
-          limite &&
-          new Date() >
-            new Date(limite)
-        ) {
-          setEncerrado(true);
+          if (
+            limite &&
+            new Date() >
+              new Date(limite)
+          ) {
+            setEncerrado(true);
+          }
         }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    };
 
-  const alterar = (
+  const alterarJogo = (
+    fase,
+    index,
     campo,
     valor
   ) => {
-    setDados((anterior) => ({
+    setJogos((anterior) => ({
       ...anterior,
-      [campo]: valor,
+      [fase]: anterior[fase].map(
+        (jogo, jogoIndex) =>
+          jogoIndex === index
+            ? {
+                ...jogo,
+                [campo]: valor,
+              }
+            : jogo
+      ),
     }));
   };
 
   const salvar = async () => {
     if (encerrado) {
-  alert(
-    "Os palpites estão encerrados."
-  );
-  return;
-}
+      alert(
+        "Os palpites estao encerrados."
+      );
+      return;
+    }
+
     try {
+      const classificados =
+        fases.reduce((acc, fase) => {
+          acc[fase.chave] =
+            listarClassificados(
+              jogos[fase.chave]
+            );
+
+          return acc;
+        }, {});
+
       await setDoc(
         doc(
           db,
@@ -212,36 +285,13 @@ const carregarPalpite =
           usuario.uid
         ),
         {
-          oitavas:
-            dados.oitavas
-              .split(",")
-              .map((s) =>
-                s.trim()
-              ),
-
-          quartas:
-            dados.quartas
-              .split(",")
-              .map((s) =>
-                s.trim()
-              ),
-
-          semifinal:
-            dados.semifinal
-              .split(",")
-              .map((s) =>
-                s.trim()
-              ),
-
-          final:
-            dados.final
-              .split(",")
-              .map((s) =>
-                s.trim()
-              ),
-
+          jogos,
+          ...classificados,
           campeao:
-            dados.campeao,
+            classificados.final[0] ||
+            "",
+          atualizadoEm:
+            new Date().toISOString(),
         }
       );
 
@@ -250,160 +300,151 @@ const carregarPalpite =
       );
     } catch (error) {
       console.error(error);
-      alert(
-        "Erro ao salvar."
-      );
+      alert("Erro ao salvar.");
     }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#0d0d0d",
-        color: "white",
-        width: "100%",
-        maxWidth: "100%",
-        overflowX: "hidden",
-        padding: "clamp(16px, 4vw, 30px)",
-        boxSizing: "border-box",
-        overflowWrap: "anywhere",
-      }}
-    >
-      <h1
-        style={{
-          fontSize: "clamp(28px, 6vw, 42px)",
-          lineHeight: 1.15,
-        }}
-      >
-        🏆 Mata-Mata
+    <div style={paginaStyle}>
+      <h1 style={tituloStyle}>
+        Mata-Mata
       </h1>
 
       {dataLimite &&
-  !encerrado && (
-    <div
-      style={{
-        backgroundColor:
-          "#0d6efd",
-        padding: "15px",
-        borderRadius: "8px",
-        marginBottom: "20px",
-        fontWeight: "bold",
-        maxWidth: "100%",
-        overflowWrap: "anywhere",
-      }}
-    >
-      ⏳ Encerramento dos
-      palpites em:
-      {" "}
-      {tempoRestante}
-    </div>
-)}  
+        !encerrado && (
+          <div style={avisoAbertoStyle}>
+            Encerramento dos palpites em:{" "}
+            {tempoRestante}
+          </div>
+        )}
 
       {encerrado && (
-  <div
-    style={{
-      backgroundColor:
-        "#dc3545",
-      padding: "15px",
-      borderRadius: "8px",
-      marginBottom: "20px",
-      fontWeight: "bold",
-      maxWidth: "100%",
-      overflowWrap: "anywhere",
-    }}
-  >
-    🔒 Os palpites do
-    Mata-Mata estão
-    encerrados.
-  </div>
-)}
+        <div style={avisoEncerradoStyle}>
+          Os palpites do Mata-Mata estao
+          encerrados.
+        </div>
+      )}
 
-      <p>
-        Digite as seleções
-        separadas por vírgula.
+      <p style={textoApoioStyle}>
+        Preencha cada jogo com os times,
+        placar previsto e classificado.
       </p>
 
-      <input
-        placeholder="Oitavas"
-        value={dados.oitavas}
-        onChange={(e) =>
-          alterar(
-            "oitavas",
-            e.target.value
-          )
-        }
-        style={inputStyle}
-      />
+      {fases.map((fase) => (
+        <section
+          key={fase.chave}
+          style={secaoStyle}
+        >
+          <h2>{fase.titulo}</h2>
 
-      <br />
-      <br />
+          <div style={listaJogosStyle}>
+            {jogos[fase.chave].map(
+              (jogo, index) => (
+                <div
+                  key={jogo.id}
+                  style={jogoStyle}
+                >
+                  <strong>
+                    Jogo {index + 1}
+                  </strong>
 
-      <input
-        placeholder="Quartas"
-        value={dados.quartas}
-        onChange={(e) =>
-          alterar(
-            "quartas",
-            e.target.value
-          )
-        }
-        style={inputStyle}
-      />
+                  <div
+                    style={
+                      confrontoStyle
+                    }
+                  >
+                    <input
+                      placeholder="Time A"
+                      value={jogo.timeA}
+                      onChange={(e) =>
+                        alterarJogo(
+                          fase.chave,
+                          index,
+                          "timeA",
+                          e.target.value
+                        )
+                      }
+                      style={inputStyle}
+                    />
 
-      <br />
-      <br />
+                    <input
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={jogo.placarA}
+                      onChange={(e) =>
+                        alterarJogo(
+                          fase.chave,
+                          index,
+                          "placarA",
+                          e.target.value
+                        )
+                      }
+                      style={
+                        placarStyle
+                      }
+                    />
 
-      <input
-        placeholder="Semifinal"
-        value={dados.semifinal}
-        onChange={(e) =>
-          alterar(
-            "semifinal",
-            e.target.value
-          )
-        }
-        style={inputStyle}
-      />
+                    <span>X</span>
 
-      <br />
-      <br />
+                    <input
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={jogo.placarB}
+                      onChange={(e) =>
+                        alterarJogo(
+                          fase.chave,
+                          index,
+                          "placarB",
+                          e.target.value
+                        )
+                      }
+                      style={
+                        placarStyle
+                      }
+                    />
 
-      <input
-        placeholder="Final"
-        value={dados.final}
-        onChange={(e) =>
-          alterar(
-            "final",
-            e.target.value
-          )
-        }
-        style={inputStyle}
-      />
+                    <input
+                      placeholder="Time B"
+                      value={jogo.timeB}
+                      onChange={(e) =>
+                        alterarJogo(
+                          fase.chave,
+                          index,
+                          "timeB",
+                          e.target.value
+                        )
+                      }
+                      style={inputStyle}
+                    />
+                  </div>
 
-      <br />
-      <br />
-
-      <input
-        placeholder="Campeão"
-        value={dados.campeao}
-        onChange={(e) =>
-          alterar(
-            "campeao",
-            e.target.value
-          )
-        }
-        style={inputStyle}
-      />
-
-      <br />
-      <br />
+                  <input
+                    placeholder="Classificado"
+                    value={
+                      jogo.classificado
+                    }
+                    onChange={(e) =>
+                      alterarJogo(
+                        fase.chave,
+                        index,
+                        "classificado",
+                        e.target.value
+                      )
+                    }
+                    style={inputStyle}
+                  />
+                </div>
+              )
+            )}
+          </div>
+        </section>
+      ))}
 
       <button
         onClick={salvar}
         style={botaoSalvar}
       >
-        💾 Salvar
+        Salvar
       </button>
 
       <button
@@ -416,9 +457,83 @@ const carregarPalpite =
   );
 }
 
+const paginaStyle = {
+  minHeight: "100vh",
+  backgroundColor: "#0d0d0d",
+  color: "white",
+  width: "100%",
+  maxWidth: "100%",
+  overflowX: "hidden",
+  padding: "clamp(16px, 4vw, 30px)",
+  boxSizing: "border-box",
+  overflowWrap: "anywhere",
+};
+
+const tituloStyle = {
+  fontSize: "clamp(28px, 6vw, 42px)",
+  lineHeight: 1.15,
+};
+
+const textoApoioStyle = {
+  color: "#ddd",
+  maxWidth: "720px",
+};
+
+const avisoAbertoStyle = {
+  backgroundColor: "#0d6efd",
+  padding: "15px",
+  borderRadius: "8px",
+  marginBottom: "20px",
+  fontWeight: "bold",
+  maxWidth: "100%",
+  overflowWrap: "anywhere",
+};
+
+const avisoEncerradoStyle = {
+  backgroundColor: "#dc3545",
+  padding: "15px",
+  borderRadius: "8px",
+  marginBottom: "20px",
+  fontWeight: "bold",
+  maxWidth: "100%",
+  overflowWrap: "anywhere",
+};
+
+const secaoStyle = {
+  backgroundColor: "#1a1a1a",
+  padding: "clamp(16px, 4vw, 20px)",
+  borderRadius: "8px",
+  marginBottom: "20px",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+};
+
+const listaJogosStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "14px",
+};
+
+const jogoStyle = {
+  border: "1px solid #333",
+  borderRadius: "8px",
+  padding: "14px",
+  display: "grid",
+  gap: "10px",
+};
+
+const confrontoStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "minmax(0, 1fr) 56px 20px 56px minmax(0, 1fr)",
+  alignItems: "center",
+  gap: "8px",
+};
+
 const inputStyle = {
   width: "100%",
-  maxWidth: "720px",
+  maxWidth: "100%",
   padding: "12px",
   borderRadius: "8px",
   border: "1px solid #444",
@@ -426,6 +541,11 @@ const inputStyle = {
   color: "white",
   boxSizing: "border-box",
   fontSize: "16px",
+};
+
+const placarStyle = {
+  ...inputStyle,
+  textAlign: "center",
 };
 
 const botaoSalvar = {

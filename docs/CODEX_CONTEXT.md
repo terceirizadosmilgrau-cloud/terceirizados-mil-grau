@@ -2,10 +2,11 @@ Projeto: Terceirizados Mil Grau
 
 Status Atual:
 
-V36 ✅
-V37 ✅
-V38 ✅
-V38.1 ✅
+V36 concluida
+V37 concluida
+V38 concluida
+V38.1 concluida
+V39 concluida
 
 Stack:
 - React
@@ -14,25 +15,27 @@ Stack:
 - Firestore
 - Firebase Hosting
 
-Permissões:
+Permissoes:
 - participante
 - admin
 - superadmin
 
 SuperAdmin:
 Baseado em tipoUsuario.
-Não existe mais email hardcoded.
+Nao existe mais email hardcoded.
 
 Firestore:
 Protegido por firestore.rules.
 
-Próxima versão:
-V39 - Mata-Mata por jogo.
+V39 implementada:
+- Mata-Mata com palpites por jogo.
+- Cada jogo tem time A, time B, placar previsto e classificado previsto.
+- O modelo antigo por listas segue salvo para compatibilidade com ranking atual.
 
-Objetivo:
-Migrar de palpites por fase para palpites jogo a jogo.
+Proxima versao:
+V40 - Resultados oficiais por jogo.
 
-Antes de alterar código:
-Sempre gerar plano técnico.
+Antes de alterar codigo:
+Sempre gerar plano tecnico.
 Sempre rodar npm run build.
 Sempre listar arquivos alterados.
