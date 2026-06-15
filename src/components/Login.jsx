@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 function Login({ abrirCadastro, loginSucesso }) {
   const [email, setEmail] = useState("");
@@ -14,7 +15,19 @@ function Login({ abrirCadastro, loginSucesso }) {
         senha
       );
 
-      loginSucesso(credencial.user);
+      const usuarioSnapshot = await getDoc(
+        doc(db, "usuarios", credencial.user.uid)
+      );
+
+      const dadosUsuario = usuarioSnapshot.exists()
+        ? usuarioSnapshot.data()
+        : {};
+
+      loginSucesso({
+        ...dadosUsuario,
+        uid: credencial.user.uid,
+        email: credencial.user.email,
+      });
     } catch (error) {
       alert("E-mail ou senha inválidos.");
     }
