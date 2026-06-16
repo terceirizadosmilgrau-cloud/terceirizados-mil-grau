@@ -81,12 +81,22 @@ const calcularDetalhesPorJogo = (
               jogoResultado.classificado
             );
 
+        const penaltisCorreto =
+          jogoResultado.decididoNosPenaltis ===
+            true &&
+          jogoPalpite.decididoNosPenaltis ===
+            true;
+
         if (placarExato) {
           detalhes[fase] += 10;
         }
 
         if (classificadoCorreto) {
           detalhes[fase] += 5;
+        }
+
+        if (penaltisCorreto) {
+          detalhes[fase] += 3;
         }
       }
     );

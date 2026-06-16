@@ -233,6 +233,12 @@ function CentralMataMata({ voltar }) {
                 {jogo.classificado ||
                   "-"}
               </small>
+
+              {jogo.decididoNosPenaltis && (
+                <small>
+                  Decidido nos penaltis
+                </small>
+              )}
             </div>
           )
         )}

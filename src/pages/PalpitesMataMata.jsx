@@ -36,11 +36,15 @@ const fases = [
 
 const criarJogo = (fase, numero) => ({
   id: `${fase}-${numero}`,
+  fase,
   timeA: "",
   timeB: "",
+  data: "",
+  horario: "",
   placarA: "",
   placarB: "",
   classificado: "",
+  decididoNosPenaltis: false,
 });
 
 const criarJogosVazios = () =>
@@ -90,6 +94,119 @@ const normalizarJogos = (
             index + 1
           ),
           ...jogoSalvo,
+          fase: fase.chave,
+          decididoNosPenaltis: Boolean(
+            jogoSalvo.decididoNosPenaltis
+          ),
+          classificado:
+            jogoSalvo.classificado ||
+            classificadosAntigos[index] ||
+            "",
+        };
+      }
+    );
+
+    return acc;
+  }, {});
+};
+
+const normalizarConfrontosOficiais = (
+  dados = {}
+) => {
+  const jogosSalvos =
+    dados.jogos || {};
+
+  return fases.reduce((acc, fase) => {
+    const jogosDaFase =
+      Array.isArray(
+        jogosSalvos[fase.chave]
+      )
+        ? jogosSalvos[fase.chave]
+        : [];
+
+    acc[fase.chave] = Array.from(
+      { length: fase.quantidade },
+      (_, index) => {
+        const jogoSalvo =
+          jogosDaFase[index] || {};
+
+        return {
+          ...criarJogo(
+            fase.chave,
+            index + 1
+          ),
+          timeA:
+            jogoSalvo.timeA || "",
+          timeB:
+            jogoSalvo.timeB || "",
+          data:
+            jogoSalvo.data || "",
+          horario:
+            jogoSalvo.horario || "",
+        };
+      }
+    );
+
+    return acc;
+  }, {});
+};
+
+const existemConfrontosOficiais = (
+  jogos = {}
+) =>
+  fases.some((fase) =>
+    (jogos[fase.chave] || []).some(
+      (jogo) =>
+        jogo.timeA ||
+        jogo.timeB ||
+        jogo.data ||
+        jogo.horario
+    )
+  );
+
+const mesclarJogosComConfrontos = (
+  confrontos,
+  dadosSalvos = {}
+) => {
+  const jogosSalvos =
+    dadosSalvos.jogos || {};
+
+  return fases.reduce((acc, fase) => {
+    const baseDaFase =
+      Array.isArray(
+        confrontos[fase.chave]
+      )
+        ? confrontos[fase.chave]
+        : [];
+
+    const jogosDaFase =
+      Array.isArray(
+        jogosSalvos[fase.chave]
+      )
+        ? jogosSalvos[fase.chave]
+        : [];
+
+    const classificadosAntigos =
+      Array.isArray(
+        dadosSalvos[fase.chave]
+      )
+        ? dadosSalvos[fase.chave]
+        : [];
+
+    acc[fase.chave] = baseDaFase.map(
+      (jogoBase, index) => {
+        const jogoSalvo =
+          jogosDaFase[index] || {};
+
+        return {
+          ...jogoBase,
+          placarA:
+            jogoSalvo.placarA || "",
+          placarB:
+            jogoSalvo.placarB || "",
+          decididoNosPenaltis: Boolean(
+            jogoSalvo.decididoNosPenaltis
+          ),
           classificado:
             jogoSalvo.classificado ||
             classificadosAntigos[index] ||
@@ -117,6 +234,11 @@ function PalpitesMataMata({
 }) {
   const [jogos, setJogos] =
     useState(criarJogosVazios);
+
+  const [
+    temConfrontosOficiais,
+    setTemConfrontosOficiais,
+  ] = useState(false);
 
   const [encerrado, setEncerrado] =
     useState(false);
@@ -184,7 +306,16 @@ function PalpitesMataMata({
   const carregarPalpite =
     async () => {
       try {
-        const snapshot =
+        const configSnapshot =
+          await getDoc(
+            doc(
+              db,
+              "configuracoes",
+              "mataMata"
+            )
+          );
+
+        const palpiteSnapshot =
           await getDoc(
             doc(
               db,
@@ -193,10 +324,43 @@ function PalpitesMataMata({
             )
           );
 
-        if (snapshot.exists()) {
+        const dadosPalpite =
+          palpiteSnapshot.exists()
+            ? palpiteSnapshot.data()
+            : {};
+
+        if (configSnapshot.exists()) {
+          const confrontos =
+            normalizarConfrontosOficiais(
+              configSnapshot.data()
+            );
+
+          const possuiConfrontos =
+            existemConfrontosOficiais(
+              confrontos
+            );
+
+          setTemConfrontosOficiais(
+            possuiConfrontos
+          );
+          setJogos(
+            possuiConfrontos
+              ? mesclarJogosComConfrontos(
+                  confrontos,
+                  dadosPalpite
+                )
+              : normalizarJogos(
+                  dadosPalpite
+                )
+          );
+
+          return;
+        }
+
+        if (palpiteSnapshot.exists()) {
           setJogos(
             normalizarJogos(
-              snapshot.data()
+              dadosPalpite
             )
           );
         }
@@ -326,8 +490,9 @@ function PalpitesMataMata({
       )}
 
       <p style={textoApoioStyle}>
-        Preencha cada jogo com os times,
-        placar previsto e classificado.
+        {temConfrontosOficiais
+          ? "Confrontos oficiais definidos. Informe apenas o placar previsto e o classificado."
+          : "Preencha cada jogo com os times, placar previsto e classificado."}
       </p>
 
       {fases.map((fase) => (
@@ -348,24 +513,51 @@ function PalpitesMataMata({
                     Jogo {index + 1}
                   </strong>
 
+                  {temConfrontosOficiais && (
+                    <div
+                      style={dadosJogoStyle}
+                    >
+                      <span>
+                        {jogo.data ||
+                          "Data a definir"}
+                      </span>
+
+                      <span>
+                        {jogo.horario ||
+                          "Horario a definir"}
+                      </span>
+                    </div>
+                  )}
+
                   <div
                     style={
                       confrontoStyle
                     }
                   >
-                    <input
-                      placeholder="Time A"
-                      value={jogo.timeA}
-                      onChange={(e) =>
-                        alterarJogo(
-                          fase.chave,
-                          index,
-                          "timeA",
-                          e.target.value
-                        )
-                      }
-                      style={inputStyle}
-                    />
+                    {temConfrontosOficiais ? (
+                      <strong
+                        style={
+                          nomeTimeStyle
+                        }
+                      >
+                        {jogo.timeA ||
+                          "Time A"}
+                      </strong>
+                    ) : (
+                      <input
+                        placeholder="Time A"
+                        value={jogo.timeA}
+                        onChange={(e) =>
+                          alterarJogo(
+                            fase.chave,
+                            index,
+                            "timeA",
+                            e.target.value
+                          )
+                        }
+                        style={inputStyle}
+                      />
+                    )}
 
                     <input
                       inputMode="numeric"
@@ -403,19 +595,30 @@ function PalpitesMataMata({
                       }
                     />
 
-                    <input
-                      placeholder="Time B"
-                      value={jogo.timeB}
-                      onChange={(e) =>
-                        alterarJogo(
-                          fase.chave,
-                          index,
-                          "timeB",
-                          e.target.value
-                        )
-                      }
-                      style={inputStyle}
-                    />
+                    {temConfrontosOficiais ? (
+                      <strong
+                        style={
+                          nomeTimeStyle
+                        }
+                      >
+                        {jogo.timeB ||
+                          "Time B"}
+                      </strong>
+                    ) : (
+                      <input
+                        placeholder="Time B"
+                        value={jogo.timeB}
+                        onChange={(e) =>
+                          alterarJogo(
+                            fase.chave,
+                            index,
+                            "timeB",
+                            e.target.value
+                          )
+                        }
+                        style={inputStyle}
+                      />
+                    )}
                   </div>
 
                   <input
@@ -433,6 +636,26 @@ function PalpitesMataMata({
                     }
                     style={inputStyle}
                   />
+
+                  <label
+                    style={checkboxLabelStyle}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={Boolean(
+                        jogo.decididoNosPenaltis
+                      )}
+                      onChange={(e) =>
+                        alterarJogo(
+                          fase.chave,
+                          index,
+                          "decididoNosPenaltis",
+                          e.target.checked
+                        )
+                      }
+                    />
+                    Decidido nos penaltis
+                  </label>
                 </div>
               )
             )}
@@ -531,6 +754,19 @@ const confrontoStyle = {
   gap: "8px",
 };
 
+const dadosJogoStyle = {
+  display: "flex",
+  gap: "8px",
+  flexWrap: "wrap",
+  color: "#ccc",
+  fontSize: "14px",
+};
+
+const nomeTimeStyle = {
+  minWidth: 0,
+  overflowWrap: "anywhere",
+};
+
 const inputStyle = {
   width: "100%",
   maxWidth: "100%",
@@ -546,6 +782,14 @@ const inputStyle = {
 const placarStyle = {
   ...inputStyle,
   textAlign: "center",
+};
+
+const checkboxLabelStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  color: "#ddd",
+  fontSize: "14px",
 };
 
 const botaoSalvar = {
