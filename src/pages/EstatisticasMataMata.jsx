@@ -104,6 +104,125 @@ const ordenarRanking = (lista, campo) =>
     })
     .slice(0, 5);
 
+const obterLideres = (
+  participantes,
+  obterValor
+) => {
+  const valores = participantes.map(
+    (participante) =>
+      Number(obterValor(participante) || 0)
+  );
+  const maiorValor = Math.max(
+    ...valores,
+    0
+  );
+
+  if (maiorValor <= 0) {
+    return {
+      valor: 0,
+      nomes: [],
+    };
+  }
+
+  return {
+    valor: maiorValor,
+    nomes: participantes
+      .filter(
+        (participante) =>
+          Number(
+            obterValor(participante) || 0
+          ) === maiorValor
+      )
+      .map((participante) =>
+        participante.nome
+      )
+      .sort((a, b) =>
+        a.localeCompare(b)
+      ),
+  };
+};
+
+const montarDestaques = (
+  participantes = []
+) => {
+  const destaque = (
+    titulo,
+    descricao,
+    obterValor,
+    sufixo = "acertos"
+  ) => ({
+    titulo,
+    descricao,
+    sufixo,
+    ...obterLideres(
+      participantes,
+      obterValor
+    ),
+  });
+
+  return [
+    destaque(
+      "Rei dos Placares",
+      "Placares exatos no Mata-Mata",
+      (p) => p.placarExato
+    ),
+    destaque(
+      "Rei dos Resultados",
+      "Resultados corretos no Mata-Mata",
+      (p) => p.resultadoCorreto
+    ),
+    destaque(
+      "Rei dos Classificados",
+      "Classificados corretos no Mata-Mata",
+      (p) => p.classificadoCorreto
+    ),
+    destaque(
+      "Rei dos Penaltis",
+      "Penaltis corretos no Mata-Mata",
+      (p) => p.penaltisCorreto
+    ),
+    destaque(
+      "Rei do Acerto Total",
+      "Acertos totais no Mata-Mata",
+      (p) => p.acertoTotal
+    ),
+    destaque(
+      "Melhor Aproveitamento",
+      "Maior aproveitamento nos acertos",
+      (p) => p.aproveitamento,
+      "%"
+    ),
+    destaque(
+      "Rei das Oitavas",
+      "Total de acertos na fase",
+      (p) =>
+        p.porFase?.oitavas
+          ?.totalAcertos
+    ),
+    destaque(
+      "Rei das Quartas",
+      "Total de acertos na fase",
+      (p) =>
+        p.porFase?.quartas
+          ?.totalAcertos
+    ),
+    destaque(
+      "Rei da Semifinal",
+      "Total de acertos na fase",
+      (p) =>
+        p.porFase?.semifinal
+          ?.totalAcertos
+    ),
+    destaque(
+      "Rei da Final",
+      "Total de acertos na fase",
+      (p) =>
+        p.porFase?.final
+          ?.totalAcertos
+    ),
+  ];
+};
+
 const calcularEstatisticas = ({
   usuarios,
   palpites,
@@ -303,6 +422,8 @@ const calcularEstatisticas = ({
 
   return {
     participantes,
+    destaques:
+      montarDestaques(participantes),
     fasesResumo,
     resumo: {
       participantesComPalpite:
@@ -481,6 +602,67 @@ function EstatisticasMataMata({ voltar }) {
     </section>
   );
 
+  const renderDestaque = (destaque) => {
+    const temDestaque =
+      destaque.nomes.length > 0;
+    const temEmpate =
+      destaque.nomes.length > 1;
+    const nomesVisiveis =
+      destaque.nomes.slice(0, 3);
+    const nomesRestantes =
+      destaque.nomes.length -
+      nomesVisiveis.length;
+
+    return (
+      <div
+        key={destaque.titulo}
+        style={destaqueCardStyle}
+      >
+        <span style={destaqueLabelStyle}>
+          {destaque.titulo}
+        </span>
+
+        {temDestaque ? (
+          <>
+            <strong
+              style={destaqueNomeStyle}
+            >
+              {temEmpate
+                ? "Empate"
+                : destaque.nomes[0]}
+            </strong>
+
+            {temEmpate && (
+              <span
+                style={destaqueEmpateStyle}
+              >
+                {nomesVisiveis.join(", ")}
+                {nomesRestantes > 0
+                  ? ` +${nomesRestantes}`
+                  : ""}
+              </span>
+            )}
+
+            <span style={destaqueValorStyle}>
+              {destaque.valor}
+              {destaque.sufixo === "%"
+                ? "%"
+                : ` ${destaque.sufixo}`}
+            </span>
+          </>
+        ) : (
+          <strong style={semDestaqueStyle}>
+            Sem destaque ainda
+          </strong>
+        )}
+
+        <small style={destaqueDescricaoStyle}>
+          {destaque.descricao}
+        </small>
+      </div>
+    );
+  };
+
   return (
     <div style={paginaStyle}>
       <h1 style={tituloStyle}>
@@ -563,6 +745,18 @@ function EstatisticasMataMata({ voltar }) {
                     .faseComMaisAcertos
                 }
               </strong>
+            </div>
+          </section>
+
+          <section style={cardStyle}>
+            <h2 style={cardTituloStyle}>
+              Destaques do Mata-Mata
+            </h2>
+
+            <div style={destaquesGridStyle}>
+              {dados.destaques.map(
+                renderDestaque
+              )}
             </div>
           </section>
 
@@ -773,6 +967,59 @@ const gridStyle = {
     "repeat(auto-fit, minmax(280px, 1fr))",
   gap: "14px",
   alignItems: "start",
+};
+
+const destaquesGridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(210px, 1fr))",
+  gap: "12px",
+};
+
+const destaqueCardStyle = {
+  backgroundColor: "#111",
+  border: "1px solid #333",
+  borderRadius: "8px",
+  padding: "14px",
+  display: "grid",
+  gap: "7px",
+  textAlign: "left",
+  minWidth: 0,
+};
+
+const destaqueLabelStyle = {
+  color: "#ffd76a",
+  fontSize: "14px",
+  fontWeight: "bold",
+};
+
+const destaqueNomeStyle = {
+  color: "white",
+  fontSize: "18px",
+  lineHeight: 1.2,
+  overflowWrap: "anywhere",
+};
+
+const destaqueEmpateStyle = {
+  color: "#ddd",
+  fontSize: "13px",
+  lineHeight: 1.3,
+  overflowWrap: "anywhere",
+};
+
+const destaqueValorStyle = {
+  color: "#ffc107",
+  fontWeight: "bold",
+};
+
+const semDestaqueStyle = {
+  color: "#aaa",
+  fontSize: "15px",
+};
+
+const destaqueDescricaoStyle = {
+  color: "#999",
+  lineHeight: 1.35,
 };
 
 const cardStyle = {

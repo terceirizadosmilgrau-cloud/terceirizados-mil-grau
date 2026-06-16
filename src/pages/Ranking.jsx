@@ -219,6 +219,7 @@ function Ranking({ voltar }) {
         let pontosGrupos = 0;
         let pontosMataMata = 0;
         let detalhesMataMata = null;
+        let palpiteMataMata = null;
         const palpites =
           palpiteSnapshot.exists()
             ? palpiteSnapshot.data()
@@ -251,7 +252,7 @@ function Ranking({ voltar }) {
           mataMataSnapshot.exists() &&
           resultadoMataMata
         ) {
-          const palpiteMataMata =
+          palpiteMataMata =
             mataMataSnapshot.data();
 
           detalhesMataMata =
@@ -278,6 +279,8 @@ function Ranking({ voltar }) {
           pontosGrupos,
           pontosMataMata,
           detalhesMataMata,
+          palpiteMataMata,
+          resultadoMataMata,
           diferencaLider: 0,
           posicao: 0,
           premiacao: 0,
@@ -598,12 +601,18 @@ function Ranking({ voltar }) {
   };
 
   const abrirDetalheParticipante = (
-    participante
+    participante,
+    posicaoAtual = participante?.posicao
   ) => {
     if (!participante) return;
 
     setParticipanteSelecionado(
-      participante
+      {
+        ...participante,
+        posicaoModal: posicaoAtual,
+        emZonaPremiacao:
+          posicaoAtual <= 3,
+      }
     );
   };
 
@@ -684,7 +693,8 @@ function Ranking({ voltar }) {
         participante
           ? () =>
               abrirDetalheParticipante(
-                participante
+                participante,
+                posicao
               )
           : undefined
       }
@@ -920,7 +930,8 @@ function Ranking({ voltar }) {
                 key={`${modoRanking}-${participante.nome}-${index}`}
                 onClick={() =>
                   abrirDetalheParticipante(
-                    participante
+                    participante,
+                    posicaoVisual(index)
                   )
                 }
                 style={
