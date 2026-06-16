@@ -229,6 +229,127 @@ const listarClassificados = (
     )
     .filter(Boolean);
 
+const obterInicioDoJogo = (jogo) => {
+  if (!jogo?.data || !jogo?.horario) {
+    return null;
+  }
+
+  const inicio = new Date(
+    `${jogo.data}T${jogo.horario}:00`
+  );
+
+  if (Number.isNaN(inicio.getTime())) {
+    return null;
+  }
+
+  return inicio;
+};
+
+const jogoIniciado = (
+  jogo,
+  agora = new Date()
+) => {
+  const inicio = obterInicioDoJogo(jogo);
+
+  if (!inicio) return false;
+
+  return agora >= inicio;
+};
+
+const mesclarJogosPreservandoTravados = (
+  jogosAtuais = {},
+  jogosPersistidos = {},
+  agora = new Date()
+) =>
+  fases.reduce((acc, fase) => {
+    const jogosDaFase =
+      Array.isArray(
+        jogosAtuais[fase.chave]
+      )
+        ? jogosAtuais[fase.chave]
+        : [];
+
+    const persistidosDaFase =
+      Array.isArray(
+        jogosPersistidos[fase.chave]
+      )
+        ? jogosPersistidos[fase.chave]
+        : [];
+
+    acc[fase.chave] = jogosDaFase.map(
+      (jogo, index) =>
+        jogoIniciado(jogo, agora)
+          ? persistidosDaFase[index] ||
+            jogo
+          : jogo
+    );
+
+    return acc;
+  }, {});
+
+const algumJogoIniciado = (
+  jogos = {},
+  agora = new Date()
+) =>
+  fases.some((fase) =>
+    (jogos[fase.chave] || []).some(
+      (jogo) =>
+        jogoIniciado(jogo, agora)
+    )
+  );
+
+const limparJogoEditavel = (
+  jogo,
+  temConfrontosOficiais
+) => ({
+  ...jogo,
+  timeA: temConfrontosOficiais
+    ? jogo.timeA
+    : "",
+  timeB: temConfrontosOficiais
+    ? jogo.timeB
+    : "",
+  placarA: "",
+  placarB: "",
+  classificado: "",
+  decididoNosPenaltis: false,
+});
+
+const limparJogosPreservandoTravados = (
+  jogosAtuais = {},
+  jogosPersistidos = {},
+  temConfrontosOficiais = false,
+  agora = new Date()
+) =>
+  fases.reduce((acc, fase) => {
+    const jogosDaFase =
+      Array.isArray(
+        jogosAtuais[fase.chave]
+      )
+        ? jogosAtuais[fase.chave]
+        : [];
+
+    const persistidosDaFase =
+      Array.isArray(
+        jogosPersistidos[fase.chave]
+      )
+        ? jogosPersistidos[fase.chave]
+        : [];
+
+    acc[fase.chave] = jogosDaFase.map(
+      (jogo, index) =>
+        jogoIniciado(jogo, agora)
+          ? persistidosDaFase[index] ||
+            jogo
+          : limparJogoEditavel(
+              jogo,
+              temConfrontosOficiais
+            )
+    );
+
+    return acc;
+  }, {});
+
 function PalpitesMataMata({
   usuario,
   voltar,
@@ -237,23 +358,21 @@ function PalpitesMataMata({
     useState(criarJogosVazios);
 
   const [
+    jogosPersistidos,
+    setJogosPersistidos,
+  ] = useState(criarJogosVazios);
+
+  const [
     temConfrontosOficiais,
     setTemConfrontosOficiais,
   ] = useState(false);
 
-  const [encerrado, setEncerrado] =
-    useState(false);
-
-  const [dataLimite, setDataLimite] =
-    useState(null);
-
-  const [tempoRestante, setTempoRestante] =
-    useState("");
+  const [agora, setAgora] = useState(
+    () => new Date()
+  );
 
   useEffect(() => {
     window.scrollTo(0, 0);
-
-    carregarConfiguracoes();
   }, []);
 
   useEffect(() => {
@@ -261,50 +380,14 @@ function PalpitesMataMata({
   }, []);
 
   useEffect(() => {
-    if (!dataLimite) return;
-
-    const atualizarTempo = () => {
-      const agora = new Date();
-      const limite = new Date(dataLimite);
-      const diferenca = limite - agora;
-
-      if (diferenca <= 0) {
-        setTempoRestante("Encerrado");
-        return;
-      }
-
-      const dias = Math.floor(
-        diferenca /
-          (1000 * 60 * 60 * 24)
-      );
-
-      const horas = Math.floor(
-        (diferenca %
-          (1000 * 60 * 60 * 24)) /
-          (1000 * 60 * 60)
-      );
-
-      const minutos = Math.floor(
-        (diferenca %
-          (1000 * 60 * 60)) /
-          (1000 * 60)
-      );
-
-      setTempoRestante(
-        `${dias}d ${horas}h ${minutos}min`
-      );
-    };
-
-    atualizarTempo();
-
     const intervalo = setInterval(
-      atualizarTempo,
+      () => setAgora(new Date()),
       60000
     );
 
     return () =>
       clearInterval(intervalo);
-  }, [dataLimite]);
+  }, []);
 
   const carregarPalpite =
     async () => {
@@ -346,7 +429,7 @@ function PalpitesMataMata({
           setTemConfrontosOficiais(
             possuiConfrontos
           );
-          setJogos(
+          const jogosCarregados =
             possuiConfrontos
               ? mesclarJogosComConfrontos(
                   confrontos,
@@ -354,52 +437,26 @@ function PalpitesMataMata({
                 )
               : normalizarJogos(
                   dadosPalpite
-                )
+                );
+
+          setJogos(jogosCarregados);
+          setJogosPersistidos(
+            jogosCarregados
           );
 
           return;
         }
 
         if (palpiteSnapshot.exists()) {
-          setJogos(
+          const jogosCarregados =
             normalizarJogos(
               dadosPalpite
-            )
+            );
+
+          setJogos(jogosCarregados);
+          setJogosPersistidos(
+            jogosCarregados
           );
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-  const carregarConfiguracoes =
-    async () => {
-      try {
-        const snapshot =
-          await getDoc(
-            doc(
-              db,
-              "configuracoes",
-              "geral"
-            )
-          );
-
-        if (snapshot.exists()) {
-          const config =
-            snapshot.data();
-
-          const limite =
-            config.dataLimitePalpites;
-
-          setDataLimite(limite);
-
-          if (
-            limite &&
-            new Date() >
-              new Date(limite)
-          ) {
-            setEncerrado(true);
-          }
         }
       } catch (error) {
         console.error(error);
@@ -427,19 +484,21 @@ function PalpitesMataMata({
   };
 
   const salvar = async () => {
-    if (encerrado) {
-      alert(
-        "Os palpites estao encerrados."
-      );
-      return;
-    }
-
     try {
+      const jogosParaSalvar =
+        mesclarJogosPreservandoTravados(
+          jogos,
+          jogosPersistidos,
+          new Date()
+        );
+
       const classificados =
         fases.reduce((acc, fase) => {
           acc[fase.chave] =
             listarClassificados(
-              jogos[fase.chave]
+              jogosParaSalvar[
+                fase.chave
+              ]
             );
 
           return acc;
@@ -452,7 +511,7 @@ function PalpitesMataMata({
           usuario.uid
         ),
         {
-          jogos,
+          jogos: jogosParaSalvar,
           ...classificados,
           campeao:
             classificados.final[0] ||
@@ -464,6 +523,10 @@ function PalpitesMataMata({
 
       alert(
         "Palpite do Mata-Mata salvo!"
+      );
+      setJogos(jogosParaSalvar);
+      setJogosPersistidos(
+        jogosParaSalvar
       );
     } catch (error) {
       console.error(error);
@@ -479,18 +542,77 @@ function PalpitesMataMata({
     if (!confirmar) return;
 
     try {
-      await deleteDoc(
+      if (!temConfrontosOficiais) {
+        await deleteDoc(
+          doc(
+            db,
+            "palpitesMataMata",
+            usuario.uid
+          )
+        );
+
+        setJogos(criarJogosVazios());
+        setJogosPersistidos(
+          criarJogosVazios()
+        );
+
+        alert(
+          "Palpites do Mata-Mata apagados."
+        );
+        return;
+      }
+
+      const agoraLimpeza = new Date();
+      const temJogosTravados =
+        algumJogoIniciado(
+          jogos,
+          agoraLimpeza
+        );
+
+      const jogosLimpos =
+        limparJogosPreservandoTravados(
+          jogos,
+          jogosPersistidos,
+          temConfrontosOficiais,
+          agoraLimpeza
+        );
+
+      const classificados =
+        fases.reduce((acc, fase) => {
+          acc[fase.chave] =
+            listarClassificados(
+              jogosLimpos[fase.chave]
+            );
+
+          return acc;
+        }, {});
+
+      await setDoc(
         doc(
           db,
           "palpitesMataMata",
           usuario.uid
-        )
+        ),
+        {
+          jogos: jogosLimpos,
+          ...classificados,
+          campeao:
+            classificados.final[0] ||
+            "",
+          atualizadoEm:
+            new Date().toISOString(),
+        }
       );
 
-      setJogos(criarJogosVazios());
+      setJogos(jogosLimpos);
+      setJogosPersistidos(
+        jogosLimpos
+      );
 
       alert(
-        "Palpites do Mata-Mata apagados."
+        temJogosTravados
+          ? "Palpites editaveis apagados. Jogos iniciados foram preservados."
+          : "Palpites do Mata-Mata apagados."
       );
     } catch (error) {
       console.error(
@@ -509,18 +631,10 @@ function PalpitesMataMata({
         Mata-Mata
       </h1>
 
-      {dataLimite &&
-        !encerrado && (
-          <div style={avisoAbertoStyle}>
-            Encerramento dos palpites em:{" "}
-            {tempoRestante}
-          </div>
-        )}
-
-      {encerrado && (
-        <div style={avisoEncerradoStyle}>
-          Os palpites do Mata-Mata estao
-          encerrados.
+      {temConfrontosOficiais && (
+        <div style={avisoAbertoStyle}>
+          Os jogos sao travados automaticamente
+          no horario de inicio.
         </div>
       )}
 
@@ -539,11 +653,23 @@ function PalpitesMataMata({
 
           <div style={listaJogosStyle}>
             {jogos[fase.chave].map(
-              (jogo, index) => (
-                <div
-                  key={jogo.id}
-                  style={jogoStyle}
-                >
+              (jogo, index) => {
+                const iniciado =
+                  jogoIniciado(
+                    jogo,
+                    agora
+                  );
+
+                return (
+                  <div
+                    key={jogo.id}
+                    style={{
+                      ...jogoStyle,
+                      ...(iniciado
+                        ? jogoTravadoStyle
+                        : {}),
+                    }}
+                  >
                   <strong>
                     Jogo {index + 1}
                   </strong>
@@ -561,6 +687,14 @@ function PalpitesMataMata({
                         {jogo.horario ||
                           "Horario a definir"}
                       </span>
+                    </div>
+                  )}
+
+                  {iniciado && (
+                    <div
+                      style={avisoJogoTravadoStyle}
+                    >
+                      Jogo iniciado - palpite travado.
                     </div>
                   )}
 
@@ -582,6 +716,7 @@ function PalpitesMataMata({
                       <input
                         placeholder="Time A"
                         value={jogo.timeA}
+                        disabled={iniciado}
                         onChange={(e) =>
                           alterarJogo(
                             fase.chave,
@@ -590,7 +725,12 @@ function PalpitesMataMata({
                             e.target.value
                           )
                         }
-                        style={inputStyle}
+                        style={{
+                          ...inputStyle,
+                          ...(iniciado
+                            ? inputDesabilitadoStyle
+                            : {}),
+                        }}
                       />
                     )}
 
@@ -598,6 +738,7 @@ function PalpitesMataMata({
                       inputMode="numeric"
                       placeholder="0"
                       value={jogo.placarA}
+                      disabled={iniciado}
                       onChange={(e) =>
                         alterarJogo(
                           fase.chave,
@@ -606,9 +747,12 @@ function PalpitesMataMata({
                           e.target.value
                         )
                       }
-                      style={
-                        placarStyle
-                      }
+                      style={{
+                        ...placarStyle,
+                        ...(iniciado
+                          ? inputDesabilitadoStyle
+                          : {}),
+                      }}
                     />
 
                     <span>X</span>
@@ -617,6 +761,7 @@ function PalpitesMataMata({
                       inputMode="numeric"
                       placeholder="0"
                       value={jogo.placarB}
+                      disabled={iniciado}
                       onChange={(e) =>
                         alterarJogo(
                           fase.chave,
@@ -625,9 +770,12 @@ function PalpitesMataMata({
                           e.target.value
                         )
                       }
-                      style={
-                        placarStyle
-                      }
+                      style={{
+                        ...placarStyle,
+                        ...(iniciado
+                          ? inputDesabilitadoStyle
+                          : {}),
+                      }}
                     />
 
                     {temConfrontosOficiais ? (
@@ -643,6 +791,7 @@ function PalpitesMataMata({
                       <input
                         placeholder="Time B"
                         value={jogo.timeB}
+                        disabled={iniciado}
                         onChange={(e) =>
                           alterarJogo(
                             fase.chave,
@@ -651,7 +800,12 @@ function PalpitesMataMata({
                             e.target.value
                           )
                         }
-                        style={inputStyle}
+                        style={{
+                          ...inputStyle,
+                          ...(iniciado
+                            ? inputDesabilitadoStyle
+                            : {}),
+                        }}
                       />
                     )}
                   </div>
@@ -661,6 +815,7 @@ function PalpitesMataMata({
                     value={
                       jogo.classificado
                     }
+                    disabled={iniciado}
                     onChange={(e) =>
                       alterarJogo(
                         fase.chave,
@@ -669,7 +824,12 @@ function PalpitesMataMata({
                         e.target.value
                       )
                     }
-                    style={inputStyle}
+                    style={{
+                      ...inputStyle,
+                      ...(iniciado
+                        ? inputDesabilitadoStyle
+                        : {}),
+                    }}
                   />
 
                   <label
@@ -677,6 +837,7 @@ function PalpitesMataMata({
                   >
                     <input
                       type="checkbox"
+                      disabled={iniciado}
                       checked={Boolean(
                         jogo.decididoNosPenaltis
                       )}
@@ -692,7 +853,8 @@ function PalpitesMataMata({
                     Decidido nos penaltis
                   </label>
                 </div>
-              )
+                );
+              }
             )}
           </div>
         </section>
@@ -754,16 +916,6 @@ const avisoAbertoStyle = {
   overflowWrap: "anywhere",
 };
 
-const avisoEncerradoStyle = {
-  backgroundColor: "#dc3545",
-  padding: "15px",
-  borderRadius: "8px",
-  marginBottom: "20px",
-  fontWeight: "bold",
-  maxWidth: "100%",
-  overflowWrap: "anywhere",
-};
-
 const secaoStyle = {
   backgroundColor: "#1a1a1a",
   padding: "clamp(16px, 4vw, 20px)",
@@ -786,6 +938,20 @@ const jogoStyle = {
   padding: "14px",
   display: "grid",
   gap: "10px",
+};
+
+const jogoTravadoStyle = {
+  borderColor: "#7f1d1d",
+  backgroundColor: "#171111",
+};
+
+const avisoJogoTravadoStyle = {
+  backgroundColor: "#7f1d1d",
+  border: "1px solid #dc3545",
+  color: "white",
+  padding: "10px",
+  borderRadius: "8px",
+  fontWeight: "bold",
 };
 
 const confrontoStyle = {
@@ -819,6 +985,11 @@ const inputStyle = {
   color: "white",
   boxSizing: "border-box",
   fontSize: "16px",
+};
+
+const inputDesabilitadoStyle = {
+  opacity: 0.75,
+  cursor: "not-allowed",
 };
 
 const placarStyle = {
