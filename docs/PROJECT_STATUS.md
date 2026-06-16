@@ -13,7 +13,8 @@
 
 ## Status Atual
 
-Versao atual: V41
+Versao atual: V43.1
+
 
 Sistema funcional, responsivo e com regras de seguranca do Firestore preparadas no projeto.
 
@@ -244,3 +245,35 @@ V40 e V41 tambem foram implementadas:
 ## Proxima Tarefa
 
 Iniciar V42: Ranking exclusivo Mata-Mata.
+
+V41.1 concluida:
+- Botao seguro para zerar resultados de teste.
+
+V42 concluida:
+- Ranking exclusivo Mata-Mata.
+
+V42.1 ate V42.8 concluidas:
+- Refinamentos visuais do Ranking.
+- Pódio mobile.
+- Identidade visual esportiva.
+- Badge profissional.
+- Correções desktop.
+- Remoção de duplicidades.
+- Top 3 removido da classificação completa.
+- Busca reposicionada.
+
+V43 concluida:
+- Confrontos oficiais do Mata-Mata.
+- SuperAdmin cadastra:
+  - timeA
+  - timeB
+  - data
+  - horario
+- Salvos em configuracoes/mataMata.
+- Participantes não editam mais seleções quando existem confrontos oficiais.
+
+V43.1 concluida:
+- Campo decididoNosPenaltis.
+- Checkbox em palpites e resultados.
+- Bonus de +3 pontos por acertar decisão nos pênaltis.
+- Máximo atual por jogo: 18 pontos.

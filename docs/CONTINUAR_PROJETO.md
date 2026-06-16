@@ -12,7 +12,7 @@ Tipo: Bolao da Copa 2026
 
 Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
 
-Proxima versao planejada: V42 - Ranking exclusivo Mata-Mata.
+Proxima versao planejada: V43.2 - Resultado do jogo e bônus de acerto total.
 
 ---
 
@@ -539,3 +539,24 @@ Regras para V42:
 * Os relatorios antigos em `relatorios/` podem citar problemas que ja foram resolvidos.
 * O arquivo `PROJECT_STATUS.md` contem o resumo oficial atualizado.
 * Este arquivo e o guia de continuidade para novos chats.
+
+configuracoes/mataMata
+
+Uso:
+- confrontos oficiais do Mata-Mata
+
+Estrutura:
+
+jogos:
+  oitavas
+  quartas
+  semifinal
+  final
+
+Cada jogo:
+- id
+- fase
+- timeA
+- timeB
+- data
+- horario

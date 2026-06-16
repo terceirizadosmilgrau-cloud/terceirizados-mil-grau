@@ -2,13 +2,18 @@ Projeto: Terceirizados Mil Grau
 
 Status Atual:
 
-V36 concluida
-V37 concluida
-V38 concluida
-V38.1 concluida
-V39 concluida
-V40 concluida
-V41 concluida
+V36 ✅
+V37 ✅
+V38 ✅
+V38.1 ✅
+V39 ✅
+V40 ✅
+V41 ✅
+V41.1 ✅
+V42 ✅
+V42.1 até V42.8 ✅
+V43 ✅
+V43.1 ✅
 
 Stack:
 - React
@@ -17,38 +22,36 @@ Stack:
 - Firestore
 - Firebase Hosting
 
-Permissoes:
+Permissões:
 - participante
 - admin
 - superadmin
 
 SuperAdmin:
 Baseado em tipoUsuario.
-Nao existe mais email hardcoded.
+Sem e-mail hardcoded.
 
-Firestore:
-Protegido por firestore.rules.
+Mata-Mata atual:
+- Confrontos oficiais configurados pelo SuperAdmin.
+- Salvos em configuracoes/mataMata.
+- Participante preenche:
+  - placarA
+  - placarB
+  - classificado
+  - decididoNosPenaltis
+- Resultados oficiais usam os mesmos confrontos.
 
-V39 implementada:
-- Mata-Mata com palpites por jogo.
-- Cada jogo tem time A, time B, placar previsto e classificado previsto.
-- O modelo antigo por listas segue salvo para compatibilidade com ranking atual.
+Pontuação atual:
+- placar exato = 10
+- classificado correto = 5
+- pênaltis correto = +3
+- máximo atual = 18
 
-V40 implementada:
-- Resultados Oficiais com Mata-Mata por jogo.
-- resultados/mataMata grava jogos e campos antigos derivados.
-- Botao seguro para zerar resultados de teste apenas para superadmin.
+Próxima versão:
+V43.2 - Resultado do jogo e bônus de acerto total.
 
-V41 implementada:
-- Pontuacao do Mata-Mata por jogo.
-- Placar exato vale 10 pontos.
-- Classificado correto vale 5 pontos.
-- Fallback antigo preservado quando jogos nao existir nos dois lados.
-
-Proxima versao:
-V42 - Ranking exclusivo Mata-Mata.
-
-Antes de alterar codigo:
-Sempre gerar plano tecnico.
-Sempre rodar npm run build.
-Sempre listar arquivos alterados.
+Antes de alterar código:
+- gerar plano técnico;
+- rodar npm.cmd run build;
+- listar arquivos alterados;
+- não fazer deploy.
