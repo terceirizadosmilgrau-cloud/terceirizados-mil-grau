@@ -13,7 +13,7 @@
 
 ## Status Atual
 
-Versao atual: V43.2
+Versao atual: V43.4I
 
 
 Sistema funcional, responsivo e com regras de seguranca do Firestore preparadas no projeto.
@@ -28,6 +28,8 @@ Status das versoes recentes:
 * V40 concluida: Resultados oficiais por jogo implementados.
 * V41 concluida: Pontuacao do Mata-Mata por jogo implementada.
 * V43.2 concluida: Resultado do jogo e bonus de acerto total implementados.
+* V43.4 concluida: Mata-Mata virou foco principal e Fase de Grupos passou a modulo secundario.
+* V43.4E/F/G/H/I concluidas: Resumo Mata-Mata, Ranking Oficial destacado, limpeza dos proprios palpites, resumos padronizados, scroll no topo e modal focado em Mata-Mata.
 
 ---
 
@@ -43,7 +45,9 @@ Status das versoes recentes:
 * Exclusao de participante por SuperAdmin
 * Palpites da fase de grupos
 * Resumo de palpites
+* Resumo Mata-Mata
 * Ranking geral
+* Ranking Mata-Mata como visualizacao inicial
 * Premiacao
 * Destaques do ranking
 * Melhor aproveitamento
@@ -58,6 +62,7 @@ Status das versoes recentes:
 * Botao seguro para zerar resultados de teste
 * Configuracao de liberacao/encerramento de palpites
 * Responsividade para celular nas principais telas
+* Cards mobile de participantes ate 768px, sem tabela com scroll lateral no celular
 * Regras Firestore configuradas no projeto
 
 ---
@@ -125,6 +130,7 @@ Colecoes usadas:
 Regras atuais preparadas para:
 
 * Participante editar apenas seus proprios palpites.
+* Participante apagar apenas seus proprios palpites.
 * Admin alterar apenas pagamento.
 * SuperAdmin alterar pagamento, perfis, resultados e configuracoes.
 * Bloquear escrita nao autorizada.
@@ -249,6 +255,21 @@ V40 e V41 tambem foram implementadas:
 ## Proxima Tarefa
 
 Proxima versao a definir.
+
+V43.4 concluida:
+- Dashboard reorganizado com foco em Mata-Mata.
+- Bloco Mata-Mata: Palpites Mata-Mata, Resumo Mata-Mata, Central Mata-Mata e Resultados Mata-Mata.
+- Bloco Fase de Grupos: Palpites de Grupos, Resumo de Palpites, Central de Palpites e Resultados de Grupos.
+- Ranking Oficial destacado em card separado.
+- Ranking abre por padrao na aba Mata-Mata, mantendo aba Geral.
+- Resultados continuam na mesma tela, mas abrem na aba correta conforme o botao do Dashboard.
+- Nova tela `src/pages/ResumoMataMata.jsx`, somente leitura.
+- Resumo de Grupos exibe estado vazio quando nao ha palpites.
+- Participante pode limpar apenas seus proprios documentos em `palpites/{uid}` e `palpitesMataMata/{uid}`.
+- `firestore.rules` permite delete em palpites somente para dono do documento ou SuperAdmin.
+- Telas principais chamam `window.scrollTo(0, 0)` ao abrir.
+- Modal `DetalheParticipante` prioriza Mata-Mata e deixa Fase de Grupos recolhida.
+- Responsividade da lista de participantes corrigida para cards mobile ate 768px.
 
 V41.1 concluida:
 - Botao seguro para zerar resultados de teste.

@@ -15,6 +15,12 @@ V42.1 ate V42.8 concluidas
 V43 concluida
 V43.1 concluida
 V43.2 concluida
+V43.4 concluida
+V43.4E concluida
+V43.4F concluida
+V43.4G concluida
+V43.4H concluida
+V43.4I concluida
 
 Stack:
 - React
@@ -41,6 +47,25 @@ Mata-Mata atual:
   - classificado
   - decididoNosPenaltis
 - Resultados oficiais usam os mesmos confrontos.
+
+UX atual:
+- Mata-Mata e o foco principal do Dashboard.
+- Fase de Grupos continua funcional, mas em modulo secundario.
+- Dashboard possui card separado "Ranking Oficial".
+- Ranking abre por padrao na aba Mata-Mata, mantendo aba Geral.
+- Resultados usam a mesma tela com abas Mata-Mata e Fase de Grupos.
+- Botoes do Dashboard abrem Resultados diretamente na aba correta.
+- Existe Resumo Mata-Mata somente leitura em src/pages/ResumoMataMata.jsx.
+- Resumo de Grupos mostra mensagem quando nao ha palpites.
+- Modal do participante prioriza Mata-Mata e deixa Fase de Grupos recolhida.
+- Telas principais rolam para o topo ao abrir.
+- Participantes no Dashboard usam cards mobile ate 768px.
+
+Limpeza de palpites:
+- Participante pode apagar apenas os proprios palpites.
+- Grupos: palpites/{uid}.
+- Mata-Mata: palpitesMataMata/{uid}.
+- firestore.rules permite delete somente para dono do documento ou superadmin.
 
 Pontuacao atual:
 - placar exato = +10

@@ -12,7 +12,7 @@ Tipo: Bolao da Copa 2026
 
 Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
 
-Versao atual: V43.2 - Resultado do jogo e bonus de acerto total.
+Versao atual: V43.4I - Mata-Mata como foco principal, resumos, limpeza dos proprios palpites, scroll no topo e modal do participante reorganizado.
 
 Proxima versao planejada: a definir.
 
@@ -53,6 +53,7 @@ Arquivos principais:
 * `src/pages/Palpites.jsx`
 * `src/components/GrupoPalpite.jsx`
 * `src/pages/ResumoPalpites.jsx`
+* `src/pages/ResumoMataMata.jsx`
 * `src/pages/Ranking.jsx`
 * `src/components/DetalheParticipante.jsx`
 * `src/pages/PalpitesMataMata.jsx`
@@ -301,6 +302,7 @@ Resumo das regras:
 * usuario autenticado pode ler dados necessarios.
 * participante pode criar seu proprio usuario no cadastro.
 * participante pode criar/editar apenas seus proprios palpites.
+* participante pode apagar apenas seus proprios palpites.
 * admin pode alterar apenas `pagamento`.
 * superadmin pode alterar `pagamento`, `tipoUsuario`, resultados e configuracoes.
 * superadmin pode excluir usuario que nao seja `superadmin`.
@@ -428,6 +430,27 @@ Implementado:
 * Pontos maximos do Mata-Mata no Ranking foram atualizados.
 * Maximo por jogo: 22 pontos sem penaltis e 25 pontos com penaltis.
 
+### V43.4 - Reorganizacao Visual, Resumos E Foco Mata-Mata
+
+Status: concluida.
+
+Implementado:
+
+* Dashboard reorganizado em bloco Mata-Mata, bloco Fase de Grupos e card separado de Ranking Oficial.
+* Bloco Mata-Mata contem Palpites Mata-Mata, Resumo Mata-Mata, Central Mata-Mata e Resultados Mata-Mata.
+* Bloco Fase de Grupos contem Palpites de Grupos, Resumo de Palpites, Central de Palpites e Resultados de Grupos.
+* Ranking abre por padrao na aba Mata-Mata.
+* Ranking Geral continua disponivel.
+* Resultados usam a mesma tela, com abas Mata-Mata e Fase de Grupos.
+* Dashboard abre Resultados ja na aba correspondente ao botao clicado.
+* Nova tela `ResumoMataMata.jsx`, somente leitura.
+* Resumo de Grupos mostra mensagem quando nao ha palpites.
+* Participante pode limpar apenas seus proprios palpites em `palpites/{uid}` e `palpitesMataMata/{uid}`.
+* `firestore.rules` permite delete nos palpites apenas para `isOwner(uid)` ou `isSuperAdmin()`.
+* Telas principais rolam para o topo ao abrir usando `window.scrollTo(0, 0)`.
+* Modal `DetalheParticipante` foi reorganizado para mostrar Mata-Mata primeiro e Fase de Grupos recolhida.
+* Cards mobile de participantes aparecem ate 768px para evitar tabela com scroll horizontal no celular.
+
 ---
 
 ## Roadmap
@@ -510,12 +533,12 @@ Ao iniciar um novo chat, enviar este arquivo e pedir:
 Leia CONTINUAR_PROJETO.md e PROJECT_STATUS.md.
 Entenda o estado atual do projeto.
 Nao altere codigo antes de gerar plano tecnico.
-Vamos continuar a partir da V42 - Ranking exclusivo Mata-Mata.
+Vamos continuar a partir da V43.4I.
 ```
 
 Tambem informar:
 
-* V36, V37, V38, V38.1, V39, V40 e V41 estao concluidas.
+* V36, V37, V38, V38.1, V39, V40, V41, V42, V43.2 e V43.4 estao concluidas.
 * Nao reabrir problema antigo de Admin.
 * Nao voltar para e-mail hardcoded.
 * Nao fazer deploy sem pedido explicito.
