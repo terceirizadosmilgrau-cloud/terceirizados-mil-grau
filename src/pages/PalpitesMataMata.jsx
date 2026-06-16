@@ -256,6 +256,49 @@ const jogoIniciado = (
   return agora >= inicio;
 };
 
+const formatarTempoAteTravamento = (
+  jogo,
+  agora = new Date()
+) => {
+  const inicio = obterInicioDoJogo(jogo);
+
+  if (!inicio || agora >= inicio) {
+    return "";
+  }
+
+  const diferenca = inicio - agora;
+  const totalMinutos = Math.ceil(
+    diferenca / (1000 * 60)
+  );
+  const dias = Math.floor(
+    totalMinutos / (60 * 24)
+  );
+  const horas = Math.floor(
+    (totalMinutos % (60 * 24)) / 60
+  );
+  const minutos = totalMinutos % 60;
+
+  if (totalMinutos < 60) {
+    return `${totalMinutos}min`;
+  }
+
+  if (dias > 0) {
+    return `${dias}d ${String(
+      horas
+    ).padStart(2, "0")}h ${String(
+      minutos
+    ).padStart(2, "0")}min`;
+  }
+
+  return `${String(horas).padStart(
+    2,
+    "0"
+  )}h ${String(minutos).padStart(
+    2,
+    "0"
+  )}min`;
+};
+
 const mesclarJogosPreservandoTravados = (
   jogosAtuais = {},
   jogosPersistidos = {},
@@ -659,6 +702,19 @@ function PalpitesMataMata({
                     jogo,
                     agora
                   );
+                const tempoAteTravamento =
+                  formatarTempoAteTravamento(
+                    jogo,
+                    agora
+                  );
+                const travamentoProximo =
+                  tempoAteTravamento &&
+                  !tempoAteTravamento.includes(
+                    "h"
+                  ) &&
+                  !tempoAteTravamento.includes(
+                    "d"
+                  );
 
                 return (
                   <div
@@ -697,6 +753,21 @@ function PalpitesMataMata({
                       Jogo iniciado - palpite travado.
                     </div>
                   )}
+
+                  {!iniciado &&
+                    tempoAteTravamento && (
+                      <div
+                        style={{
+                          ...avisoContagemStyle,
+                          ...(travamentoProximo
+                            ? avisoContagemProximaStyle
+                            : {}),
+                        }}
+                      >
+                        Trava em:{" "}
+                        {tempoAteTravamento}
+                      </div>
+                    )}
 
                   <div
                     style={
@@ -952,6 +1023,22 @@ const avisoJogoTravadoStyle = {
   padding: "10px",
   borderRadius: "8px",
   fontWeight: "bold",
+};
+
+const avisoContagemStyle = {
+  backgroundColor: "#18202b",
+  border: "1px solid #2f4056",
+  color: "#d7e6f7",
+  padding: "8px 10px",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontWeight: "bold",
+};
+
+const avisoContagemProximaStyle = {
+  backgroundColor: "#2b2412",
+  borderColor: "#8a6d1f",
+  color: "#ffe8a3",
 };
 
 const confrontoStyle = {
