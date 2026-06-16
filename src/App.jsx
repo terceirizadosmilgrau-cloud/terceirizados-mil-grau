@@ -14,6 +14,7 @@ import CentralPalpites from "./pages/CentralPalpites";
 import PalpitesMataMata from "./pages/PalpitesMataMata";
 import CentralMataMata from "./pages/CentralMataMata";
 import ResumoMataMata from "./pages/ResumoMataMata";
+import EstatisticasMataMata from "./pages/EstatisticasMataMata";
 
 function App() {
   const [tela, setTela] = useState("login");
@@ -145,6 +146,16 @@ function App() {
     );
   }
 
+  if (tela === "estatisticasMataMata") {
+    return (
+      <EstatisticasMataMata
+        voltar={() =>
+          setTela("dashboard")
+        }
+      />
+    );
+  }
+
   if (tela === "mataMata") {
   return (
     <PalpitesMataMata
@@ -214,6 +225,10 @@ function App() {
 
   abrirResumoMataMata={() =>
     setTela("resumoMataMata")
+  }
+
+  abrirEstatisticasMataMata={() =>
+    setTela("estatisticasMataMata")
   }
 />
     );
