@@ -248,18 +248,11 @@ participantes.length > 0
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <button
-        className="dashboard-v37-button"
-        onClick={sair}
-        style={botaoSairTopoStyle}
-      >
-        Sair
-      </button>
-
       <div
+  className="dashboard-v37-header"
   style={{
-    display: "flex",
-    flexDirection: "column",
+    display: "grid",
+    gridTemplateColumns: "1fr auto 1fr",
     alignItems: "center",
     gap: "15px",
     marginBottom: "30px",
@@ -270,10 +263,19 @@ participantes.length > 0
   style={{
     textAlign: "center",
     margin: 0,
+    gridColumn: "2",
   }}
 >
   🏆 Terceirizados Mil Grau
 </h1>
+
+        <button
+          className="dashboard-v37-button dashboard-v37-logout"
+          onClick={sair}
+          style={botaoSairTopoStyle}
+        >
+          Sair
+        </button>
 
         <div
           className="dashboard-v37-actions"
@@ -714,10 +716,8 @@ const botaoSairTopoStyle = {
   padding: "10px 16px",
   borderRadius: "8px",
   cursor: "pointer",
-  position: "absolute",
-  top: "18px",
-  right: "18px",
   fontWeight: "bold",
+  justifySelf: "end",
 };
 
 const botaoCinza = {

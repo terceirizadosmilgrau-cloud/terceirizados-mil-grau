@@ -127,6 +127,11 @@ code {
   overflow-wrap: anywhere;
 }
 
+.dashboard-v37-header .dashboard-v37-actions {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 .dashboard-v37-card {
   max-width: 100%;
 }
@@ -228,12 +233,24 @@ code {
   .dashboard-v37-title {
     font-size: 28px !important;
     line-height: 1.15 !important;
+    grid-column: 1 !important;
+  }
+
+  .dashboard-v37-header {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    gap: 12px !important;
+  }
+
+  .dashboard-v37-logout {
+    justify-self: stretch !important;
   }
 
   .dashboard-v37-actions {
     flex-direction: column !important;
     align-items: stretch !important;
     max-width: 100% !important;
+    grid-column: 1 !important;
   }
 
   .dashboard-v37-button {
