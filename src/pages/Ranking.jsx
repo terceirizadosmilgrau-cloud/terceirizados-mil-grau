@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import {
   collection,
-  getDocs,
   doc,
   getDoc,
+  getDocs,
 } from "firebase/firestore";
 
+import DetalheParticipante from "../components/DetalheParticipante";
 import { db } from "../firebase";
 import { calcularPontuacao } from "../utils/calcularPontuacao";
-import DetalheParticipante from "../components/DetalheParticipante";
 import {
   calcularDetalhesPontuacaoMataMata,
   calcularPontuacaoMataMata,
-}
-  from "../utils/calcularPontuacaoMataMata";
+} from "../utils/calcularPontuacaoMataMata";
 
 const fasesMataMata = [
   "oitavas",
@@ -39,9 +38,7 @@ const placarPreenchido = (jogo) =>
 const calcularPontosMaximosMataMata = (
   resultadoMataMata
 ) => {
-  if (!resultadoMataMata) {
-    return 0;
-  }
+  if (!resultadoMataMata) return 0;
 
   if (temJogosMataMata(resultadoMataMata)) {
     return fasesMataMata.reduce(
@@ -84,20 +81,51 @@ const calcularPontosMaximosMataMata = (
   );
 };
 
+const pontosFaseMataMata = (
+  participante,
+  fase
+) =>
+  participante
+    .detalhesMataMata?.[fase] || 0;
+
+const estiloBadgePosicao = (posicao) => {
+  if (posicao === 1) {
+    return posicaoPrimeiroStyle;
+  }
+
+  if (posicao === 2) {
+    return posicaoSegundoStyle;
+  }
+
+  if (posicao === 3) {
+    return posicaoTerceiroStyle;
+  }
+
+  return posicaoStyle;
+};
+
+const tituloPosicao = (posicao) => {
+  if (posicao === 1) return "🏆 Lider";
+  if (posicao === 2) return "🥈 Vice-lider";
+  if (posicao === 3) return "🥉 3o lugar";
+  return null;
+};
+
+const marcadorFase = (pontos) =>
+  pontos > 0 ? "🟢" : "⚪";
+
 function Ranking({ voltar }) {
   const [ranking, setRanking] = useState([]);
-
   const [arrecadacao, setArrecadacao] =
-  useState(0);
-
+    useState(0);
   const [busca, setBusca] =
-  useState("");
-
+    useState("");
+  const [modoRanking, setModoRanking] =
+    useState("geral");
   const [
-  participanteSelecionado,
-  setParticipanteSelecionado,
-] = useState(null);
-
+    participanteSelecionado,
+    setParticipanteSelecionado,
+  ] = useState(null);
   const [estatisticas, setEstatisticas] =
     useState({
       participantes: 0,
@@ -106,9 +134,10 @@ function Ranking({ voltar }) {
       comPalpite: 0,
       semPalpite: 0,
     });
-
-    const [ultimaAtualizacao, setUltimaAtualizacao] =
-  useState("");
+  const [
+    ultimaAtualizacao,
+    setUltimaAtualizacao,
+  ] = useState("");
 
   useEffect(() => {
     carregarRanking();
@@ -121,22 +150,23 @@ function Ranking({ voltar }) {
           doc(db, "resultados", "grupos")
         );
 
-      if (!resultadoSnapshot.exists())
+      if (!resultadoSnapshot.exists()) {
         return;
+      }
 
       const resultadoMataMataSnapshot =
-  await getDoc(
-    doc(
-      db,
-      "resultados",
-      "mataMata"
-    )
-  );
+        await getDoc(
+          doc(
+            db,
+            "resultados",
+            "mataMata"
+          )
+        );
 
-const resultadoMataMata =
-  resultadoMataMataSnapshot.exists()
-    ? resultadoMataMataSnapshot.data()
-    : null;
+      const resultadoMataMata =
+        resultadoMataMataSnapshot.exists()
+          ? resultadoMataMataSnapshot.data()
+          : null;
 
       const resultados =
         resultadoSnapshot.data();
@@ -147,7 +177,6 @@ const resultadoMataMata =
         );
 
       const listaRanking = [];
-
       let pagos = 0;
       let arrecadacaoTotal = 0;
       let comPalpite = 0;
@@ -162,355 +191,285 @@ const resultadoMataMata =
         }
 
         const palpiteSnapshot =
-  await getDoc(
-    doc(
-      db,
-      "palpites",
-      usuarioDoc.id
-    )
-  );
+          await getDoc(
+            doc(
+              db,
+              "palpites",
+              usuarioDoc.id
+            )
+          );
 
-let pontos = 0;
-let pontosGrupos = 0;
-let pontosMataMata = 0;
-let detalhesMataMata = null;
+        let pontosGrupos = 0;
+        let pontosMataMata = 0;
+        let detalhesMataMata = null;
+        const palpites =
+          palpiteSnapshot.exists()
+            ? palpiteSnapshot.data()
+            : {};
 
-if (palpiteSnapshot.exists()) {
-  comPalpite++;
+        if (palpiteSnapshot.exists()) {
+          comPalpite++;
 
-  const palpites =
-    palpiteSnapshot.data();
+          Object.keys(resultados).forEach(
+            (grupo) => {
+              pontosGrupos +=
+                calcularPontuacao(
+                  palpites[grupo],
+                  resultados[grupo]
+                );
+            }
+          );
+        }
 
-  Object.keys(resultados).forEach(
-  (grupo) => {
-    const pontosGrupo =
-  calcularPontuacao(
-    palpites[grupo],
-    resultados[grupo]
-  );
+        const mataMataSnapshot =
+          await getDoc(
+            doc(
+              db,
+              "palpitesMataMata",
+              usuarioDoc.id
+            )
+          );
 
-pontosGrupos += pontosGrupo;
-pontos += pontosGrupo;
-  }
-);
-}
+        if (
+          mataMataSnapshot.exists() &&
+          resultadoMataMata
+        ) {
+          const palpiteMataMata =
+            mataMataSnapshot.data();
 
-const mataMataSnapshot =
-  await getDoc(
-    doc(
-      db,
-      "palpitesMataMata",
-      usuarioDoc.id
-    )
-  );
+          detalhesMataMata =
+            calcularDetalhesPontuacaoMataMata(
+              palpiteMataMata,
+              resultadoMataMata
+            );
 
-if (
-  mataMataSnapshot.exists() &&
-  resultadoMataMata
-) {
-  const palpiteMataMata =
-    mataMataSnapshot.data();
+          pontosMataMata =
+            calcularPontuacaoMataMata(
+              palpiteMataMata,
+              resultadoMataMata
+            );
+        }
 
-  detalhesMataMata =
-    calcularDetalhesPontuacaoMataMata(
-      palpiteMataMata,
-      resultadoMataMata
-    );
+        const participante = {
+          nome:
+            usuario.apelido ||
+            usuario.nome ||
+            "Sem nome",
+          pontos:
+            pontosGrupos +
+            pontosMataMata,
+          pontosGrupos,
+          pontosMataMata,
+          detalhesMataMata,
+          diferencaLider: 0,
+          posicao: 0,
+          premiacao: 0,
+          detalhes: {},
+          palpites,
+          resultados,
+          acertosExatos: 0,
+          acertosParciais: 0,
+          aproveitamento: 0,
+          medalhas: [],
+        };
 
-  pontosMataMata =
-  calcularPontuacaoMataMata(
-    palpiteMataMata,
-    resultadoMataMata
-  );
+        Object.keys(resultados).forEach(
+          (grupo) => {
+            const palpiteGrupo =
+              palpites?.[grupo] || {};
+            const resultadoGrupo =
+              resultados?.[grupo] || {};
+            let acertosExatos = 0;
 
-  pontos += pontosMataMata;
+            [
+              "primeiro",
+              "segundo",
+              "terceiro",
+              "quarto",
+            ].forEach((posicao) => {
+              if (
+                palpiteGrupo[posicao] &&
+                resultadoGrupo[posicao] &&
+                palpiteGrupo[posicao] ===
+                  resultadoGrupo[posicao]
+              ) {
+                acertosExatos++;
+              }
+            });
 
-}
+            const pontosGrupo =
+              calcularPontuacao(
+                palpiteGrupo,
+                resultadoGrupo
+              );
 
-listaRanking.push({
-  nome:
-    usuario.apelido ||
-    usuario.nome,
+            participante.detalhes[
+              grupo
+            ] = {
+              palpite: palpiteGrupo,
+              resultado: resultadoGrupo,
+              pontos: pontosGrupo,
+              acertosExatos,
+              acertosParciais: 0,
+              acertosGrupo:
+                acertosExatos,
+            };
 
-  pontos:
-    pontosGrupos +
-    pontosMataMata,
+            participante.acertosExatos +=
+              acertosExatos;
+          }
+        );
 
-  pontosGrupos,
-  pontosMataMata,
+        let pontosMaximos = 0;
 
-  detalhesMataMata,
+        Object.values(resultados || {}).forEach(
+          (grupo) => {
+            if (grupo?.primeiro)
+              pontosMaximos += 10;
+            if (grupo?.segundo)
+              pontosMaximos += 10;
+            if (grupo?.terceiro)
+              pontosMaximos += 3;
+            if (grupo?.quarto)
+              pontosMaximos += 2;
 
-  diferencaLider: 0,
-  posicao: 0,
-  premiacao: 0,
+            pontosMaximos += 10;
+          }
+        );
 
-  detalhes: {},
+        if (resultadoMataMata) {
+          pontosMaximos +=
+            calcularPontosMaximosMataMata(
+              resultadoMataMata
+            );
+        }
 
-  palpites:
-    palpiteSnapshot.exists()
-      ? palpiteSnapshot.data()
-      : {},
+        participante.aproveitamento =
+          pontosMaximos > 0
+            ? (
+                (participante.pontos /
+                  pontosMaximos) *
+                100
+              ).toFixed(1)
+            : 0;
 
-  resultados,
-});
+        listaRanking.push(participante);
       }
 
-      listaRanking.sort(
-  (a, b) => b.pontos - a.pontos
-);
+      listaRanking.sort((a, b) => {
+        if (b.pontos !== a.pontos) {
+          return b.pontos - a.pontos;
+        }
 
-listaRanking.forEach(
-  (participante, index) => {
+        if (
+          (b.acertosExatos || 0) !==
+          (a.acertosExatos || 0)
+        ) {
+          return (
+            (b.acertosExatos || 0) -
+            (a.acertosExatos || 0)
+          );
+        }
 
-    participante.detalhes = {};
+        if (
+          Number(
+            b.aproveitamento || 0
+          ) !==
+          Number(
+            a.aproveitamento || 0
+          )
+        ) {
+          return (
+            Number(
+              b.aproveitamento || 0
+            ) -
+            Number(
+              a.aproveitamento || 0
+            )
+          );
+        }
 
-    Object.keys(
-      participante.resultados || {}
-    ).forEach((grupo) => {
-     const palpiteGrupo =
-  participante.palpites?.[
-    grupo
-  ] || {};
+        return a.nome.localeCompare(
+          b.nome
+        );
+      });
 
-const resultadoGrupo =
-  participante.resultados?.[
-    grupo
-  ] || {};
+      listaRanking.forEach(
+        (participante, index) => {
+          participante.posicao =
+            index + 1;
+          participante.diferencaLider =
+            listaRanking.length > 0
+              ? listaRanking[0].pontos -
+                participante.pontos
+              : 0;
 
-let acertosExatos = 0;
-
-[
-  "primeiro",
-  "segundo",
-  "terceiro",
-  "quarto",
-].forEach((posicao) => {
-  const palpite =
-    palpiteGrupo[posicao];
-
-  const resultado =
-    resultadoGrupo[posicao];
-
-  if (
-    palpite &&
-    resultado &&
-    palpite === resultado
-  ) {
-    acertosExatos++;
-  }
-});
-
-const acertosParciais = 0;
-
-const acertosGrupo =
-  acertosExatos;
-
-participante.detalhes[
-  grupo
-] = {
-  palpite: palpiteGrupo,
-  resultado: resultadoGrupo,
-
-  pontos: calcularPontuacao(
-    palpiteGrupo,
-    resultadoGrupo
-  ),
-
-  acertosExatos,
-  acertosParciais,
-  acertosGrupo,
-};
-    });
-
-    participante.posicao =
-      index + 1;
-
-    participante.diferencaLider =
-  listaRanking.length > 0
-    ? listaRanking[0].pontos -
-      participante.pontos
-    : 0;
-
-participante.acertosExatos = 0;
-participante.acertosParciais = 0;
-
-Object.values(
-  participante.detalhes
-).forEach((grupo) => {
-  participante.acertosExatos +=
-    grupo.acertosExatos || 0;
-
-  participante.acertosParciais +=
-    grupo.acertosParciais || 0;
-});
-
-let pontosMaximos = 0;
-
-Object.values(
-  participante.resultados || {}
-).forEach((grupo) => {
-
-  if (grupo?.primeiro)
-    pontosMaximos += 10;
-
-  if (grupo?.segundo)
-    pontosMaximos += 10;
-
-  if (grupo?.terceiro)
-    pontosMaximos += 3;
-
-  if (grupo?.quarto)
-    pontosMaximos += 2;
-
-  pontosMaximos += 10; // bônus grupo perfeito
-});
-
-if (resultadoMataMata) {
-  pontosMaximos +=
-    calcularPontosMaximosMataMata(
-      resultadoMataMata
-    );
-}
-
-participante.aproveitamento =
-  pontosMaximos > 0
-    ? (
-        (participante.pontos /
-          pontosMaximos) *
-        100
-      ).toFixed(1)
-    : 0;
-
-    participante.medalhas = [];
-  }
-);
-
-listaRanking.sort((a, b) => {
-
-  if (b.pontos !== a.pontos) {
-    return b.pontos - a.pontos;
-  }
-
-  if (
-    (b.acertosExatos || 0) !==
-    (a.acertosExatos || 0)
-  ) {
-    return (
-      (b.acertosExatos || 0) -
-      (a.acertosExatos || 0)
-    );
-  }
-
-  if (
-    Number(
-      b.aproveitamento || 0
-    ) !==
-    Number(
-      a.aproveitamento || 0
-    )
-  ) {
-    return (
-      Number(
-        b.aproveitamento || 0
-      ) -
-      Number(
-        a.aproveitamento || 0
-      )
-    );
-  }
-
-  return a.nome.localeCompare(
-    b.nome
-  );
-});
-
-listaRanking.forEach(
-  (participante, index) => {
-
-    participante.posicao =
-      index + 1;
-
-    participante.diferencaLider =
-      listaRanking.length > 0
-        ? listaRanking[0].pontos -
-          participante.pontos
-        : 0;
-
-    if (index === 0) {
-      participante.premiacao =
-        arrecadacaoTotal * 0.5;
-    } else if (index === 1) {
-      participante.premiacao =
-        arrecadacaoTotal * 0.3;
-    } else if (index === 2) {
-      participante.premiacao =
-        arrecadacaoTotal * 0.2;
-    } else {
-      participante.premiacao = 0;
-    }
-  }
-);
-
-
-const melhorAproveitamento =
-  [...listaRanking].sort(
-    (a, b) =>
-      Number(
-        b.aproveitamento || 0
-      ) -
-      Number(
-        a.aproveitamento || 0
-      )
-  )[0];
-
-const reiDosAcertos =
-  [...listaRanking].sort(
-    (a, b) =>
-      (b.acertosExatos || 0) -
-      (a.acertosExatos || 0)
-  )[0];
-
-if (listaRanking[0]) {
-  listaRanking[0].medalhas.push(
-    "🥇 Líder Atual"
-  );
-}
-
-if (melhorAproveitamento) {
-  melhorAproveitamento.medalhas.push(
-    "📈 Melhor Aproveitamento"
-  );
-}
-
-if (reiDosAcertos) {
-  reiDosAcertos.medalhas.push(
-    "🎯 Rei dos Acertos"
-  );
-}
-
-listaRanking.forEach(
-  (participante) => {
-    if (
-      participante.posicao <= 3
-    ) {
-      participante.medalhas.push(
-        "💰 Em Zona de Premiação"
+          if (index === 0) {
+            participante.premiacao =
+              arrecadacaoTotal * 0.5;
+          } else if (index === 1) {
+            participante.premiacao =
+              arrecadacaoTotal * 0.3;
+          } else if (index === 2) {
+            participante.premiacao =
+              arrecadacaoTotal * 0.2;
+          }
+        }
       );
-    }
-  }
-);
 
-setUltimaAtualizacao(
-  new Date().toLocaleString("pt-BR")
-);
+      const melhorAproveitamento =
+        [...listaRanking].sort(
+          (a, b) =>
+            Number(
+              b.aproveitamento || 0
+            ) -
+            Number(
+              a.aproveitamento || 0
+            )
+        )[0];
 
+      const reiDosAcertos =
+        [...listaRanking].sort(
+          (a, b) =>
+            (b.acertosExatos || 0) -
+            (a.acertosExatos || 0)
+        )[0];
+
+      if (listaRanking[0]) {
+        listaRanking[0].medalhas.push(
+          "Lider Atual"
+        );
+      }
+
+      if (melhorAproveitamento) {
+        melhorAproveitamento.medalhas.push(
+          "Melhor Aproveitamento"
+        );
+      }
+
+      if (reiDosAcertos) {
+        reiDosAcertos.medalhas.push(
+          "Rei dos Acertos"
+        );
+      }
+
+      listaRanking.forEach(
+        (participante) => {
+          if (participante.posicao <= 3) {
+            participante.medalhas.push(
+              "Em Zona de Premiacao"
+            );
+          }
+        }
+      );
+
+      setUltimaAtualizacao(
+        new Date().toLocaleString("pt-BR")
+      );
       setRanking(listaRanking);
-
       setArrecadacao(
         arrecadacaoTotal
       );
-
       setEstatisticas({
         participantes:
           usuariosSnapshot.docs.length,
@@ -528,498 +487,818 @@ setUltimaAtualizacao(
     }
   };
 
-  const premio1 =
-    arrecadacao * 0.5;
-
-  const premio2 =
-    arrecadacao * 0.3;
-
-  const premio3 =
-    arrecadacao * 0.2;
-
-    const lider = ranking[0];
-
-const melhorAproveitamento =
-  [...ranking].sort(
-    (a, b) =>
-      Number(
-        b.aproveitamento || 0
-      ) -
-      Number(
-        a.aproveitamento || 0
-      )
-  )[0];
-
-const maisAcertos =
-  [...ranking].sort(
-    (a, b) =>
-      (b.acertosExatos || 0) -
-      (a.acertosExatos || 0)
-  )[0];
-
+  const premio1 = arrecadacao * 0.5;
+  const premio2 = arrecadacao * 0.3;
+  const premio3 = arrecadacao * 0.2;
+  const lider = ranking[0];
   const liderPontos =
     ranking.length > 0
       ? ranking[0].pontos
       : 0;
+
+  const melhorAproveitamento =
+    [...ranking].sort(
+      (a, b) =>
+        Number(
+          b.aproveitamento || 0
+        ) -
+        Number(
+          a.aproveitamento || 0
+        )
+    )[0];
+
+  const maisAcertos =
+    [...ranking].sort(
+      (a, b) =>
+        (b.acertosExatos || 0) -
+        (a.acertosExatos || 0)
+    )[0];
+
+  const mestreMataMata =
+    [...ranking].sort(
+      (a, b) =>
+        (b.pontosMataMata || 0) -
+        (a.pontosMataMata || 0)
+    )[0];
+
+  const rankingMataMata =
+    [...ranking].sort((a, b) => {
+      const pontos =
+        (b.pontosMataMata || 0) -
+        (a.pontosMataMata || 0);
+      if (pontos !== 0) return pontos;
+
+      const final =
+        pontosFaseMataMata(b, "final") -
+        pontosFaseMataMata(a, "final");
+      if (final !== 0) return final;
+
+      const semifinal =
+        pontosFaseMataMata(b, "semifinal") -
+        pontosFaseMataMata(a, "semifinal");
+      if (semifinal !== 0)
+        return semifinal;
+
+      const quartas =
+        pontosFaseMataMata(b, "quartas") -
+        pontosFaseMataMata(a, "quartas");
+      if (quartas !== 0) return quartas;
+
+      const oitavas =
+        pontosFaseMataMata(b, "oitavas") -
+        pontosFaseMataMata(a, "oitavas");
+      if (oitavas !== 0) return oitavas;
+
+      return a.nome.localeCompare(
+        b.nome
+      );
+    });
+
+  const rankingAtual =
+    modoRanking === "mataMata"
+      ? rankingMataMata
+      : ranking;
+
+  const rankingExibido =
+    modoRanking === "mataMata"
+      ? rankingAtual
+      : rankingAtual.slice(3);
+
+  const posicaoVisual = (index) =>
+    modoRanking === "mataMata"
+      ? index + 1
+      : index + 4;
 
   const diferenca = (pontos) => {
     const diff =
       liderPontos - pontos;
 
     if (diff === 0) {
-      return "👑 Líder";
+      return "Lider";
     }
 
     return "(-" + diff + " pts)";
   };
 
+  const renderTabs = () => (
+    <div style={tabsStyle}>
+      <button
+        onClick={() =>
+          setModoRanking("geral")
+        }
+        style={
+          modoRanking === "geral"
+            ? tabAtivaStyle
+            : tabStyle
+        }
+      >
+        🏆 Geral
+      </button>
+
+      <button
+        onClick={() =>
+          setModoRanking("mataMata")
+        }
+        style={
+          modoRanking === "mataMata"
+            ? tabAtivaStyle
+            : tabStyle
+        }
+      >
+        ⚽ Mata-Mata
+      </button>
+    </div>
+  );
+
+  const renderBreakdownMataMata = (
+    participante
+  ) => (
+    <div style={breakdownGridStyle}>
+      {[
+        ["Oitavas", "oitavas"],
+        ["Quartas", "quartas"],
+        ["Semifinal", "semifinal"],
+        ["Final", "final"],
+      ].map(([label, fase]) => (
+        <div
+          key={fase}
+          style={breakdownChipStyle}
+        >
+          <span style={breakdownLabelStyle}>
+            {marcadorFase(
+              pontosFaseMataMata(
+                participante,
+                fase
+              )
+            )}{" "}
+            {label}
+          </span>
+          <strong>
+            {pontosFaseMataMata(
+              participante,
+              fase
+            )}{" "}
+            pts
+          </strong>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderPodioCard = (
+    participante,
+    posicao,
+    estilo,
+    diferencaTexto
+  ) => (
+    <div
+      className="ranking-v37-podium-card"
+      style={estilo}
+    >
+      <div
+        style={estiloBadgePosicao(posicao)}
+      >
+        #{posicao}
+      </div>
+
+      <div style={podioInfoStyle}>
+        {tituloPosicao(posicao) && (
+          <span style={podioTituloStyle}>
+            {tituloPosicao(posicao)}
+          </span>
+        )}
+
+        <strong style={podioNomeStyle}>
+          {participante?.nome || "---"}
+        </strong>
+
+        <span style={podioMetaStyle}>
+          ⭐ {participante?.pontos || 0} pts
+        </span>
+
+        <span style={podioMetaStyle}>
+          📉 {diferencaTexto}
+        </span>
+      </div>
+
+    </div>
+  );
+
   return (
     <div
       className="ranking-v37"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#0d0d0d",
-        color: "white",
-        width: "100%",
-        maxWidth: "100%",
-        overflowX: "hidden",
-        padding: "clamp(16px, 4vw, 30px)",
-        fontFamily:
-          "Arial, sans-serif",
-        overflowWrap: "anywhere",
-      }}
+      style={paginaStyle}
     >
-      <h1
-  style={{
-    textAlign: "center",
-    fontSize: "clamp(24px, 5vw, 42px)",
-  }}
->
-  🏆 Ranking Geral
-</h1>
+      <h1 style={tituloStyle}>
+        {modoRanking === "mataMata"
+          ? "⚽ Ranking Mata-Mata"
+          : "🏆 Ranking Geral"}
+      </h1>
 
-      <p
-  style={{
-    color: "#999",
-    marginBottom: "20px",
-  }}
->
-  ⏰ Última atualização:
-  {" "}
-  {ultimaAtualizacao}
-</p>
+      <p style={textoSecundarioStyle}>
+        Ultima atualizacao:{" "}
+        {ultimaAtualizacao}
+      </p>
 
-      <div
-  style={{
-    marginBottom: "20px",
-  }}
->
-  <button
-    className="ranking-v37-button"
-    onClick={carregarRanking}
-    style={{
-      backgroundColor: "#198754",
-      color: "white",
-      border: "none",
-      padding: "10px 16px",
-      borderRadius: "8px",
-      cursor: "pointer",
-      fontWeight: "bold",
-      maxWidth: "100%",
-    }}
-  >
-    🔄 Atualizar Ranking
-  </button>
-</div>
-
-      <div
-        className="ranking-v37-card"
-        style={{
-          backgroundColor: "#1a1a1a",
-          padding: "clamp(16px, 4vw, 20px)",
-          borderRadius: "12px",
-          marginBottom: "20px",
-          maxWidth: "100%",
-        }}
-      >
-        <h2>📊 Estatísticas</h2>
-
-        <p>
-          Participantes:{" "}
-          {estatisticas.participantes}
-        </p>
-
-        <p>
-          ✅ Pagos:{" "}
-          {estatisticas.pagos}
-        </p>
-
-        <p>
-          ❌ Pendentes:{" "}
-          {estatisticas.pendentes}
-        </p>
-
-        <p>
-          📝 Palpites enviados:{" "}
-          {estatisticas.comPalpite}
-        </p>
-
-        <p>
-          ⚠️ Sem palpite:{" "}
-          {estatisticas.semPalpite}
-        </p>
-      </div>
-
-      <div
-        className="ranking-v37-card"
-        style={{
-          backgroundColor: "#1a1a1a",
-          padding: "clamp(16px, 4vw, 20px)",
-          borderRadius: "12px",
-          marginBottom: "20px",
-          maxWidth: "100%",
-        }}
-      >
-        <h2>💰 Premiação</h2>
-
-        <p>
-          Arrecadação: R${" "}
-          {arrecadacao.toFixed(2)}
-        </p>
-
-        <p>
-          🥇 1º Lugar: R${" "}
-          {premio1.toFixed(2)}
-        </p>
-
-        <p>
-          🥈 2º Lugar: R${" "}
-          {premio2.toFixed(2)}
-        </p>
-
-        <p>
-          🥉 3º Lugar: R${" "}
-          {premio3.toFixed(2)}
-        </p>
-      </div>
-
-      <div
-  className="ranking-v37-card"
-  style={{
-    backgroundColor: "#1a1a1a",
-    padding: "clamp(16px, 4vw, 20px)",
-    borderRadius: "12px",
-    marginBottom: "20px",
-    maxWidth: "100%",
-  }}
-
-  
->
-  <h2>
-    🔥 Destaques
-  </h2>
-
-  <p>
-    🥇 Líder:
-    {" "}
-    {lider?.nome || "-"}
-    {" "}
-    ({lider?.pontos || 0}
-    pts)
-  </p>
-
-  <p>
-    📈 Melhor Aproveitamento:
-    {" "}
-    {melhorAproveitamento?.nome ||
-      "-"}
-    {" "}
-    (
-    {melhorAproveitamento?.aproveitamento ||
-      0}
-    %)
-  </p>
-
-  <p>
-    🎯 Mais Acertos Exatos:
-    {" "}
-    {maisAcertos?.nome || "-"}
-    {" "}
-    (
-    {maisAcertos?.acertosExatos ||
-      0}
-    )
-  </p>
-
-  <p>
-  ⚽ Mestre do Mata-Mata:
-  {" "}
-  {[...ranking].sort(
-    (a, b) =>
-      (b.pontosMataMata || 0) -
-      (a.pontosMataMata || 0)
-  )[0]?.nome || "-"}
-</p>
-
-<p>
-  🏆 Pontos Mata-Mata:
-  {" "}
-  {[...ranking].sort(
-    (a, b) =>
-      (b.pontosMataMata || 0) -
-      (a.pontosMataMata || 0)
-  )[0]?.pontosMataMata || 0}
-</p>
-
-  <p>
-    💰 Premiação Atual:
-    {" "}
-    R$
-    {" "}
-    {premio1.toFixed(2)}
-  </p>
-</div>
-
-<div
-  style={{
-    marginBottom: "25px",
-  }}
->
-  <h2>🏆 Pódio</h2>
-
-        <div
-          className="ranking-v37-podium"
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            gap: "15px",
-            flexWrap: "wrap",
-            marginTop: "20px",
-            maxWidth: "100%",
-          }}
+      <div style={acoesStyle}>
+        <button
+          className="ranking-v37-button"
+          onClick={carregarRanking}
+          style={botaoAtualizarStyle}
         >
-          <div
-            className="ranking-v37-podium-card"
-            style={{
-              width: "min(100%, 180px)",
-              backgroundColor: "#6c757d",
-              padding: "clamp(16px, 4vw, 20px)",
-              borderRadius: "12px",
-              textAlign: "center",
-              overflowWrap: "anywhere",
-            }}
-          >
-            <h1>🥈</h1>
-
-            <h3>
-              {ranking[1]?.nome ||
-                "---"}
-            </h3>
-
-            <p>
-              {ranking[1]?.pontos ||
-                0} pts
-            </p>
-
-            <p>
-              {ranking[1]
-                ? diferenca(
-                    ranking[1].pontos
-                  )
-                : ""}
-            </p>
-
-            <strong>
-              R$ {premio2.toFixed(2)}
-            </strong>
-          </div>
-
-          <div
-            className="ranking-v37-podium-card"
-            style={{
-              width: "min(100%, 220px)",
-              backgroundColor: "#ffc107",
-              color: "#000",
-              padding: "clamp(18px, 4vw, 25px)",
-              borderRadius: "12px",
-              textAlign: "center",
-              overflowWrap: "anywhere",
-            }}
-          >
-            <h1>🥇</h1>
-
-            <h2>
-              {ranking[0]?.nome ||
-                "---"}
-            </h2>
-
-            <p>
-              {ranking[0]?.pontos ||
-                0} pts
-            </p>
-
-            <p>👑 Líder</p>
-
-            <strong>
-              R$ {premio1.toFixed(2)}
-            </strong>
-          </div>
-
-          <div
-            className="ranking-v37-podium-card"
-            style={{
-              width: "min(100%, 180px)",
-              backgroundColor: "#cd7f32",
-              padding: "clamp(16px, 4vw, 20px)",
-              borderRadius: "12px",
-              textAlign: "center",
-              overflowWrap: "anywhere",
-            }}
-          >
-            <h1>🥉</h1>
-
-            <h3>
-              {ranking[2]?.nome ||
-                "---"}
-            </h3>
-
-            <p>
-              {ranking[2]?.pontos ||
-                0} pts
-            </p>
-
-            <p>
-              {ranking[2]
-                ? diferenca(
-                    ranking[2].pontos
-                  )
-                : ""}
-            </p>
-
-            <strong>
-              R$ {premio3.toFixed(2)}
-            </strong>
-          </div>
-        </div>
+          🔄 Atualizar Ranking
+        </button>
       </div>
+
+      {renderTabs()}
+
+      <div style={buscaWrapperStyle}>
+        <input
+          className="ranking-v37-input"
+          type="text"
+          placeholder="🔍 Buscar participante..."
+          value={busca}
+          onChange={(e) =>
+            setBusca(e.target.value)
+          }
+          style={inputBuscaStyle}
+        />
+      </div>
+
+      {modoRanking === "geral" && (
+        <>
+          <div style={resumoGridStyle}>
+          <div
+            className="ranking-v37-card"
+            style={cardStyle}
+          >
+            <h2>📊 Estatisticas</h2>
+            <p>
+              👥 Participantes:{" "}
+              {estatisticas.participantes}
+            </p>
+            <p>
+              ✅ Pagos: {estatisticas.pagos}
+            </p>
+            <p>
+              ⏳ Pendentes:{" "}
+              {estatisticas.pendentes}
+            </p>
+            <p>
+              📝 Palpites enviados:{" "}
+              {estatisticas.comPalpite}
+            </p>
+            <p>
+              ⚠️ Sem palpite:{" "}
+              {estatisticas.semPalpite}
+            </p>
+          </div>
+
+          <div
+            className="ranking-v37-card"
+            style={cardStyle}
+          >
+            <h2>💰 Premiacao</h2>
+            <p>
+              🧾 Arrecadacao: R${" "}
+              {arrecadacao.toFixed(2)}
+            </p>
+            <p>
+              🥇 1o Lugar: R${" "}
+              {premio1.toFixed(2)}
+            </p>
+            <p>
+              🥈 2o Lugar: R${" "}
+              {premio2.toFixed(2)}
+            </p>
+            <p>
+              🥉 3o Lugar: R${" "}
+              {premio3.toFixed(2)}
+            </p>
+          </div>
+
+          <div
+            className="ranking-v37-card"
+            style={cardStyle}
+          >
+            <h2>🔥 Destaques</h2>
+            <p>
+              🏆 Lider: {lider?.nome || "-"} (
+              {lider?.pontos || 0} pts)
+            </p>
+            <p>
+              📈 Melhor Aproveitamento:{" "}
+              {melhorAproveitamento?.nome ||
+                "-"}{" "}
+              (
+              {melhorAproveitamento?.aproveitamento ||
+                0}
+              %)
+            </p>
+            <p>
+              🎯 Mais Acertos Exatos:{" "}
+              {maisAcertos?.nome || "-"} (
+              {maisAcertos?.acertosExatos ||
+                0}
+              )
+            </p>
+            <p>
+              ⚽ Mestre do Mata-Mata:{" "}
+              {mestreMataMata?.nome || "-"}
+            </p>
+            <p>
+              🏆 Pontos Mata-Mata:{" "}
+              {mestreMataMata
+                ?.pontosMataMata || 0}
+            </p>
+          </div>
+
+          </div>
+
+          <div style={podioWrapperStyle}>
+            <h2>🏆 Podio</h2>
+            <div
+              className="ranking-v37-podium"
+              style={podioStyle}
+            >
+              {renderPodioCard(
+                ranking[0],
+                1,
+                podioPrimeiroStyle,
+                "Lider"
+              )}
+
+              <div style={podioMenoresStyle}>
+                {renderPodioCard(
+                  ranking[1],
+                  2,
+                  podioSegundoStyle,
+                  ranking[1]
+                    ? diferenca(
+                        ranking[1].pontos
+                      )
+                    : "-"
+                )}
+
+                {renderPodioCard(
+                  ranking[2],
+                  3,
+                  podioTerceiroStyle,
+                  ranking[2]
+                    ? diferenca(
+                        ranking[2].pontos
+                      )
+                    : "-"
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <div
         className="ranking-v37-card"
-        style={{
-          backgroundColor: "#1a1a1a",
-          padding: "clamp(16px, 4vw, 20px)",
-          borderRadius: "12px",
-          maxWidth: "100%",
-        }}
+        style={cardStyle}
       >
         <h2>
-          📋 Classificação Completa
+          {modoRanking === "mataMata"
+            ? "⚽ Classificacao Mata-Mata"
+            : "🏆 Classificacao Completa"}
         </h2>
 
-        <input
-  className="ranking-v37-input"
-  type="text"
-  placeholder="🔎 Buscar participante..."
-  value={busca}
-  onChange={(e) =>
-    setBusca(e.target.value)
-  }
-  style={{
-    width: "100%",
-    maxWidth: "100%",
-    padding: "12px",
-    marginBottom: "20px",
-    borderRadius: "8px",
-    border: "none",
-    fontSize: "16px",
-  }}
-/>
-
-        {ranking
-  .filter((participante) =>
-    (participante.nome || "")
-  .toLowerCase()
-      .includes(
-        busca.toLowerCase()
-      )
-  )
-  .map(
-    (
-      participante,
-      index
-    ) => (
-            <div
-  key={index}
-  onClick={() =>
-    setParticipanteSelecionado(
-      participante
-    )
-  }
-  style={{
-                padding: "12px",
-                borderBottom:
-                  "1px solid #333",
-                backgroundColor:
-                  index === 0
-                    ? "#2b2b2b"
-                    : "transparent",
-
-                    cursor: "pointer",
-                overflowWrap: "anywhere",
-                lineHeight: 1.35,
-              }}
-            >
-              <strong>
-                {index + 1}º
-              </strong>{" "}
-              {participante.nome}
-              {" - "}
-              {participante.pontos}
-              pts{" "}
-              <span
-                style={{
-                  color: "#999",
-                }}
-              >
-                {diferenca(
-                  participante.pontos
-                )}
-              </span>
-            </div>
+        {rankingExibido
+          .filter((participante) =>
+            (participante.nome || "")
+              .toLowerCase()
+              .includes(
+                busca.toLowerCase()
+              )
           )
-        )}
+          .map(
+            (participante, index) => (
+              <div
+                key={`${modoRanking}-${participante.nome}-${index}`}
+                onClick={() =>
+                  setParticipanteSelecionado(
+                    participante
+                  )
+                }
+                style={
+                  posicaoVisual(index) === 1
+                    ? itemLiderStyle
+                    : itemRankingStyle
+                }
+              >
+                <div style={itemHeaderStyle}>
+                  <div
+                    style={estiloBadgePosicao(
+                      posicaoVisual(index)
+                    )}
+                  >
+                    #{posicaoVisual(index)}
+                  </div>
+
+                  <div style={nomeBlocoStyle}>
+                    {tituloPosicao(
+                      posicaoVisual(index)
+                    ) && (
+                      <span
+                        style={
+                          destaquePosicaoStyle
+                        }
+                      >
+                        {tituloPosicao(
+                          posicaoVisual(index)
+                        )}
+                      </span>
+                    )}
+
+                    <strong style={nomeStyle}>
+                      {participante.nome}
+                    </strong>
+
+                    {modoRanking === "geral" && (
+                      <span
+                        style={
+                          diferencaStyle
+                        }
+                      >
+                        📉{" "}
+                        {diferenca(
+                          participante.pontos
+                        )}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={pontosStyle}>
+                    <strong>
+                      {modoRanking ===
+                      "mataMata"
+                        ? "🏆 "
+                        : "⭐ "}
+                      {modoRanking ===
+                      "mataMata"
+                        ? participante.pontosMataMata ||
+                          0
+                        : participante.pontos}
+                    </strong>
+                    <span>pts</span>
+                  </div>
+                </div>
+
+                {modoRanking === "mataMata" && (
+                  renderBreakdownMataMata(
+                    participante
+                  )
+                )}
+              </div>
+            )
+          )}
       </div>
 
-<DetalheParticipante
-  participante={
-    participanteSelecionado
-  }
-  fechar={() =>
-    setParticipanteSelecionado(
-      null
-    )
-  }
-/>
+      <DetalheParticipante
+        participante={
+          participanteSelecionado
+        }
+        fechar={() =>
+          setParticipanteSelecionado(null)
+        }
+      />
+
       <button
         className="ranking-v37-button"
         onClick={voltar}
-        style={{
-          marginTop: "20px",
-          backgroundColor:
-            "#6c757d",
-          color: "white",
-          border: "none",
-          padding: "12px 20px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          maxWidth: "100%",
-        }}
+        style={botaoVoltarStyle}
       >
         Voltar
       </button>
     </div>
   );
 }
+
+const paginaStyle = {
+  minHeight: "100vh",
+  backgroundColor: "#0d0d0d",
+  color: "white",
+  width: "100%",
+  maxWidth: "100%",
+  overflowX: "hidden",
+  padding: "clamp(16px, 4vw, 30px)",
+  fontFamily: "Arial, sans-serif",
+  overflowWrap: "anywhere",
+};
+
+const tituloStyle = {
+  textAlign: "center",
+  fontSize: "clamp(24px, 5vw, 42px)",
+};
+
+const textoSecundarioStyle = {
+  color: "#999",
+  marginBottom: "20px",
+};
+
+const acoesStyle = {
+  marginBottom: "20px",
+};
+
+const botaoAtualizarStyle = {
+  backgroundColor: "#198754",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  maxWidth: "100%",
+};
+
+const tabsStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  marginBottom: "20px",
+};
+
+const tabStyle = {
+  backgroundColor: "#343a40",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  minWidth: "130px",
+  flex: "1 1 130px",
+  maxWidth: "220px",
+};
+
+const tabAtivaStyle = {
+  ...tabStyle,
+  backgroundColor: "#f5b301",
+  color: "#120d00",
+};
+
+const buscaWrapperStyle = {
+  marginBottom: "20px",
+};
+
+const cardStyle = {
+  backgroundColor: "#181818",
+  padding: "clamp(16px, 4vw, 20px)",
+  borderRadius: "8px",
+  marginBottom: "20px",
+  maxWidth: "100%",
+  boxSizing: "border-box",
+  border: "1px solid #2c2c2c",
+};
+
+const resumoGridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: "16px",
+  alignItems: "stretch",
+};
+
+const podioWrapperStyle = {
+  marginBottom: "25px",
+};
+
+const podioStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr",
+  gap: "10px",
+  marginTop: "20px",
+  maxWidth: "100%",
+  width: "100%",
+};
+
+const podioCardStyle = {
+  minWidth: 0,
+  padding: "12px",
+  borderRadius: "8px",
+  textAlign: "left",
+  overflowWrap: "anywhere",
+  boxSizing: "border-box",
+  display: "grid",
+  gridTemplateColumns:
+    "48px minmax(0, 1fr) minmax(78px, auto)",
+  alignItems: "center",
+  gap: "10px",
+  border: "1px solid rgba(255,255,255,0.14)",
+};
+
+const podioSegundoStyle = {
+  ...podioCardStyle,
+  backgroundColor: "#30343a",
+};
+
+const podioPrimeiroStyle = {
+  ...podioCardStyle,
+  backgroundColor: "#4c3900",
+  borderColor: "#f5b301",
+  padding: "14px",
+};
+
+const podioTerceiroStyle = {
+  ...podioCardStyle,
+  backgroundColor: "#3f2812",
+};
+
+const podioMenoresStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: "10px",
+};
+
+const podioPosicaoStyle = {
+  width: "42px",
+  height: "42px",
+  borderRadius: "8px",
+  backgroundColor: "rgba(255,255,255,0.16)",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: "bold",
+};
+
+const podioInfoStyle = {
+  minWidth: 0,
+  display: "grid",
+  gap: "3px",
+};
+
+const podioNomeStyle = {
+  color: "white",
+  lineHeight: 1.2,
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+};
+
+const podioMetaStyle = {
+  color: "#ddd",
+  fontSize: "13px",
+  lineHeight: 1.2,
+};
+
+const podioTituloStyle = {
+  color: "#ffd76a",
+  fontSize: "12px",
+  fontWeight: "bold",
+  lineHeight: 1.2,
+};
+
+const inputBuscaStyle = {
+  width: "100%",
+  maxWidth: "100%",
+  padding: "12px",
+  marginBottom: "20px",
+  borderRadius: "8px",
+  border: "none",
+  fontSize: "16px",
+};
+
+const itemRankingStyle = {
+  padding: "14px",
+  border: "1px solid #333",
+  borderRadius: "8px",
+  backgroundColor: "#171717",
+  cursor: "pointer",
+  overflowWrap: "anywhere",
+  lineHeight: 1.35,
+  marginBottom: "12px",
+  boxSizing: "border-box",
+};
+
+const itemLiderStyle = {
+  ...itemRankingStyle,
+  backgroundColor: "#241f10",
+  borderColor: "#f5b301",
+};
+
+const itemHeaderStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "48px minmax(0, 1fr) minmax(74px, auto)",
+  alignItems: "center",
+  gap: "12px",
+};
+
+const posicaoStyle = {
+  width: "48px",
+  minWidth: "48px",
+  height: "44px",
+  borderRadius: "8px",
+  backgroundColor: "#242424",
+  border: "1px solid #3b3b3b",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: "bold",
+  letterSpacing: "0",
+};
+
+const posicaoPrimeiroStyle = {
+  ...posicaoStyle,
+  backgroundColor: "#3a2a00",
+  border: "1px solid #f5b301",
+  color: "#ffd76a",
+};
+
+const posicaoSegundoStyle = {
+  ...posicaoStyle,
+  backgroundColor: "#2f3237",
+  border: "1px solid #bfc5cf",
+  color: "#f1f5f9",
+};
+
+const posicaoTerceiroStyle = {
+  ...posicaoStyle,
+  backgroundColor: "#3a2513",
+  border: "1px solid #c47a2c",
+  color: "#f3c08d",
+};
+
+const nomeBlocoStyle = {
+  minWidth: 0,
+  display: "grid",
+  gap: "4px",
+  textAlign: "left",
+};
+
+const nomeStyle = {
+  color: "white",
+  overflowWrap: "anywhere",
+  wordBreak: "break-word",
+  lineHeight: 1.25,
+};
+
+const destaquePosicaoStyle = {
+  color: "#ffd76a",
+  fontSize: "12px",
+  fontWeight: "bold",
+  lineHeight: 1.2,
+};
+
+const pontosStyle = {
+  justifySelf: "end",
+  minWidth: "84px",
+  borderRadius: "8px",
+  backgroundColor: "#3a2a00",
+  border: "1px solid #a77a00",
+  color: "#ffd76a",
+  padding: "8px 10px",
+  display: "grid",
+  gap: "1px",
+  textAlign: "center",
+  lineHeight: 1.1,
+};
+
+const diferencaStyle = {
+  color: "#999",
+  fontSize: "13px",
+};
+
+const breakdownGridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(118px, 1fr))",
+  gap: "8px",
+  marginTop: "12px",
+};
+
+const breakdownChipStyle = {
+  backgroundColor: "#202020",
+  border: "1px solid #3a3a3a",
+  borderRadius: "8px",
+  padding: "8px 10px",
+  display: "grid",
+  gap: "2px",
+  textAlign: "left",
+  minWidth: 0,
+};
+
+const breakdownLabelStyle = {
+  color: "#bbb",
+  fontSize: "12px",
+  lineHeight: 1.2,
+};
+
+const botaoVoltarStyle = {
+  marginTop: "20px",
+  backgroundColor: "#6c757d",
+  color: "white",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  maxWidth: "100%",
+};
 
 export default Ranking;

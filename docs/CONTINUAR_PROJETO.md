@@ -12,7 +12,7 @@ Tipo: Bolao da Copa 2026
 
 Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
 
-Proxima versao planejada: V40 - Resultados oficiais por jogo.
+Proxima versao planejada: V42 - Ranking exclusivo Mata-Mata.
 
 ---
 
@@ -158,7 +158,7 @@ Cada item de jogo contem:
 
 Observacao:
 
-Os campos antigos por lista continuam sendo gravados a partir dos classificados para manter o ranking atual compativel ate a V41.
+Os campos antigos por lista continuam sendo gravados a partir dos classificados para compatibilidade com telas e fallback.
 
 ### `resultados/grupos`
 
@@ -176,11 +176,33 @@ Uso:
 
 Campos atuais:
 
+* `jogos`
 * `oitavas`
 * `quartas`
 * `semifinal`
 * `final`
 * `campeao`
+* `atualizadoEm`
+
+Estrutura de `jogos`:
+
+* `oitavas`
+* `quartas`
+* `semifinal`
+* `final`
+
+Cada item de jogo contem:
+
+* `id`
+* `timeA`
+* `timeB`
+* `placarA`
+* `placarB`
+* `classificado`
+
+Observacao:
+
+Os resultados oficiais tambem mantem os campos antigos por lista derivados dos classificados para compatibilidade e fallback.
 
 ### `configuracoes/geral`
 
@@ -284,6 +306,8 @@ Observacao importante:
 
 O Ranking atual calcula no cliente lendo `usuarios`, `palpites` e `palpitesMataMata` de todos. Por isso as regras ainda permitem leitura dessas colecoes para usuarios autenticados. Para privacidade maior, uma versao futura deveria criar ranking publico calculado separadamente.
 
+O Ranking nao usa `usuarios.pontos` para ordenar ou calcular pontuacao. Ele calcula no cliente a partir de `resultados/grupos`, `resultados/mataMata`, `palpites/{uid}` e `palpitesMataMata/{uid}`.
+
 ---
 
 ## Concluido
@@ -354,6 +378,32 @@ Implementado:
 * Palpites antigos por lista continuam visiveis como fallback.
 * Campos antigos (`oitavas`, `quartas`, `semifinal`, `final`, `campeao`) continuam salvos para compatibilidade com o ranking atual.
 
+### V40 - Resultados Oficiais Por Jogo
+
+Status: concluida.
+
+Implementado:
+
+* `Resultados.jsx` passou a cadastrar resultados oficiais do Mata-Mata por jogo.
+* Cada jogo oficial possui time A, time B, placar oficial e classificado oficial.
+* `resultados/mataMata` grava `jogos` e tambem os campos antigos derivados (`oitavas`, `quartas`, `semifinal`, `final`, `campeao`).
+* Compatibilidade com o modelo antigo preservada.
+* Botao "Zerar Resultados de Teste" visivel apenas para `tipoUsuario === "superadmin"`.
+* O botao limpa apenas `resultados/grupos` e `resultados/mataMata`, mantendo os documentos existentes.
+
+### V41 - Pontuacao Do Mata-Mata Por Jogo
+
+Status: concluida.
+
+Implementado:
+
+* `calcularPontuacaoMataMata.js` usa `palpitesMataMata/{uid}.jogos` e `resultados/mataMata.jogos` quando os dois existem.
+* Placar exato vale 10 pontos.
+* Classificado correto vale 5 pontos.
+* Acertando placar e classificado, o jogo soma 15 pontos.
+* Fallback antigo por listas preservado quando `jogos` nao existe em algum dos lados.
+* `Ranking.jsx` segue sendo ranking geral, mas agora considera a pontuacao por jogo do Mata-Mata.
+
 ---
 
 ## Roadmap
@@ -382,11 +432,11 @@ Brasil 2 x 1 Uruguai
 Classificado: Brasil
 ```
 
-### V40
+### V40 - Concluida
 
 Resultados oficiais por jogo.
 
-### V41
+### V41 - Concluida
 
 Pontuacao por jogo.
 
@@ -410,16 +460,16 @@ Estatisticas do bolao.
 
 ## Proxima Tarefa
 
-Iniciar V40 - Resultados oficiais por jogo.
+Iniciar V42 - Ranking exclusivo Mata-Mata.
 
-Antes de alterar codigo na V40, gerar plano tecnico contendo:
+Antes de alterar codigo na V42, gerar plano tecnico contendo:
 
 * modelo de dados sugerido;
 * colecoes/documentos Firestore envolvidos;
 * telas afetadas;
 * impacto no ranking;
 * impacto em `firestore.rules`;
-* plano de migracao dos resultados atuais de Mata-Mata;
+* plano de exibicao do ranking exclusivo Mata-Mata;
 * etapas pequenas e seguras.
 
 ---
@@ -432,12 +482,12 @@ Ao iniciar um novo chat, enviar este arquivo e pedir:
 Leia CONTINUAR_PROJETO.md e PROJECT_STATUS.md.
 Entenda o estado atual do projeto.
 Nao altere codigo antes de gerar plano tecnico.
-Vamos continuar a partir da V40 - Resultados oficiais por jogo.
+Vamos continuar a partir da V42 - Ranking exclusivo Mata-Mata.
 ```
 
 Tambem informar:
 
-* V36, V37, V38, V38.1 e V39 estao concluidas.
+* V36, V37, V38, V38.1, V39, V40 e V41 estao concluidas.
 * Nao reabrir problema antigo de Admin.
 * Nao voltar para e-mail hardcoded.
 * Nao fazer deploy sem pedido explicito.
@@ -474,10 +524,10 @@ Regras de seguranca:
 * Admin altera apenas pagamento.
 * SuperAdmin altera configuracoes, resultados e perfis.
 
-Regras para V40:
+Regras para V42:
 
-* Nao quebrar Mata-Mata atual sem plano de migracao.
-* Primeiro propor modelo de resultados oficiais por jogo.
+* Nao quebrar o Ranking Geral atual.
+* Primeiro propor como sera o ranking exclusivo Mata-Mata.
 * Depois implementar em etapas.
 * Validar build a cada etapa importante.
 

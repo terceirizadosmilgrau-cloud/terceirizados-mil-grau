@@ -13,7 +13,7 @@
 
 ## Status Atual
 
-Versao atual: V39
+Versao atual: V41
 
 Sistema funcional, responsivo e com regras de seguranca do Firestore preparadas no projeto.
 
@@ -24,6 +24,8 @@ Status das versoes recentes:
 * V38 concluida: Seguranca Firestore preparada com `firestore.rules`.
 * V38.1 concluida: SuperAdmin padronizado por `tipoUsuario`.
 * V39 concluida: Mata-Mata por jogo implementado nos palpites e na central.
+* V40 concluida: Resultados oficiais por jogo implementados.
+* V41 concluida: Pontuacao do Mata-Mata por jogo implementada.
 
 ---
 
@@ -49,6 +51,9 @@ Status das versoes recentes:
 * Central de Palpites
 * Central Mata-Mata
 * Resultados Oficiais
+* Resultados oficiais do Mata-Mata por jogo
+* Pontuacao do Mata-Mata por jogo
+* Botao seguro para zerar resultados de teste
 * Configuracao de liberacao/encerramento de palpites
 * Responsividade para celular nas principais telas
 * Regras Firestore configuradas no projeto
@@ -178,13 +183,20 @@ No desktop, a tabela permanece preservada.
 * Central Mata-Mata exibe jogos por participante.
 * Modelo antigo por listas preservado para compatibilidade com ranking atual.
 
-### V40
+### V40 - Concluida
 
-* Resultados oficiais por jogo.
+* Resultados oficiais do Mata-Mata por partida.
+* Cada jogo oficial possui time A, time B, placar e classificado.
+* `resultados/mataMata` grava `jogos` e campos antigos derivados para compatibilidade.
+* Botao seguro para zerar resultados de teste apenas para SuperAdmin.
 
-### V41
+### V41 - Concluida
 
-* Pontuacao por jogo.
+* Pontuacao do Mata-Mata por jogo.
+* Placar exato vale 10 pontos.
+* Classificado correto vale 5 pontos.
+* Se acertar os dois, o jogo soma 15 pontos.
+* Fallback antigo preservado quando `jogos` nao existe nos dois lados.
 
 ### V42
 
@@ -222,7 +234,7 @@ Brasil 2 x 1 Uruguai
 Classificado: Brasil
 ```
 
-Pendencias planejadas para proximas versoes:
+V40 e V41 tambem foram implementadas:
 
 * V40: Resultados oficiais por jogo.
 * V41: Pontuacao por jogo.
@@ -231,4 +243,4 @@ Pendencias planejadas para proximas versoes:
 
 ## Proxima Tarefa
 
-Iniciar V40: Resultados oficiais por jogo.
+Iniciar V42: Ranking exclusivo Mata-Mata.
