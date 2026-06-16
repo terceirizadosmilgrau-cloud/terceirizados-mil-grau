@@ -12,7 +12,9 @@ Tipo: Bolao da Copa 2026
 
 Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
 
-Proxima versao planejada: V43.2 - Resultado do jogo e bônus de acerto total.
+Versao atual: V43.2 - Resultado do jogo e bonus de acerto total.
+
+Proxima versao planejada: a definir.
 
 ---
 
@@ -155,6 +157,7 @@ Cada item de jogo contem:
 * `placarA`
 * `placarB`
 * `classificado`
+* `decididoNosPenaltis`
 
 Observacao:
 
@@ -199,6 +202,7 @@ Cada item de jogo contem:
 * `placarA`
 * `placarB`
 * `classificado`
+* `decididoNosPenaltis`
 
 Observacao:
 
@@ -404,6 +408,26 @@ Implementado:
 * Fallback antigo por listas preservado quando `jogos` nao existe em algum dos lados.
 * `Ranking.jsx` segue sendo ranking geral, mas agora considera a pontuacao por jogo do Mata-Mata.
 
+### V43.2 - Resultado Do Jogo E Bonus De Acerto Total
+
+Status: concluida.
+
+Implementado:
+
+* Resultado do jogo correto vale 5 pontos.
+* Resultado do jogo e derivado do placar:
+  * `placarA > placarB`: timeA venceu.
+  * `placarA === placarB`: empate.
+  * `placarB > placarA`: timeB venceu.
+* Placar exato continua valendo 10 pontos.
+* Classificado correto continua valendo 5 pontos.
+* Penaltis correto continua valendo 3 pontos.
+* Bonus de acerto total vale 2 pontos.
+* Acerto total exige placar exato, resultado do jogo e classificado corretos.
+* Se o jogo oficial foi decidido nos penaltis, o acerto total tambem exige penaltis correto.
+* Pontos maximos do Mata-Mata no Ranking foram atualizados.
+* Maximo por jogo: 22 pontos sem penaltis e 25 pontos com penaltis.
+
 ---
 
 ## Roadmap
@@ -448,6 +472,10 @@ Ranking exclusivo Mata-Mata.
 
 Comparacao de palpites.
 
+### V43.2 - Concluida
+
+Resultado do jogo e bonus de acerto total.
+
 ### V44
 
 Travamento automatico dos palpites.
@@ -460,9 +488,9 @@ Estatisticas do bolao.
 
 ## Proxima Tarefa
 
-Iniciar V42 - Ranking exclusivo Mata-Mata.
+Proxima versao a definir.
 
-Antes de alterar codigo na V42, gerar plano tecnico contendo:
+Antes de alterar codigo em uma nova versao, gerar plano tecnico quando solicitado contendo:
 
 * modelo de dados sugerido;
 * colecoes/documentos Firestore envolvidos;
@@ -530,6 +558,13 @@ Regras para V42:
 * Primeiro propor como sera o ranking exclusivo Mata-Mata.
 * Depois implementar em etapas.
 * Validar build a cada etapa importante.
+
+Regras para V43.2:
+
+* Nao criar novo campo para resultado do jogo; ele e derivado do placar.
+* Resultado do jogo correto vale +5.
+* Bonus de acerto total vale +2.
+* Atualizar pontos maximos do Ranking sempre que mudar a pontuacao.
 
 ---
 

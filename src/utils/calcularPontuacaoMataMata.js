@@ -24,6 +24,32 @@ const placarPreenchido = (jogo) =>
   jogo?.placarB !== undefined &&
   jogo?.placarB !== "";
 
+const resultadoDoJogo = (jogo) => {
+  if (!placarPreenchido(jogo)) {
+    return "";
+  }
+
+  const placarA = Number(jogo.placarA);
+  const placarB = Number(jogo.placarB);
+
+  if (
+    Number.isNaN(placarA) ||
+    Number.isNaN(placarB)
+  ) {
+    return "";
+  }
+
+  if (placarA > placarB) {
+    return "timeA";
+  }
+
+  if (placarB > placarA) {
+    return "timeB";
+  }
+
+  return "empate";
+};
+
 const calcularDetalhesPorJogo = (
   palpite,
   resultado
@@ -81,14 +107,36 @@ const calcularDetalhesPorJogo = (
               jogoResultado.classificado
             );
 
+        const resultadoCorreto =
+          resultadoDoJogo(
+            jogoPalpite
+          ) &&
+          resultadoDoJogo(
+            jogoPalpite
+          ) ===
+            resultadoDoJogo(
+              jogoResultado
+            );
+
         const penaltisCorreto =
           jogoResultado.decididoNosPenaltis ===
             true &&
           jogoPalpite.decididoNosPenaltis ===
             true;
 
+        const acertoTotal =
+          placarExato &&
+          resultadoCorreto &&
+          classificadoCorreto &&
+          (!jogoResultado.decididoNosPenaltis ||
+            penaltisCorreto);
+
         if (placarExato) {
           detalhes[fase] += 10;
+        }
+
+        if (resultadoCorreto) {
+          detalhes[fase] += 5;
         }
 
         if (classificadoCorreto) {
@@ -97,6 +145,10 @@ const calcularDetalhesPorJogo = (
 
         if (penaltisCorreto) {
           detalhes[fase] += 3;
+        }
+
+        if (acertoTotal) {
+          detalhes[fase] += 2;
         }
       }
     );

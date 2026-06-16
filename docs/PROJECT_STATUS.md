@@ -13,7 +13,7 @@
 
 ## Status Atual
 
-Versao atual: V43.1
+Versao atual: V43.2
 
 
 Sistema funcional, responsivo e com regras de seguranca do Firestore preparadas no projeto.
@@ -27,6 +27,7 @@ Status das versoes recentes:
 * V39 concluida: Mata-Mata por jogo implementado nos palpites e na central.
 * V40 concluida: Resultados oficiais por jogo implementados.
 * V41 concluida: Pontuacao do Mata-Mata por jogo implementada.
+* V43.2 concluida: Resultado do jogo e bonus de acerto total implementados.
 
 ---
 
@@ -195,8 +196,11 @@ No desktop, a tabela permanece preservada.
 
 * Pontuacao do Mata-Mata por jogo.
 * Placar exato vale 10 pontos.
+* Resultado do jogo correto vale 5 pontos.
 * Classificado correto vale 5 pontos.
-* Se acertar os dois, o jogo soma 15 pontos.
+* Penaltis correto vale 3 pontos quando o jogo oficial foi decidido nos penaltis.
+* Bonus de acerto total vale 2 pontos.
+* Maximo por jogo: 22 pontos sem penaltis e 25 pontos com penaltis.
 * Fallback antigo preservado quando `jogos` nao existe nos dois lados.
 
 ### V42
@@ -244,7 +248,7 @@ V40 e V41 tambem foram implementadas:
 
 ## Proxima Tarefa
 
-Iniciar V42: Ranking exclusivo Mata-Mata.
+Proxima versao a definir.
 
 V41.1 concluida:
 - Botao seguro para zerar resultados de teste.
@@ -261,6 +265,18 @@ V42.1 ate V42.8 concluidas:
 - Remoção de duplicidades.
 - Top 3 removido da classificação completa.
 - Busca reposicionada.
+
+V43.2 concluida:
+- Resultado do jogo derivado do placar:
+  - placarA > placarB = timeA venceu.
+  - placarA === placarB = empate.
+  - placarB > placarA = timeB venceu.
+- Resultado do jogo correto vale +5 pontos.
+- Bonus de acerto total vale +2 pontos.
+- Acerto total exige placar exato, resultado do jogo e classificado corretos.
+- Se o jogo oficial foi decidido nos penaltis, o acerto total tambem exige penaltis correto.
+- Maximo por jogo atualizado para 22 pontos sem penaltis e 25 pontos com penaltis.
+- Pontos maximos do Ranking Mata-Mata atualizados para considerar resultado, penaltis e bonus total.
 
 V43 concluida:
 - Confrontos oficiais do Mata-Mata.

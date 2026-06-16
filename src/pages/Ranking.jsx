@@ -56,10 +56,25 @@ const calcularPontosMaximosMataMata = (
 
               if (placarPreenchido(jogo)) {
                 pontos += 10;
+                pontos += 5;
               }
 
               if (jogo.classificado) {
                 pontos += 5;
+              }
+
+              if (
+                jogo.decididoNosPenaltis ===
+                true
+              ) {
+                pontos += 3;
+              }
+
+              if (
+                placarPreenchido(jogo) &&
+                jogo.classificado
+              ) {
+                pontos += 2;
               }
 
               return subtotal + pontos;
@@ -580,6 +595,16 @@ function Ranking({ voltar }) {
     return "(-" + diff + " pts)";
   };
 
+  const abrirDetalheParticipante = (
+    participante
+  ) => {
+    if (!participante) return;
+
+    setParticipanteSelecionado(
+      participante
+    );
+  };
+
   const renderTabs = () => (
     <div style={tabsStyle}>
       <button
@@ -653,7 +678,20 @@ function Ranking({ voltar }) {
   ) => (
     <div
       className="ranking-v37-podium-card"
-      style={estilo}
+      onClick={
+        participante
+          ? () =>
+              abrirDetalheParticipante(
+                participante
+              )
+          : undefined
+      }
+      style={{
+        ...estilo,
+        cursor: participante
+          ? "pointer"
+          : "default",
+      }}
     >
       <div
         style={estiloBadgePosicao(posicao)}
@@ -879,7 +917,7 @@ function Ranking({ voltar }) {
               <div
                 key={`${modoRanking}-${participante.nome}-${index}`}
                 onClick={() =>
-                  setParticipanteSelecionado(
+                  abrirDetalheParticipante(
                     participante
                   )
                 }

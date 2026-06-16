@@ -2,18 +2,19 @@ Projeto: Terceirizados Mil Grau
 
 Status Atual:
 
-V36 ✅
-V37 ✅
-V38 ✅
-V38.1 ✅
-V39 ✅
-V40 ✅
-V41 ✅
-V41.1 ✅
-V42 ✅
-V42.1 até V42.8 ✅
-V43 ✅
-V43.1 ✅
+V36 concluida
+V37 concluida
+V38 concluida
+V38.1 concluida
+V39 concluida
+V40 concluida
+V41 concluida
+V41.1 concluida
+V42 concluida
+V42.1 ate V42.8 concluidas
+V43 concluida
+V43.1 concluida
+V43.2 concluida
 
 Stack:
 - React
@@ -22,7 +23,7 @@ Stack:
 - Firestore
 - Firebase Hosting
 
-Permissões:
+Permissoes:
 - participante
 - admin
 - superadmin
@@ -41,17 +42,28 @@ Mata-Mata atual:
   - decididoNosPenaltis
 - Resultados oficiais usam os mesmos confrontos.
 
-Pontuação atual:
-- placar exato = 10
-- classificado correto = 5
-- pênaltis correto = +3
-- máximo atual = 18
+Pontuacao atual:
+- placar exato = +10
+- resultado do jogo correto = +5
+- classificado correto = +5
+- penaltis correto = +3
+- bonus de acerto total = +2
+- maximo atual = 22 sem penaltis e 25 com penaltis
 
-Próxima versão:
-V43.2 - Resultado do jogo e bônus de acerto total.
+Resultado do jogo:
+- Derivado do placar.
+- placarA > placarB = timeA venceu.
+- placarA === placarB = empate.
+- placarB > placarA = timeB venceu.
 
-Antes de alterar código:
-- gerar plano técnico;
+Acerto total:
+- placar exato correto;
+- resultado do jogo correto;
+- classificado correto;
+- se o jogo oficial foi decidido nos penaltis, tambem precisa acertar penaltis.
+
+Antes de alterar codigo:
+- gerar plano tecnico quando a tarefa pedir;
 - rodar npm.cmd run build;
 - listar arquivos alterados;
-- não fazer deploy.
+- nao fazer deploy.
