@@ -20,6 +20,7 @@ function Dashboard({
   abrirRanking,
   abrirCentralPalpites,
   abrirCentralMataMata,
+  abrirResumo,
 }) {
   const [participantes, setParticipantes] = useState([]);
   const [palpitesLiberados, setPalpitesLiberados] =
@@ -236,6 +237,7 @@ participantes.length > 0
     <div
       className="dashboard-v37"
       style={{
+        position: "relative",
         minHeight: "100vh",
         backgroundColor: "#0d0d0d",
         color: "white",
@@ -243,6 +245,14 @@ participantes.length > 0
         fontFamily: "Arial, sans-serif",
       }}
     >
+      <button
+        className="dashboard-v37-button"
+        onClick={sair}
+        style={botaoSairTopoStyle}
+      >
+        Sair
+      </button>
+
       <div
   style={{
     display: "flex",
@@ -263,76 +273,109 @@ participantes.length > 0
 </h1>
 
         <div
-  className="dashboard-v37-actions"
-  style={{
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: "10px",
-    maxWidth: "900px",
-  }}
->
-          <button
-            className="dashboard-v37-button"
-            onClick={abrirPalpites}
-            style={botaoAzul}
-          >
-            ⚽ Palpites da Copa
-          </button>
+          className="dashboard-v37-actions"
+          style={navegacaoPrincipalStyle}
+        >
+          <section style={secaoNavegacaoPrincipalStyle}>
+            <h2 style={secaoNavegacaoTituloStyle}>
+              ⚽ Mata-Mata
+            </h2>
 
-          <button
-  className="dashboard-v37-button"
-  onClick={abrirMataMata}
-  style={botaoDourado}
->
-  🏆 Mata-Mata
-</button>
-
-          <button
-            className="dashboard-v37-button"
-            onClick={abrirRanking}
-            style={botaoVerde}
-          >
-            🏆 Ranking
-          </button>
-
-          {isSuperAdmin && (
-            <>
+            <div style={grupoBotoesStyle}>
               <button
                 className="dashboard-v37-button"
-                onClick={abrirCentralPalpites}
-                style={botaoRoxo}
+                onClick={abrirMataMata}
+                style={botaoDourado}
               >
-                📊 Central de Palpites
+                Palpites Mata-Mata
               </button>
 
               <button
-  className="dashboard-v37-button"
-  onClick={
-    abrirCentralMataMata
-  }
-  style={botaoRoxo}
->
-  🏆 Central Mata-Mata
-</button>
+                className="dashboard-v37-button"
+                onClick={abrirRanking}
+                style={botaoVerde}
+              >
+                Ranking
+              </button>
+
+              {isSuperAdmin && (
+                <>
+                  <button
+                    className="dashboard-v37-button"
+                    onClick={
+                      abrirCentralMataMata
+                    }
+                    style={botaoRoxo}
+                  >
+                    Central Mata-Mata
+                  </button>
+
+                  <button
+                    className="dashboard-v37-button"
+                    onClick={() =>
+                      abrirResultados(
+                        "mataMata"
+                      )
+                    }
+                    style={botaoLaranja}
+                  >
+                    Resultados Mata-Mata
+                  </button>
+                </>
+              )}
+            </div>
+          </section>
+
+          <section style={secaoNavegacaoSecundariaStyle}>
+            <h2 style={secaoNavegacaoTituloStyle}>
+              📦 Fase de Grupos
+            </h2>
+
+            <div style={grupoBotoesStyle}>
+              <button
+                className="dashboard-v37-button"
+                onClick={abrirPalpites}
+                style={botaoAzul}
+              >
+                Palpites de Grupos
+              </button>
+
+              {isSuperAdmin && (
+                <>
+                  <button
+                    className="dashboard-v37-button"
+                    onClick={
+                      abrirCentralPalpites
+                    }
+                    style={botaoRoxo}
+                  >
+                    Central de Palpites
+                  </button>
+
+                  <button
+                    className="dashboard-v37-button"
+                    onClick={() =>
+                      abrirResultados(
+                        "grupos"
+                      )
+                    }
+                    style={botaoLaranja}
+                  >
+                    Resultados de Grupos
+                  </button>
+                </>
+              )}
 
               <button
                 className="dashboard-v37-button"
-                onClick={abrirResultados}
-                style={botaoLaranja}
+                onClick={abrirResumo}
+                style={botaoCinza}
               >
-                ⚽ Resultados Oficiais
+                Resumo de Palpites
               </button>
-            </>
-          )}
+            </div>
+          </section>
 
-          <button
-            className="dashboard-v37-button"
-            onClick={sair}
-            style={botaoVermelho}
-          >
-            Sair
-          </button>
         </div>
       </div>
 
@@ -638,6 +681,63 @@ const botaoVermelho = {
   borderRadius: "8px",
   cursor: "pointer",
   minWidth: "180px",
+};
+
+const botaoSairTopoStyle = {
+  backgroundColor: "#dc3545",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  position: "absolute",
+  top: "18px",
+  right: "18px",
+  fontWeight: "bold",
+};
+
+const botaoCinza = {
+  backgroundColor: "#495057",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  minWidth: "180px",
+};
+
+const navegacaoPrincipalStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: "14px",
+  width: "min(100%, 980px)",
+};
+
+const secaoNavegacaoPrincipalStyle = {
+  backgroundColor: "#1a1a1a",
+  border: "1px solid #3d3100",
+  borderRadius: "8px",
+  padding: "16px",
+};
+
+const secaoNavegacaoSecundariaStyle = {
+  backgroundColor: "#151515",
+  border: "1px solid #2c2c2c",
+  borderRadius: "8px",
+  padding: "16px",
+};
+
+const secaoNavegacaoTituloStyle = {
+  margin: "0 0 12px",
+  fontSize: "20px",
+  textAlign: "left",
+};
+
+const grupoBotoesStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
 };
 
 const botaoLiberar = {

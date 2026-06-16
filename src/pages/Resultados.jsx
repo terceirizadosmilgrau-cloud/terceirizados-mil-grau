@@ -317,10 +317,17 @@ const criarResultadosMataMataVazios =
 
 function Resultados({
   usuario,
+  contextoInicial = "mataMata",
   voltar,
 }) {
   const [resultados, setResultados] =
     useState({});
+  const [abaAtiva, setAbaAtiva] =
+    useState(
+      contextoInicial === "grupos"
+        ? "grupos"
+        : "mataMata"
+    );
 
   const [mataMata, setMataMata] =
     useState(
@@ -654,7 +661,38 @@ function Resultados({
         Resultados Oficiais
       </h1>
 
-      {Object.entries(grupos).map(
+      <div style={abasStyle}>
+        <button
+          type="button"
+          onClick={() =>
+            setAbaAtiva("mataMata")
+          }
+          style={
+            abaAtiva === "mataMata"
+              ? abaAtivaStyle
+              : abaStyle
+          }
+        >
+          ⚽ Mata-Mata
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setAbaAtiva("grupos")
+          }
+          style={
+            abaAtiva === "grupos"
+              ? abaAtivaStyle
+              : abaStyle
+          }
+        >
+          📦 Fase de Grupos
+        </button>
+      </div>
+
+      {abaAtiva === "grupos" &&
+        Object.entries(grupos).map(
         ([grupo, selecoes]) => (
           <div
             key={grupo}
@@ -729,7 +767,8 @@ function Resultados({
         )
       )}
 
-      {usuario?.tipoUsuario ===
+      {abaAtiva === "mataMata" &&
+        usuario?.tipoUsuario ===
         "superadmin" && (
         <div style={secaoStyle}>
           <h2>
@@ -859,6 +898,7 @@ function Resultados({
         </div>
       )}
 
+      {abaAtiva === "mataMata" && (
       <div style={secaoStyle}>
         <h2>Resultados Mata-Mata</h2>
 
@@ -1052,6 +1092,7 @@ function Resultados({
           )
         )}
       </div>
+      )}
 
       <button
         style={botaoSalvar}
@@ -1111,6 +1152,30 @@ const secaoStyle = {
 const textoApoioStyle = {
   color: "#ddd",
   maxWidth: "780px",
+};
+
+const abasStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
+  marginBottom: "20px",
+};
+
+const abaStyle = {
+  backgroundColor: "#343a40",
+  color: "white",
+  border: "none",
+  padding: "10px 16px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  minWidth: "160px",
+};
+
+const abaAtivaStyle = {
+  ...abaStyle,
+  backgroundColor: "#ffc107",
+  color: "#000",
 };
 
 const selectStyle = {

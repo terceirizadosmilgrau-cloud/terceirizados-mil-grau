@@ -17,6 +17,12 @@ import CentralMataMata from "./pages/CentralMataMata";
 function App() {
   const [tela, setTela] = useState("login");
   const [usuario, setUsuario] = useState(null);
+  const [origemResumo, setOrigemResumo] =
+    useState("palpites");
+  const [
+    contextoResultados,
+    setContextoResultados,
+  ] = useState("mataMata");
 
   const loginSucesso = (user) => {
     setUsuario(user);
@@ -106,6 +112,9 @@ function App() {
     return (
       <Resultados
         usuario={usuario}
+        contextoInicial={
+          contextoResultados
+        }
         voltar={() =>
           setTela("dashboard")
         }
@@ -118,7 +127,7 @@ function App() {
       <ResumoPalpites
         usuario={usuario}
         voltar={() =>
-          setTela("palpites")
+          setTela(origemResumo)
         }
       />
     );
@@ -142,7 +151,10 @@ function App() {
           setTela("dashboard")
         }
         abrirResumo={() =>
-          setTela("resumo")
+          {
+            setOrigemResumo("palpites");
+            setTela("resumo");
+          }
         }
       />
     );
@@ -162,9 +174,12 @@ function App() {
     setTela("mataMata")
   }
 
-  abrirResultados={() =>
-    setTela("resultados")
-  }
+  abrirResultados={(contexto) => {
+    setContextoResultados(
+      contexto || "mataMata"
+    );
+    setTela("resultados");
+  }}
 
   abrirRanking={() =>
     setTela("ranking")
@@ -179,6 +194,10 @@ function App() {
     "centralMataMata"
   )
 }
+  abrirResumo={() => {
+    setOrigemResumo("dashboard");
+    setTela("resumo");
+  }}
 />
     );
   }
