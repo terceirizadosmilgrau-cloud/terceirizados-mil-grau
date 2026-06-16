@@ -623,40 +623,79 @@ function EstatisticasMataMata({ voltar }) {
                     style={faseCardStyle}
                   >
                     <h3 style={faseTituloStyle}>
-                      {fase.titulo}
+                      {fase.titulo.toUpperCase()}
                     </h3>
-                    <p>
-                      Jogos:{" "}
+
+                    <p style={jogosOficiaisStyle}>
+                      Jogos com resultado oficial:{" "}
                       {
                         resumo.jogosContabilizados
                       }
                     </p>
-                    <p>
-                      Placar exato:{" "}
-                      {resumo.placarExato}
-                    </p>
-                    <p>
-                      Resultado:{" "}
-                      {
-                        resumo.resultadoCorreto
-                      }
-                    </p>
-                    <p>
-                      Classificado:{" "}
-                      {
-                        resumo.classificadoCorreto
-                      }
-                    </p>
-                    <p>
-                      Penaltis:{" "}
-                      {
-                        resumo.penaltisCorreto
-                      }
-                    </p>
-                    <p>
-                      Acerto total:{" "}
-                      {resumo.acertoTotal}
-                    </p>
+
+                    <div style={acertosBlocoStyle}>
+                      <strong
+                        style={subtituloFaseStyle}
+                      >
+                        Acertos dos participantes
+                      </strong>
+
+                      <p style={linhaFaseStyle}>
+                        <span>
+                          Placares exatos:
+                        </span>
+                        <strong>
+                          {resumo.placarExato}
+                        </strong>
+                      </p>
+
+                      <p style={linhaFaseStyle}>
+                        <span>
+                          Resultados corretos:
+                        </span>
+                        <strong>
+                          {
+                            resumo.resultadoCorreto
+                          }
+                        </strong>
+                      </p>
+
+                      <p style={linhaFaseStyle}>
+                        <span>
+                          Classificados corretos:
+                        </span>
+                        <strong>
+                          {
+                            resumo.classificadoCorreto
+                          }
+                        </strong>
+                      </p>
+
+                      <p style={linhaFaseStyle}>
+                        <span>
+                          Penaltis corretos:
+                        </span>
+                        <strong>
+                          {
+                            resumo.penaltisCorreto
+                          }
+                        </strong>
+                      </p>
+
+                      <p style={linhaFaseStyle}>
+                        <span>
+                          Acertos totais:
+                        </span>
+                        <strong>
+                          {resumo.acertoTotal}
+                        </strong>
+                      </p>
+                    </div>
+
+                    <small style={notaFaseStyle}>
+                      Total de acertos somando todos
+                      os participantes.
+                    </small>
                   </div>
                 );
               })}
@@ -800,11 +839,45 @@ const faseCardStyle = {
   borderRadius: "8px",
   padding: "14px",
   lineHeight: 1.55,
+  display: "grid",
+  gap: "12px",
 };
 
 const faseTituloStyle = {
   marginTop: 0,
+  marginBottom: 0,
   color: "#ffd76a",
+};
+
+const jogosOficiaisStyle = {
+  margin: 0,
+  color: "#e6e6e6",
+  fontWeight: "bold",
+};
+
+const acertosBlocoStyle = {
+  display: "grid",
+  gap: "6px",
+  borderTop: "1px solid #2c2c2c",
+  paddingTop: "10px",
+};
+
+const subtituloFaseStyle = {
+  color: "#ddd",
+  fontSize: "14px",
+};
+
+const linhaFaseStyle = {
+  margin: 0,
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "12px",
+  color: "#cfcfcf",
+};
+
+const notaFaseStyle = {
+  color: "#999",
+  lineHeight: 1.35,
 };
 
 export default EstatisticasMataMata;
