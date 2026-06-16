@@ -198,6 +198,16 @@ code {
   margin-top: 14px;
 }
 
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
 @media (max-width: 640px) {
   #root {
     border-inline: 0;

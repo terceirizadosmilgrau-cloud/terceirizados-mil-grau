@@ -9,7 +9,15 @@ function ResumoPalpites({
 }) {
   const [palpites, setPalpites] = useState({});
 
+  const palpitesGrupos =
+    Object.entries(palpites).filter(
+      ([chave]) =>
+        chave !== "atualizadoEm"
+    );
+
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarResumo();
   }, []);
 
@@ -40,12 +48,21 @@ function ResumoPalpites({
     >
       <h1>📋 Meus Palpites</h1>
 
-      {Object.entries(palpites)
-        .filter(
-          ([chave]) =>
-            chave !== "atualizadoEm"
-        )
-        .map(([grupo, dados]) => (
+      {palpitesGrupos.length === 0 && (
+        <div
+          style={{
+            backgroundColor: "#1a1a1a",
+            padding: "20px",
+            borderRadius: "12px",
+            marginBottom: "20px",
+          }}
+        >
+          Nenhum palpite de Grupos
+          encontrado.
+        </div>
+      )}
+
+      {palpitesGrupos.map(([grupo, dados]) => (
           <div
             key={grupo}
             style={{

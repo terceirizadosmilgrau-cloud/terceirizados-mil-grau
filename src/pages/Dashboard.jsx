@@ -21,6 +21,7 @@ function Dashboard({
   abrirCentralPalpites,
   abrirCentralMataMata,
   abrirResumo,
+  abrirResumoMataMata,
 }) {
   const [participantes, setParticipantes] = useState([]);
   const [palpitesLiberados, setPalpitesLiberados] =
@@ -38,6 +39,8 @@ const [filtro, setFiltro] =
   usuario?.tipoUsuario === "admin";
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarConfiguracoes();
 
     const unsubscribe = onSnapshot(
@@ -292,10 +295,10 @@ participantes.length > 0
 
               <button
                 className="dashboard-v37-button"
-                onClick={abrirRanking}
-                style={botaoVerde}
+                onClick={abrirResumoMataMata}
+                style={botaoCinza}
               >
-                Ranking
+                Resumo Mata-Mata
               </button>
 
               {isSuperAdmin && (
@@ -340,6 +343,14 @@ participantes.length > 0
                 Palpites de Grupos
               </button>
 
+              <button
+                className="dashboard-v37-button"
+                onClick={abrirResumo}
+                style={botaoCinza}
+              >
+                Resumo de Palpites
+              </button>
+
               {isSuperAdmin && (
                 <>
                   <button
@@ -365,19 +376,32 @@ participantes.length > 0
                   </button>
                 </>
               )}
-
-              <button
-                className="dashboard-v37-button"
-                onClick={abrirResumo}
-                style={botaoCinza}
-              >
-                Resumo de Palpites
-              </button>
             </div>
           </section>
 
         </div>
       </div>
+
+      <section style={rankingOficialStyle}>
+        <div>
+          <h2 style={rankingTituloStyle}>
+            🏆 RANKING OFICIAL
+          </h2>
+
+          <p style={rankingTextoStyle}>
+            Acompanhe a classificação e veja
+            quem está liderando o bolão.
+          </p>
+        </div>
+
+        <button
+          className="dashboard-v37-button"
+          onClick={abrirRanking}
+          style={botaoRankingOficialStyle}
+        >
+          Ver Ranking
+        </button>
+      </section>
 
       <div
         className="dashboard-v37-card"
@@ -738,6 +762,44 @@ const grupoBotoesStyle = {
   display: "flex",
   flexWrap: "wrap",
   gap: "10px",
+};
+
+const rankingOficialStyle = {
+  backgroundColor: "#211a05",
+  border: "1px solid #ffc107",
+  borderRadius: "8px",
+  padding: "clamp(18px, 4vw, 24px)",
+  margin: "0 auto 20px",
+  width: "min(100%, 980px)",
+  boxSizing: "border-box",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "16px",
+  flexWrap: "wrap",
+};
+
+const rankingTituloStyle = {
+  margin: "0 0 8px",
+  color: "#ffd76a",
+  fontSize: "clamp(22px, 5vw, 32px)",
+};
+
+const rankingTextoStyle = {
+  margin: 0,
+  color: "#f1f1f1",
+  lineHeight: 1.4,
+};
+
+const botaoRankingOficialStyle = {
+  backgroundColor: "#ffc107",
+  color: "#000",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  minWidth: "180px",
 };
 
 const botaoLiberar = {

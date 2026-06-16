@@ -45,6 +45,8 @@ function CentralMataMata({ voltar }) {
     });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregar();
   }, []);
 

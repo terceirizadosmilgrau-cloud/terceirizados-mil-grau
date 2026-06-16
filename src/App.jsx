@@ -13,6 +13,7 @@ import Ranking from "./pages/Ranking";
 import CentralPalpites from "./pages/CentralPalpites";
 import PalpitesMataMata from "./pages/PalpitesMataMata";
 import CentralMataMata from "./pages/CentralMataMata";
+import ResumoMataMata from "./pages/ResumoMataMata";
 
 function App() {
   const [tela, setTela] = useState("login");
@@ -132,6 +133,18 @@ function App() {
       />
     );
   }
+
+  if (tela === "resumoMataMata") {
+    return (
+      <ResumoMataMata
+        usuario={usuario}
+        voltar={() =>
+          setTela("dashboard")
+        }
+      />
+    );
+  }
+
   if (tela === "mataMata") {
   return (
     <PalpitesMataMata
@@ -198,6 +211,10 @@ function App() {
     setOrigemResumo("dashboard");
     setTela("resumo");
   }}
+
+  abrirResumoMataMata={() =>
+    setTela("resumoMataMata")
+  }
 />
     );
   }

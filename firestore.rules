@@ -63,7 +63,7 @@ service cloud.firestore {
 
       allow create, update: if isOwner(uid);
 
-      allow delete: if isSuperAdmin();
+      allow delete: if isOwner(uid) || isSuperAdmin();
     }
 
     match /palpitesMataMata/{uid} {
@@ -71,7 +71,7 @@ service cloud.firestore {
 
       allow create, update: if isOwner(uid);
 
-      allow delete: if isSuperAdmin();
+      allow delete: if isOwner(uid) || isSuperAdmin();
     }
 
     match /resultados/{documento} {

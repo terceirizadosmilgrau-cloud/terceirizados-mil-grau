@@ -347,6 +347,8 @@ function Resultados({
   ] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarResultados();
   }, []);
 

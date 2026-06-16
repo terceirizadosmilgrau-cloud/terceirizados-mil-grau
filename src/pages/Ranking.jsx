@@ -136,7 +136,7 @@ function Ranking({ voltar }) {
   const [busca, setBusca] =
     useState("");
   const [modoRanking, setModoRanking] =
-    useState("geral");
+    useState("mataMata");
   const [
     participanteSelecionado,
     setParticipanteSelecionado,
@@ -155,6 +155,8 @@ function Ranking({ voltar }) {
   ] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarRanking();
   }, []);
 

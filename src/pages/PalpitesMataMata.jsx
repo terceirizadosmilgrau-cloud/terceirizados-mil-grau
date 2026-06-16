@@ -5,6 +5,7 @@ import {
 
 import {
   doc,
+  deleteDoc,
   setDoc,
   getDoc,
 } from "firebase/firestore";
@@ -250,6 +251,8 @@ function PalpitesMataMata({
     useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarConfiguracoes();
   }, []);
 
@@ -468,6 +471,38 @@ function PalpitesMataMata({
     }
   };
 
+  const limparPalpites = async () => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja apagar seus palpites do Mata-Mata? Essa ação não pode ser desfeita."
+    );
+
+    if (!confirmar) return;
+
+    try {
+      await deleteDoc(
+        doc(
+          db,
+          "palpitesMataMata",
+          usuario.uid
+        )
+      );
+
+      setJogos(criarJogosVazios());
+
+      alert(
+        "Palpites do Mata-Mata apagados."
+      );
+    } catch (error) {
+      console.error(
+        "Erro ao limpar palpites:",
+        error
+      );
+      alert(
+        "Erro ao limpar palpites."
+      );
+    }
+  };
+
   return (
     <div style={paginaStyle}>
       <h1 style={tituloStyle}>
@@ -671,6 +706,13 @@ function PalpitesMataMata({
       </button>
 
       <button
+        onClick={limparPalpites}
+        style={botaoLimpar}
+      >
+        🗑 Limpar meus palpites Mata-Mata
+      </button>
+
+      <button
         onClick={voltar}
         style={botaoVoltar}
       >
@@ -812,6 +854,18 @@ const botaoVoltar = {
   padding: "12px 20px",
   cursor: "pointer",
   width: "min(100%, 140px)",
+  marginBottom: "10px",
+};
+
+const botaoLimpar = {
+  backgroundColor: "#7f1d1d",
+  color: "white",
+  border: "1px solid #dc3545",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  cursor: "pointer",
+  width: "min(100%, 300px)",
+  marginRight: "10px",
   marginBottom: "10px",
 };
 

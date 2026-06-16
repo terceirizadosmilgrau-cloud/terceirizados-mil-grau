@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   doc,
+  deleteDoc,
   setDoc,
   getDoc,
 } from "firebase/firestore";
@@ -24,6 +25,8 @@ function Palpites({
   useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     carregarConfiguracoes();
     carregarPalpites();
   }, []);
@@ -196,6 +199,34 @@ function Palpites({
     }
   };
 
+  const limparPalpites = async () => {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja apagar seus palpites de grupos? Essa ação não pode ser desfeita."
+    );
+
+    if (!confirmar) return;
+
+    try {
+      await deleteDoc(
+        doc(db, "palpites", usuario.uid)
+      );
+
+      setPalpites({});
+
+      alert(
+        "Palpites de grupos apagados."
+      );
+    } catch (error) {
+      console.error(
+        "Erro ao limpar palpites:",
+        error
+      );
+      alert(
+        "Erro ao limpar palpites."
+      );
+    }
+  };
+
   return (
     <div
       style={{
@@ -319,6 +350,13 @@ function Palpites({
           </button>
 
           <button
+            style={botaoLimpar}
+            onClick={limparPalpites}
+          >
+            🗑 Limpar meus palpites de Grupos
+          </button>
+
+          <button
             style={botaoVoltar}
             onClick={voltar}
           >
@@ -360,6 +398,17 @@ const botaoVoltar = {
   padding: "12px 20px",
   cursor: "pointer",
   flex: "1 1 140px",
+  maxWidth: "100%",
+};
+
+const botaoLimpar = {
+  backgroundColor: "#7f1d1d",
+  color: "white",
+  border: "1px solid #dc3545",
+  borderRadius: "8px",
+  padding: "12px 20px",
+  cursor: "pointer",
+  flex: "1 1 240px",
   maxWidth: "100%",
 };
 
