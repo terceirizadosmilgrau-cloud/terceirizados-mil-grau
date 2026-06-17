@@ -11,6 +11,14 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase";
+import {
+  formatarPlacar,
+  formatarResultadoOficial,
+  jogoEncerrado,
+  obterIndicadoresJogo,
+  placarPreenchido,
+  textoPreenchido,
+} from "../utils/mataMataVisual";
 
 const fases = [
   {
@@ -48,17 +56,8 @@ const criarJogo = (fase, numero) => ({
   decididoNosPenaltis: false,
 });
 
-const normalizarTexto = (valor) =>
-  String(valor || "").trim();
-
 const normalizarChave = (valor) =>
-  normalizarTexto(valor).toLowerCase();
-
-const placarPreenchido = (jogo) =>
-  jogo?.placarA !== undefined &&
-  jogo?.placarA !== "" &&
-  jogo?.placarB !== undefined &&
-  jogo?.placarB !== "";
+  textoPreenchido(valor).toLowerCase();
 
 const placarChave = (jogo) =>
   placarPreenchido(jogo)
@@ -67,52 +66,10 @@ const placarChave = (jogo) =>
       ).trim()}`
     : "";
 
-const formatarPlacar = (jogo) =>
-  placarPreenchido(jogo)
-    ? `${jogo.placarA} x ${jogo.placarB}`
-    : "-";
-
 const temConteudoJogo = (jogo) =>
   placarPreenchido(jogo) ||
-  normalizarTexto(jogo?.classificado) ||
+  textoPreenchido(jogo?.classificado) ||
   jogo?.decididoNosPenaltis;
-
-const jogoEncerrado = (jogo) =>
-  placarPreenchido(jogo) &&
-  Boolean(
-    normalizarChave(jogo?.classificado)
-  );
-
-const placarExato = (
-  palpite,
-  resultado
-) =>
-  placarPreenchido(palpite) &&
-  jogoEncerrado(resultado) &&
-  String(palpite.placarA).trim() ===
-    String(resultado.placarA).trim() &&
-  String(palpite.placarB).trim() ===
-    String(resultado.placarB).trim();
-
-const classificadoCorreto = (
-  palpite,
-  resultado
-) =>
-  Boolean(
-    normalizarChave(palpite?.classificado)
-  ) &&
-  jogoEncerrado(resultado) &&
-  normalizarChave(palpite.classificado) ===
-    normalizarChave(
-      resultado.classificado
-    );
-
-const penaltisCorreto = (
-  palpite,
-  resultado
-) =>
-  resultado?.decididoNosPenaltis === true &&
-  palpite?.decididoNosPenaltis === true;
 
 const normalizarConfrontosOficiais = (
   dados = {}
@@ -220,7 +177,7 @@ const normalizarJogos = (
 const criarContagem = (itens, total) =>
   Object.values(
     itens.reduce((acc, item) => {
-      const valor = normalizarTexto(item);
+      const valor = textoPreenchido(item);
       if (!valor || valor === "-") return acc;
 
       const chave = normalizarChave(valor);
@@ -729,98 +686,84 @@ function ComparacaoPalpites({ voltar }) {
     participante,
     jogo,
     resultado
-  ) => (
-    <div style={palpiteCardStyle}>
-      <strong style={participanteNomeStyle}>
-        {participante?.nome || "-"}
-      </strong>
+  ) => {
+    const indicadores =
+      obterIndicadoresJogo(jogo, resultado);
 
-      {!temConteudoJogo(jogo) ? (
-        <span style={vazioStyle}>
-          Jogo sem palpite preenchido.
-        </span>
-      ) : (
-        <>
-          <span>
-            Placar:{" "}
-            <strong>
-              {formatarPlacar(jogo)}
-            </strong>
+    return (
+      <div style={palpiteCardStyle}>
+        <strong style={participanteNomeStyle}>
+          {participante?.nome || "-"}
+        </strong>
+
+        {!temConteudoJogo(jogo) ? (
+          <span style={vazioStyle}>
+            Jogo sem palpite preenchido.
           </span>
+        ) : (
+          <>
+            <span>
+              Placar:{" "}
+              <strong>
+                {formatarPlacar(jogo)}
+              </strong>
+            </span>
 
-          <span>
-            Classificado:{" "}
-            <strong>
-              {jogo?.classificado || "-"}
-            </strong>
-          </span>
+            <span>
+              Classificado:{" "}
+              <strong>
+                {jogo?.classificado || "-"}
+              </strong>
+            </span>
 
-          <span>
-            {jogo?.decididoNosPenaltis
-              ? "Penaltis"
-              : "Sem penaltis"}
-          </span>
+            <span>
+              {jogo?.decididoNosPenaltis
+                ? "Penaltis"
+                : "Sem penaltis"}
+            </span>
 
-          {jogoEncerrado(resultado) && (
-            <div style={chipsStyle}>
-              {renderBadge(
-                `${
-                  placarExato(
-                    jogo,
-                    resultado
-                  )
-                    ? "OK"
-                    : "X"
-                } Placar`,
-                placarExato(
-                  jogo,
-                  resultado
-                )
-                  ? chipAcertoStyle
-                  : chipErroStyle
-              )}
-
-              {renderBadge(
-                `${
-                  classificadoCorreto(
-                    jogo,
-                    resultado
-                  )
-                    ? "OK"
-                    : "X"
-                } Classificado`,
-                classificadoCorreto(
-                  jogo,
-                  resultado
-                )
-                  ? chipAcertoStyle
-                  : chipErroStyle
-              )}
-
-              {resultado.decididoNosPenaltis ===
-                true &&
-                renderBadge(
+            {indicadores.encerrado && (
+              <div style={chipsStyle}>
+                {renderBadge(
                   `${
-                    penaltisCorreto(
-                      jogo,
-                      resultado
-                    )
+                    indicadores.placar
                       ? "OK"
                       : "X"
-                  } Penaltis`,
-                  penaltisCorreto(
-                    jogo,
-                    resultado
-                  )
+                  } Placar`,
+                  indicadores.placar
                     ? chipAcertoStyle
                     : chipErroStyle
                 )}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+
+                {renderBadge(
+                  `${
+                    indicadores.classificado
+                      ? "OK"
+                      : "X"
+                  } Classificado`,
+                  indicadores.classificado
+                    ? chipAcertoStyle
+                    : chipErroStyle
+                )}
+
+                {indicadores.compararPenaltis &&
+                  renderBadge(
+                    `${
+                      indicadores.penaltis
+                        ? "OK"
+                        : "X"
+                    } Penaltis`,
+                    indicadores.penaltis
+                      ? chipAcertoStyle
+                      : chipErroStyle
+                  )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   const renderBadge = (
     texto,
@@ -849,12 +792,9 @@ function ComparacaoPalpites({ voltar }) {
         <span style={resultadoOficialStyle}>
           Resultado oficial:{" "}
           <strong>
-            {resultado.placarA} x{" "}
-            {resultado.placarB}
-          </strong>{" "}
-          |{" "}
-          <strong>
-            {resultado.classificado}
+            {formatarResultadoOficial(
+              resultado
+            )}
           </strong>
         </span>
       </div>
