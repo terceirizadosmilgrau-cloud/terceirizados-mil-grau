@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -168,6 +169,19 @@ function Cadastro({ voltarLogin }) {
         >
           Voltar ao Login
         </p>
+
+        <Link
+          to="/"
+          style={{
+            display: "block",
+            textAlign: "center",
+            marginTop: "12px",
+            color: "#ffc107",
+            textDecoration: "none",
+          }}
+        >
+          Voltar para inicio
+        </Link>
       </div>
     </div>
   );

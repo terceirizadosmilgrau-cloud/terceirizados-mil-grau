@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 
 import Login from "./components/Login";
 import Cadastro from "./components/Cadastro";
 import { db } from "./firebase";
 
+import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Palpites from "./pages/Palpites";
 import ResumoPalpites from "./pages/ResumoPalpites";
@@ -17,55 +25,17 @@ import ResumoMataMata from "./pages/ResumoMataMata";
 import EstatisticasMataMata from "./pages/EstatisticasMataMata";
 import ComparacaoPalpites from "./pages/ComparacaoPalpites";
 
-function App() {
-  const [tela, setTela] = useState("login");
-  const [usuario, setUsuario] = useState(null);
+function AreaAutenticada({
+  usuario,
+  sair,
+}) {
+  const [tela, setTela] = useState("dashboard");
   const [origemResumo, setOrigemResumo] =
     useState("palpites");
   const [
     contextoResultados,
     setContextoResultados,
   ] = useState("mataMata");
-
-  const loginSucesso = (user) => {
-    setUsuario(user);
-    setTela("dashboard");
-  };
-
-  useEffect(() => {
-    if (!usuario?.uid) return;
-
-    const unsubscribe = onSnapshot(
-      doc(db, "usuarios", usuario.uid),
-      (snapshot) => {
-        if (!snapshot.exists()) return;
-
-        setUsuario((usuarioAtual) => {
-          if (
-            !usuarioAtual ||
-            usuarioAtual.uid !== usuario.uid
-          ) {
-            return usuarioAtual;
-          }
-
-          return {
-            ...snapshot.data(),
-            uid: usuarioAtual.uid,
-            email:
-              usuarioAtual.email ||
-              snapshot.data().email,
-          };
-        });
-      }
-    );
-
-    return () => unsubscribe();
-  }, [usuario?.uid]);
-
-  const sair = () => {
-    setUsuario(null);
-    setTela("login");
-  };
 
   const isSuperAdmin =
     usuario?.tipoUsuario === "superadmin";
@@ -251,23 +221,100 @@ function App() {
 
   
 
-  if (tela === "cadastro") {
-    return (
-      <Cadastro
-        voltarLogin={() =>
-          setTela("login")
-        }
-      />
+  return <Navigate to="/app" replace />;
+}
+
+function AppRoutes() {
+  const [usuario, setUsuario] = useState(null);
+  const navigate = useNavigate();
+
+  const loginSucesso = (user) => {
+    setUsuario(user);
+    navigate("/app");
+  };
+
+  useEffect(() => {
+    if (!usuario?.uid) return;
+
+    const unsubscribe = onSnapshot(
+      doc(db, "usuarios", usuario.uid),
+      (snapshot) => {
+        if (!snapshot.exists()) return;
+
+        setUsuario((usuarioAtual) => {
+          if (
+            !usuarioAtual ||
+            usuarioAtual.uid !== usuario.uid
+          ) {
+            return usuarioAtual;
+          }
+
+          return {
+            ...snapshot.data(),
+            uid: usuarioAtual.uid,
+            email:
+              usuarioAtual.email ||
+              snapshot.data().email,
+          };
+        });
+      }
     );
-  }
+
+    return () => unsubscribe();
+  }, [usuario?.uid]);
+
+  const sair = () => {
+    setUsuario(null);
+    navigate("/login");
+  };
 
   return (
-    <Login
-      abrirCadastro={() =>
-        setTela("cadastro")
-      }
-      loginSucesso={loginSucesso}
-    />
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/login"
+        element={
+          <Login
+            abrirCadastro={() =>
+              navigate("/cadastro")
+            }
+            loginSucesso={loginSucesso}
+          />
+        }
+      />
+      <Route
+        path="/cadastro"
+        element={
+          <Cadastro
+            voltarLogin={() =>
+              navigate("/login")
+            }
+          />
+        }
+      />
+      <Route
+        path="/app"
+        element={
+          usuario ? (
+            <AreaAutenticada
+              usuario={usuario}
+              sair={sair}
+            />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

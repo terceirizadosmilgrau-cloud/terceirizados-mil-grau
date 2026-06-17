@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -121,6 +122,19 @@ function Login({ abrirCadastro, loginSucesso }) {
         >
           Criar Conta
         </p>
+
+        <Link
+          to="/"
+          style={{
+            display: "block",
+            textAlign: "center",
+            marginTop: "12px",
+            color: "#ffc107",
+            textDecoration: "none",
+          }}
+        >
+          Voltar para inicio
+        </Link>
 
         <p
           style={{
