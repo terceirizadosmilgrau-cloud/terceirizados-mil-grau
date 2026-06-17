@@ -23,6 +23,7 @@ function Dashboard({
   abrirResumo,
   abrirResumoMataMata,
   abrirEstatisticasMataMata,
+  abrirComparacaoPalpites,
 }) {
   const [participantes, setParticipantes] = useState([]);
   const [palpitesLiberados, setPalpitesLiberados] =
@@ -312,6 +313,16 @@ participantes.length > 0
                 style={botaoVerde}
               >
                 Estatisticas Mata-Mata
+              </button>
+
+              <button
+                className="dashboard-v37-button"
+                onClick={
+                  abrirComparacaoPalpites
+                }
+                style={botaoAzul}
+              >
+                Comparar Palpites
               </button>
 
               {isSuperAdmin && (
