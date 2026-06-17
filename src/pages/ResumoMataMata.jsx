@@ -184,6 +184,54 @@ const mesclarJogosComConfrontos = (
   }, {});
 };
 
+const normalizarTexto = (valor) =>
+  String(valor || "")
+    .toLowerCase()
+    .trim();
+
+const placarPreenchido = (jogo) =>
+  jogo?.placarA !== undefined &&
+  jogo?.placarA !== "" &&
+  jogo?.placarB !== undefined &&
+  jogo?.placarB !== "";
+
+const jogoEncerrado = (jogo) =>
+  placarPreenchido(jogo) &&
+  Boolean(
+    normalizarTexto(jogo?.classificado)
+  );
+
+const placarExato = (
+  palpite,
+  resultado
+) =>
+  placarPreenchido(palpite) &&
+  jogoEncerrado(resultado) &&
+  String(palpite.placarA).trim() ===
+    String(resultado.placarA).trim() &&
+  String(palpite.placarB).trim() ===
+    String(resultado.placarB).trim();
+
+const classificadoCorreto = (
+  palpite,
+  resultado
+) =>
+  Boolean(
+    normalizarTexto(palpite?.classificado)
+  ) &&
+  jogoEncerrado(resultado) &&
+  normalizarTexto(palpite.classificado) ===
+    normalizarTexto(
+      resultado.classificado
+    );
+
+const penaltisCorreto = (
+  palpite,
+  resultado
+) =>
+  resultado?.decididoNosPenaltis === true &&
+  palpite?.decididoNosPenaltis === true;
+
 function ResumoMataMata({
   usuario,
   voltar,
@@ -191,6 +239,10 @@ function ResumoMataMata({
   const [palpite, setPalpite] =
     useState(null);
   const [jogos, setJogos] = useState({});
+  const [
+    resultadosJogos,
+    setResultadosJogos,
+  ] = useState({});
   const [carregando, setCarregando] =
     useState(true);
 
@@ -219,14 +271,25 @@ function ResumoMataMata({
       const dadosPalpite =
         palpiteSnapshot.data();
 
-      const configSnapshot =
-        await getDoc(
+      const [
+        configSnapshot,
+        resultadoSnapshot,
+      ] = await Promise.all([
+        getDoc(
           doc(
             db,
             "configuracoes",
             "mataMata"
           )
-        );
+        ),
+        getDoc(
+          doc(
+            db,
+            "resultados",
+            "mataMata"
+          )
+        ),
+      ]);
 
       if (configSnapshot.exists()) {
         const confrontos =
@@ -252,6 +315,16 @@ function ResumoMataMata({
         );
       }
 
+      if (resultadoSnapshot.exists()) {
+        setResultadosJogos(
+          normalizarJogos(
+            resultadoSnapshot.data()
+          )
+        );
+      } else {
+        setResultadosJogos({});
+      }
+
       setPalpite(dadosPalpite);
     } catch (error) {
       console.error(error);
@@ -270,6 +343,99 @@ function ResumoMataMata({
         jogo.classificado
     )
   );
+
+  const renderBadge = (
+    texto,
+    estilo
+  ) => (
+    <span style={estilo}>
+      {texto}
+    </span>
+  );
+
+  const renderIndicadores = (
+    jogo,
+    resultado
+  ) => {
+    if (!jogoEncerrado(resultado)) {
+      return (
+        <div style={statusLinhaStyle}>
+          {renderBadge(
+            "Pendente",
+            statusPendenteStyle
+          )}
+        </div>
+      );
+    }
+
+    const acertouPlacar =
+      placarExato(jogo, resultado);
+    const acertouClassificado =
+      classificadoCorreto(
+        jogo,
+        resultado
+      );
+    const deveCompararPenaltis =
+      resultado.decididoNosPenaltis ===
+      true;
+    const acertouPenaltis =
+      penaltisCorreto(jogo, resultado);
+
+    return (
+      <div style={indicadoresStyle}>
+        <div style={statusLinhaStyle}>
+          {renderBadge(
+            "Encerrado",
+            statusEncerradoStyle
+          )}
+        </div>
+
+        <div style={resultadoOficialStyle}>
+          Resultado oficial:{" "}
+          <strong>
+            {resultado.placarA} x{" "}
+            {resultado.placarB}
+          </strong>{" "}
+          |{" "}
+          <strong>
+            {resultado.classificado}
+          </strong>
+        </div>
+
+        <div style={chipsStyle}>
+          {renderBadge(
+            `${acertouPlacar ? "OK" : "X"} Placar`,
+            acertouPlacar
+              ? chipAcertoStyle
+              : chipErroStyle
+          )}
+
+          {renderBadge(
+            `${
+              acertouClassificado
+                ? "OK"
+                : "X"
+            } Classificado`,
+            acertouClassificado
+              ? chipAcertoStyle
+              : chipErroStyle
+          )}
+
+          {deveCompararPenaltis &&
+            renderBadge(
+              `${
+                acertouPenaltis
+                  ? "OK"
+                  : "X"
+              } Penaltis`,
+              acertouPenaltis
+                ? chipAcertoStyle
+                : chipErroStyle
+            )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={paginaStyle}>
@@ -317,57 +483,69 @@ function ResumoMataMata({
 
                 <div style={jogosGridStyle}>
                   {(jogos[fase.chave] || []).map(
-                    (jogo, index) => (
-                      <div
-                        key={
-                          jogo.id ||
-                          `${fase.chave}-${index}`
-                        }
-                        style={jogoStyle}
-                      >
-                        <strong>
-                          Jogo {index + 1}
-                        </strong>
+                    (jogo, index) => {
+                      const resultado =
+                        resultadosJogos[
+                          fase.chave
+                        ]?.[index] || {};
 
+                      return (
                         <div
-                          style={
-                            confrontoStyle
+                          key={
+                            jogo.id ||
+                            `${fase.chave}-${index}`
                           }
+                          style={jogoStyle}
                         >
-                          <span>
-                            {jogo.timeA ||
-                              "Time A"}
-                          </span>
                           <strong>
-                            {jogo.placarA ||
-                              "0"}{" "}
-                            x{" "}
-                            {jogo.placarB ||
-                              "0"}
+                            Jogo {index + 1}
                           </strong>
-                          <span>
-                            {jogo.timeB ||
-                              "Time B"}
-                          </span>
-                        </div>
 
-                        <span>
-                          Classificado:{" "}
-                          <strong>
-                            {jogo.classificado ||
-                              "-"}
-                          </strong>
-                        </span>
-
-                        {jogo.decididoNosPenaltis && (
-                          <span
-                            style={penaltisStyle}
+                          <div
+                            style={
+                              confrontoStyle
+                            }
                           >
-                            Decidido nos pênaltis
+                            <span>
+                              {jogo.timeA ||
+                                "Time A"}
+                            </span>
+                            <strong>
+                              {jogo.placarA ||
+                                "0"}{" "}
+                              x{" "}
+                              {jogo.placarB ||
+                                "0"}
+                            </strong>
+                            <span>
+                              {jogo.timeB ||
+                                "Time B"}
+                            </span>
+                          </div>
+
+                          <span>
+                            Classificado:{" "}
+                            <strong>
+                              {jogo.classificado ||
+                                "-"}
+                            </strong>
                           </span>
-                        )}
-                      </div>
-                    )
+
+                          {jogo.decididoNosPenaltis && (
+                            <span
+                              style={penaltisStyle}
+                            >
+                              Decidido nos pênaltis
+                            </span>
+                          )}
+
+                          {renderIndicadores(
+                            jogo,
+                            resultado
+                          )}
+                        </div>
+                      );
+                    }
                   )}
                 </div>
               </section>
@@ -431,16 +609,16 @@ const faseTituloStyle = {
 const jogosGridStyle = {
   display: "grid",
   gridTemplateColumns:
-    "repeat(auto-fit, minmax(240px, 1fr))",
-  gap: "12px",
+    "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: "16px",
 };
 
 const jogoStyle = {
-  border: "1px solid #333",
+  border: "1px solid #2b2b2b",
   borderRadius: "8px",
-  padding: "14px",
+  padding: "16px",
   display: "grid",
-  gap: "10px",
+  gap: "12px",
   backgroundColor: "#111",
 };
 
@@ -457,6 +635,75 @@ const penaltisStyle = {
   color: "#ffc107",
   fontWeight: "bold",
   fontSize: "14px",
+};
+
+const indicadoresStyle = {
+  borderTop: "1px solid #242424",
+  paddingTop: "12px",
+  display: "grid",
+  gap: "9px",
+};
+
+const statusLinhaStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "6px",
+  alignItems: "center",
+};
+
+const badgeBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  lineHeight: 1.2,
+};
+
+const statusPendenteStyle = {
+  ...badgeBaseStyle,
+  backgroundColor: "#262626",
+  border: "1px solid #3a3a3a",
+  color: "#cfcfcf",
+};
+
+const statusEncerradoStyle = {
+  ...badgeBaseStyle,
+  backgroundColor: "#1d2a22",
+  border: "1px solid #34513c",
+  color: "#bfe7c9",
+};
+
+const chipsStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "6px",
+};
+
+const chipBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  lineHeight: 1.2,
+};
+
+const chipAcertoStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#17251b",
+  border: "1px solid #2d5a38",
+  color: "#a9d8b5",
+};
+
+const chipErroStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#2a1719",
+  border: "1px solid #5b3035",
+  color: "#e6a8ae",
+};
+
+const resultadoOficialStyle = {
+  color: "#cfcfcf",
+  fontSize: "13px",
+  lineHeight: 1.4,
 };
 
 const botaoVoltarStyle = {
