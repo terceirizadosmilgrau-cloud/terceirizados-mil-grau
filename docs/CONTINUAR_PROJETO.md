@@ -10,11 +10,15 @@ Nome: Terceirizados Mil Grau
 
 Tipo: Bolao da Copa 2026
 
-Objetivo atual: manter o sistema funcional para participantes, admins e superadmin, com ranking, palpites, Mata-Mata, responsividade mobile e regras Firestore preparadas.
+Status atual:
 
-Versao atual: V43.4I - Mata-Mata como foco principal, resumos, limpeza dos proprios palpites, scroll no topo e modal do participante reorganizado.
-
-Proxima versao planejada: a definir.
+* Versao atual: V49.2.5.
+* Nucleo do bolao privado praticamente concluido.
+* Foco atual: Mata-Mata.
+* Build passando.
+* Deploy autorizado apos salvar Git, mas nao fazer deploy automaticamente.
+* Proxima fase: FASE 2 - Landing Page Publica.
+* Proxima versao planejada: V50 Landing Page Publica.
 
 ---
 
@@ -27,7 +31,7 @@ Proxima versao planejada: a definir.
 * Firebase Hosting
 * GitHub
 
-Comandos principais:
+Comando obrigatorio apos implementacoes:
 
 ```bash
 npm.cmd run build
@@ -51,9 +55,9 @@ Arquivos principais:
 * `src/pages/Dashboard.jsx`
 * `src/components/admin/ParticipantesTable.jsx`
 * `src/pages/Palpites.jsx`
-* `src/components/GrupoPalpite.jsx`
 * `src/pages/ResumoPalpites.jsx`
 * `src/pages/ResumoMataMata.jsx`
+* `src/pages/ComparacaoPalpites.jsx`
 * `src/pages/Ranking.jsx`
 * `src/components/DetalheParticipante.jsx`
 * `src/pages/PalpitesMataMata.jsx`
@@ -62,18 +66,14 @@ Arquivos principais:
 * `src/pages/Resultados.jsx`
 * `src/utils/calcularPontuacao.js`
 * `src/utils/calcularPontuacaoMataMata.js`
-* `src/data/grupos.js`
+* `src/utils/mataMataVisual.js`
 * `src/firebase.js`
 * `src/index.css`
 * `firestore.rules`
 * `firebase.json`
-* `PROJECT_STATUS.md`
-
-Pasta de relatorios antigos:
-
-* `relatorios/`
-
-Os relatorios antigos sao historicos e podem conter referencias a problemas ja resolvidos.
+* `docs/PROJECT_STATUS.md`
+* `docs/CONTINUAR_PROJETO.md`
+* `docs/CODEX_CONTEXT.md`
 
 ---
 
@@ -97,15 +97,6 @@ Valores validos de `tipoUsuario`:
 * `admin`
 * `superadmin`
 
-Uso:
-
-* cadastro de usuarios;
-* login e sincronizacao do usuario;
-* listagem de participantes;
-* permissoes Admin/SuperAdmin;
-* pagamento;
-* ranking.
-
 ### `palpites/{uid}`
 
 Uso:
@@ -115,21 +106,13 @@ Uso:
 * ranking;
 * central de palpites.
 
-Estrutura esperada:
-
-* grupos `A`, `B`, `C` etc.
-* cada grupo com:
-  * `primeiro`
-  * `segundo`
-  * `terceiro`
-  * `quarto`
-* `atualizadoEm`
-
 ### `palpitesMataMata/{uid}`
 
 Uso:
 
-* palpites do Mata-Mata atual;
+* palpites do Mata-Mata;
+* resumo Mata-Mata;
+* comparacao de palpites;
 * ranking;
 * central Mata-Mata.
 
@@ -143,71 +126,47 @@ Campos atuais:
 * `campeao`
 * `atualizadoEm`
 
-Estrutura de `jogos`:
-
-* `oitavas`
-* `quartas`
-* `semifinal`
-* `final`
-
-Cada item de jogo contem:
+Cada jogo em `jogos` contem:
 
 * `id`
+* `fase`
 * `timeA`
 * `timeB`
 * `placarA`
 * `placarB`
 * `classificado`
 * `decididoNosPenaltis`
-
-Observacao:
-
-Os campos antigos por lista continuam sendo gravados a partir dos classificados para compatibilidade com telas e fallback.
 
 ### `resultados/grupos`
 
 Uso:
 
 * resultados oficiais da fase de grupos;
-* calculo do ranking.
+* calculo do ranking geral.
+
+O Ranking deve funcionar mesmo se este documento nao existir.
 
 ### `resultados/mataMata`
 
 Uso:
 
-* resultados oficiais do Mata-Mata atual;
+* resultados oficiais do Mata-Mata;
+* indicadores visuais;
 * calculo do ranking.
 
-Campos atuais:
+Jogo encerrado visualmente apenas quando possui:
 
-* `jogos`
-* `oitavas`
-* `quartas`
-* `semifinal`
-* `final`
-* `campeao`
-* `atualizadoEm`
+* `placarA` preenchido;
+* `placarB` preenchido;
+* `classificado` preenchido.
 
-Estrutura de `jogos`:
+### `configuracoes/mataMata`
 
-* `oitavas`
-* `quartas`
-* `semifinal`
-* `final`
+Uso:
 
-Cada item de jogo contem:
-
-* `id`
-* `timeA`
-* `timeB`
-* `placarA`
-* `placarB`
-* `classificado`
-* `decididoNosPenaltis`
-
-Observacao:
-
-Os resultados oficiais tambem mantem os campos antigos por lista derivados dos classificados para compatibilidade e fallback.
+* confrontos oficiais do Mata-Mata;
+* datas e horarios dos jogos;
+* travamento automatico.
 
 ### `configuracoes/geral`
 
@@ -216,14 +175,9 @@ Uso:
 * liberar/encerrar palpites;
 * data limite de palpites.
 
-Campos conhecidos:
-
-* `palpitesLiberados`
-* `dataLimitePalpites`
-
 ---
 
-## Perfis
+## Permissoes
 
 ### Participante
 
@@ -232,7 +186,7 @@ Pode:
 * fazer seus proprios palpites;
 * ver seus palpites;
 * ver ranking;
-* ver dados necessarios do bolao.
+* ver comparacao de palpites.
 
 Nao pode:
 
@@ -268,7 +222,8 @@ Pode:
 * remover Admin;
 * excluir participante;
 * alterar resultados oficiais;
-* alterar configuracoes do bolao.
+* alterar configuracoes do bolao;
+* zerar todos os documentos de `palpites` e `palpitesMataMata`.
 
 Padrao atual:
 
@@ -280,341 +235,154 @@ Nao usar e-mail hardcoded para permissao.
 
 ---
 
-## Regras Atuais
+## Pontuacao Oficial
 
-Arquivo:
+Nao alterar sem aprovacao explicita.
 
-* `firestore.rules`
+Mata-Mata:
 
-Configurado em:
+* placar exato = +10;
+* resultado do jogo correto = +5;
+* classificado correto = +5;
+* penaltis correto = +3;
+* bonus de acerto total = +2;
+* maximo por jogo = 22 sem penaltis e 25 com penaltis.
 
-* `firebase.json`
+Arquivos de pontuacao:
 
-Estado:
-
-* regras criadas;
-* SuperAdmin padronizado por `tipoUsuario`;
-* sem fallback por e-mail hardcoded;
-* ainda nao fazer deploy sem pedido explicito.
-
-Resumo das regras:
-
-* usuario autenticado pode ler dados necessarios.
-* participante pode criar seu proprio usuario no cadastro.
-* participante pode criar/editar apenas seus proprios palpites.
-* participante pode apagar apenas seus proprios palpites.
-* admin pode alterar apenas `pagamento`.
-* superadmin pode alterar `pagamento`, `tipoUsuario`, resultados e configuracoes.
-* superadmin pode excluir usuario que nao seja `superadmin`.
-* todo o resto fica bloqueado.
-
-Observacao importante:
-
-O Ranking atual calcula no cliente lendo `usuarios`, `palpites` e `palpitesMataMata` de todos. Por isso as regras ainda permitem leitura dessas colecoes para usuarios autenticados. Para privacidade maior, uma versao futura deveria criar ranking publico calculado separadamente.
-
-O Ranking nao usa `usuarios.pontos` para ordenar ou calcular pontuacao. Ele calcula no cliente a partir de `resultados/grupos`, `resultados/mataMata`, `palpites/{uid}` e `palpitesMataMata/{uid}`.
+* `src/utils/calcularPontuacao.js`
+* `src/utils/calcularPontuacaoMataMata.js`
 
 ---
 
 ## Concluido
 
-### V36 - Permissoes Admin
+Versoes antigas concluidas:
 
-Status: concluida.
+* V36 Permissoes Admin.
+* V37 Responsividade.
+* V38 Seguranca Firestore.
+* V38.1 SuperAdmin padronizado.
+* V39 Mata-Mata por jogo.
+* V40 Resultados oficiais por jogo.
+* V41 Pontuacao do Mata-Mata por jogo.
+* V41.1 Botao seguro para zerar resultados de teste.
+* V42 Ranking exclusivo Mata-Mata.
+* V42.1 ate V42.8 refinamentos do Ranking.
+* V43 Confrontos oficiais do Mata-Mata.
+* V43.1 Penaltis.
+* V43.2 Resultado do jogo e bonus de acerto total.
+* V43.4 reorganizacao visual e foco Mata-Mata.
+* V44 Travamento automatico.
+* V44.1 Contagem regressiva.
+* V45 Estatisticas Mata-Mata.
+* V45.1 Estatisticas por fase.
+* V45.2 Destaques do Mata-Mata.
+* V45.3 Correcao da premiacao e detalhamento por jogo.
+* V45.4 Detalhamento compacto e recolhivel.
 
-Implementado:
+Versoes recentes concluidas:
 
-* Admin funcional por `tipoUsuario: "admin"`.
-* SuperAdmin funcional por `tipoUsuario: "superadmin"`.
-* Sincronizacao do usuario logado em tempo real via `usuarios/{uid}`.
-* Admin pode confirmar/marcar pagamento pendente.
-* SuperAdmin pode promover/remover Admin e excluir participante.
+* V46 Comparacao de Palpites.
+* V46.1 Comparador de Participantes.
+* V47.0 Indicadores no Resumo Mata-Mata.
+* V47.0.1 Limpeza visual dos indicadores.
+* V47.1 Indicadores na Comparacao de Palpites.
+* V47.2 Indicadores no Detalhe do Participante.
+* V48 Destaques Mata-Mata no Dashboard.
+* V48.0.1 Correcao da contagem de palpites enviados.
+* V48.0.2 Acao SuperAdmin para zerar todos os palpites.
+* V49.1 Correcoes criticas da auditoria.
+* V49.2.1 Helpers visuais compartilhados.
+* V49.2.2 Comparacao usando helpers.
+* V49.2.3 Detalhe do participante usando helpers.
+* V49.2.4 Dashboard usando helpers.
+* V49.2.5 Performance do Ranking.
 
-### V37 - Responsividade
+---
 
-Status: concluida.
+## Estado Tecnico Atual
 
-Implementado:
-
-* Dashboard responsivo.
-* Ranking responsivo.
-* Detalhe do participante responsivo.
-* Palpites responsivo.
-* Mata-Mata responsivo.
-* Central Mata-Mata responsiva.
-* Resultados Oficiais responsivo.
-* Participantes no mobile usando cards.
-* Tabela desktop de participantes preservada.
-
-### V38 - Seguranca Firestore
-
-Status: concluida no projeto.
-
-Implementado:
-
-* `firestore.rules` criado.
-* `firebase.json` aponta para `firestore.rules`.
-* regras auditadas contra o app.
-* build validado.
-
-Observacao:
-
-Deploy das regras ainda deve ser feito somente quando o usuario pedir explicitamente.
-
-### V38.1 - SuperAdmin Padronizado
-
-Status: concluida.
-
-Implementado:
-
-* `App.jsx` usa `usuario?.tipoUsuario === "superadmin"`.
-* `Dashboard.jsx` usa `usuario?.tipoUsuario === "superadmin"`.
-* `firestore.rules` usa `myTipoUsuario() == "superadmin"`.
-* dependencia de e-mail hardcoded removida da logica ativa.
-
-### V39 - Mata-Mata Por Jogo
-
-Status: concluida.
-
-Implementado:
-
-* `PalpitesMataMata.jsx` passou a cadastrar jogos por fase.
-* Cada jogo possui time A, time B, placar previsto e classificado previsto.
-* `CentralMataMata.jsx` exibe confrontos por participante quando o novo modelo existe.
-* Palpites antigos por lista continuam visiveis como fallback.
-* Campos antigos (`oitavas`, `quartas`, `semifinal`, `final`, `campeao`) continuam salvos para compatibilidade com o ranking atual.
-
-### V40 - Resultados Oficiais Por Jogo
-
-Status: concluida.
-
-Implementado:
-
-* `Resultados.jsx` passou a cadastrar resultados oficiais do Mata-Mata por jogo.
-* Cada jogo oficial possui time A, time B, placar oficial e classificado oficial.
-* `resultados/mataMata` grava `jogos` e tambem os campos antigos derivados (`oitavas`, `quartas`, `semifinal`, `final`, `campeao`).
-* Compatibilidade com o modelo antigo preservada.
-* Botao "Zerar Resultados de Teste" visivel apenas para `tipoUsuario === "superadmin"`.
-* O botao limpa apenas `resultados/grupos` e `resultados/mataMata`, mantendo os documentos existentes.
-
-### V41 - Pontuacao Do Mata-Mata Por Jogo
-
-Status: concluida.
-
-Implementado:
-
-* `calcularPontuacaoMataMata.js` usa `palpitesMataMata/{uid}.jogos` e `resultados/mataMata.jogos` quando os dois existem.
-* Placar exato vale 10 pontos.
-* Classificado correto vale 5 pontos.
-* Acertando placar e classificado, o jogo soma 15 pontos.
-* Fallback antigo por listas preservado quando `jogos` nao existe em algum dos lados.
-* `Ranking.jsx` segue sendo ranking geral, mas agora considera a pontuacao por jogo do Mata-Mata.
-
-### V43.2 - Resultado Do Jogo E Bonus De Acerto Total
-
-Status: concluida.
-
-Implementado:
-
-* Resultado do jogo correto vale 5 pontos.
-* Resultado do jogo e derivado do placar:
-  * `placarA > placarB`: timeA venceu.
-  * `placarA === placarB`: empate.
-  * `placarB > placarA`: timeB venceu.
-* Placar exato continua valendo 10 pontos.
-* Classificado correto continua valendo 5 pontos.
-* Penaltis correto continua valendo 3 pontos.
-* Bonus de acerto total vale 2 pontos.
-* Acerto total exige placar exato, resultado do jogo e classificado corretos.
-* Se o jogo oficial foi decidido nos penaltis, o acerto total tambem exige penaltis correto.
-* Pontos maximos do Mata-Mata no Ranking foram atualizados.
-* Maximo por jogo: 22 pontos sem penaltis e 25 pontos com penaltis.
-
-### V43.4 - Reorganizacao Visual, Resumos E Foco Mata-Mata
-
-Status: concluida.
-
-Implementado:
-
-* Dashboard reorganizado em bloco Mata-Mata, bloco Fase de Grupos e card separado de Ranking Oficial.
-* Bloco Mata-Mata contem Palpites Mata-Mata, Resumo Mata-Mata, Central Mata-Mata e Resultados Mata-Mata.
-* Bloco Fase de Grupos contem Palpites de Grupos, Resumo de Palpites, Central de Palpites e Resultados de Grupos.
-* Ranking abre por padrao na aba Mata-Mata.
-* Ranking Geral continua disponivel.
-* Resultados usam a mesma tela, com abas Mata-Mata e Fase de Grupos.
-* Dashboard abre Resultados ja na aba correspondente ao botao clicado.
-* Nova tela `ResumoMataMata.jsx`, somente leitura.
-* Resumo de Grupos mostra mensagem quando nao ha palpites.
-* Participante pode limpar apenas seus proprios palpites em `palpites/{uid}` e `palpitesMataMata/{uid}`.
-* `firestore.rules` permite delete nos palpites apenas para `isOwner(uid)` ou `isSuperAdmin()`.
-* Telas principais rolam para o topo ao abrir usando `window.scrollTo(0, 0)`.
-* Modal `DetalheParticipante` foi reorganizado para mostrar Mata-Mata primeiro e Fase de Grupos recolhida.
-* Cards mobile de participantes aparecem ate 768px para evitar tabela com scroll horizontal no celular.
+* `Ranking.jsx` carrega `usuarios`, `palpites` e `palpitesMataMata` em colecoes e usa mapas por uid para evitar leituras sequenciais.
+* `ResumoMataMata.jsx`, `ComparacaoPalpites.jsx`, `DetalheParticipante.jsx` e `Dashboard.jsx` usam helpers visuais compartilhados de `src/utils/mataMataVisual.js`.
+* Dashboard possui cards de Destaques Mata-Mata.
+* SuperAdmin pode zerar todos os palpites com confirmacao forte digitando `ZERAR PALPITES`.
+* Acesso a comparacao de palpites permanece liberado para usuarios autenticados.
+* `firestore.rules` nao foi alterado nas versoes recentes.
 
 ---
 
 ## Roadmap
 
-### V39 - Concluida
+### FASE 1 - Concluida
 
-Mata-Mata por jogo.
+* V46 Comparacao de Palpites.
+* V47 Indicadores Visuais de Jogos Encerrados.
+* V48 Destaques Dashboard.
+* V49 Auditoria Final.
 
-Implementado:
+### FASE 2 - Proxima
 
-* modelo por partida nos palpites;
-* central com visualizacao por jogo;
-* compatibilidade com listas antigas para o ranking atual.
+* V50 Landing Page Publica.
+* V51 Hero Copa.
+* V52 Pagina de Regras.
+* V53 Pagina de Premiacao.
+* V54 Destaques Publicos.
 
-Cada jogo possui:
+### FASE 3 - Planejada
 
-* Time A
-* Time B
-* Placar previsto
-* Classificado previsto
-
-Exemplo:
-
-```text
-Brasil 2 x 1 Uruguai
-Classificado: Brasil
-```
-
-### V40 - Concluida
-
-Resultados oficiais por jogo.
-
-### V41 - Concluida
-
-Pontuacao por jogo.
-
-### V42
-
-Ranking exclusivo Mata-Mata.
-
-### V43
-
-Comparacao de palpites.
-
-### V43.2 - Concluida
-
-Resultado do jogo e bonus de acerto total.
-
-### V44
-
-Travamento automatico dos palpites.
-
-### V45
-
-Estatisticas do bolao.
-
----
-
-## Proxima Tarefa
-
-Proxima versao a definir.
-
-Antes de alterar codigo em uma nova versao, gerar plano tecnico quando solicitado contendo:
-
-* modelo de dados sugerido;
-* colecoes/documentos Firestore envolvidos;
-* telas afetadas;
-* impacto no ranking;
-* impacto em `firestore.rules`;
-* plano de exibicao do ranking exclusivo Mata-Mata;
-* etapas pequenas e seguras.
+* V55 Perfil Completo.
+* V56 Historico do Ranking.
+* V57 Timeline da Copa.
+* V58 Feed de Atualizacoes.
+* V59 Refatoracao Visual Completa.
 
 ---
 
 ## Instrucoes Para Novo Chat
 
-Ao iniciar um novo chat, enviar este arquivo e pedir:
+Ao iniciar um novo chat, enviar:
 
 ```text
-Leia CONTINUAR_PROJETO.md e PROJECT_STATUS.md.
-Entenda o estado atual do projeto.
+Projeto: Terceirizados Mil Grau
+
+Leia obrigatoriamente:
+- docs/PROJECT_STATUS.md
+- docs/CONTINUAR_PROJETO.md
+- docs/CODEX_CONTEXT.md
+
+Versao atual: V49.2.5
+Proxima fase: FASE 2 - Landing Page Publica
+Proxima versao planejada: V50 Landing Page Publica
+
 Nao altere codigo antes de gerar plano tecnico.
-Vamos continuar a partir da V43.4I.
+Nao faça deploy sem autorizacao.
 ```
 
-Tambem informar:
-
-* V36, V37, V38, V38.1, V39, V40, V41, V42, V43.2 e V43.4 estao concluidas.
-* Nao reabrir problema antigo de Admin.
-* Nao voltar para e-mail hardcoded.
-* Nao fazer deploy sem pedido explicito.
-
 ---
 
-## Instrucoes Para Codex
+## Regras Permanentes Para Codex
 
-Regras gerais:
-
-* Ler `PROJECT_STATUS.md` e `CONTINUAR_PROJETO.md` antes de iniciar uma nova versao.
-* Nao alterar layout se a tarefa for apenas regra de negocio.
-* Nao alterar regra de negocio se a tarefa for apenas layout.
-* Nao alterar Firestore ou rules sem pedido explicito.
-* Nao executar `firebase deploy` sem pedido explicito.
-* Rodar `npm.cmd run build` depois de alteracoes relevantes.
+* Sempre gerar plano tecnico antes de implementar.
+* Nao alterar `firestore.rules` sem aprovacao.
+* Nao alterar pontuacao oficial sem aprovacao.
+* Nao alterar `calcularPontuacaoMataMata.js` sem aprovacao.
+* Nao fazer deploy sem autorizacao explicita.
+* Rodar `npm.cmd run build` depois de alteracoes.
+* Informar arquivos alterados.
+* Informar o que mudou.
+* Informar como testar.
+* Informar resultado do build.
+* Informar comandos Git.
+* Informar se precisa deploy.
 * Trabalhar em etapas pequenas.
-* Listar arquivos modificados ao final.
-
-Regras de permissao:
-
-* Usar apenas `tipoUsuario` para perfil.
-* Valores validos:
-  * `participante`
-  * `admin`
-  * `superadmin`
-* Nao usar e-mail hardcoded para permissao.
-* Nao mexer em `ParticipantesTable.jsx` sem pedido explicito, porque ela controla botoes admin/superadmin.
-
-Regras de seguranca:
-
-* Firestore deve respeitar `firestore.rules`.
-* Participante edita apenas seus proprios palpites.
-* Admin altera apenas pagamento.
-* SuperAdmin altera configuracoes, resultados e perfis.
-
-Regras para V42:
-
-* Nao quebrar o Ranking Geral atual.
-* Primeiro propor como sera o ranking exclusivo Mata-Mata.
-* Depois implementar em etapas.
-* Validar build a cada etapa importante.
-
-Regras para V43.2:
-
-* Nao criar novo campo para resultado do jogo; ele e derivado do placar.
-* Resultado do jogo correto vale +5.
-* Bonus de acerto total vale +2.
-* Atualizar pontos maximos do Ranking sempre que mudar a pontuacao.
+* Manter instrucoes claras para Codex.
 
 ---
 
-## Observacoes Importantes
+## Observacoes Importantes Para Fase 2
 
-* A conta principal ja deve estar com `tipoUsuario: "superadmin"` em `usuarios/{uid}`.
-* Os relatorios antigos em `relatorios/` podem citar problemas que ja foram resolvidos.
-* O arquivo `PROJECT_STATUS.md` contem o resumo oficial atualizado.
-* Este arquivo e o guia de continuidade para novos chats.
-
-configuracoes/mataMata
-
-Uso:
-- confrontos oficiais do Mata-Mata
-
-Estrutura:
-
-jogos:
-  oitavas
-  quartas
-  semifinal
-  final
-
-Cada jogo:
-- id
-- fase
-- timeA
-- timeB
-- data
-- horario
+* A Landing Page Publica nao deve expor dados privados diretamente.
+* Antes de abrir dados sem login, avaliar impacto em `firestore.rules`.
+* O app atual usa navegacao por estado em `App.jsx`; para paginas publicas pode ser necessario plano de roteamento.
+* Deploy esta autorizado somente apos salvar Git, mas nao deve ser executado automaticamente.
