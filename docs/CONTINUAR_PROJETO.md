@@ -1,6 +1,6 @@
 # CONTINUAR PROJETO - TERCEIRIZADOS MIL GRAU
 
-Este arquivo serve para continuar o projeto em um novo chat com contexto suficiente para seguir com seguranca.
+Este arquivo serve para continuar o projeto em um novo chat ou no Codex com contexto suficiente para seguir com segurança.
 
 ---
 
@@ -8,17 +8,72 @@ Este arquivo serve para continuar o projeto em um novo chat com contexto suficie
 
 Nome: Terceirizados Mil Grau
 
-Tipo: Bolao da Copa 2026
+Tipo: Bolão da Copa 2026
 
 Status atual:
 
-* Versao atual: V49.2.5.
-* Nucleo do bolao privado praticamente concluido.
-* Foco atual: Mata-Mata.
+* Versão atual: V52.3 concluída.
+* Núcleo privado do bolão praticamente concluído.
+* Fase 2 - Área Pública em andamento.
+* Landing Page pública criada e visualmente polida.
+* Página pública de Regras criada.
 * Build passando.
-* Deploy autorizado apos salvar Git, mas nao fazer deploy automaticamente.
-* Proxima fase: FASE 2 - Landing Page Publica.
-* Proxima versao planejada: V50 Landing Page Publica.
+* GitHub deve ser sincronizado antes de continuar em outro computador.
+* Deploy pode ser feito somente com autorização explícita.
+* Próxima versão planejada: V52.4 - Polimento final da Landing.
+
+---
+
+## Regras Permanentes de Trabalho
+
+Antes de qualquer implementação:
+
+* Sempre gerar Plano Técnico primeiro.
+* Aguardar aprovação antes de implementar.
+
+Após qualquer implementação:
+
+* Explicar exatamente o que foi alterado.
+* Explicar como testar.
+* Informar resultado do build.
+* Informar comandos Git.
+* Informar claramente se deve ou não fazer deploy.
+
+Deploy:
+
+* Nunca fazer deploy sem autorização explícita.
+* Quando for apenas área pública/hosting, usar preferencialmente:
+
+```bash
+firebase deploy --only hosting
+```
+
+Firestore:
+
+* Nunca alterar `firestore.rules` sem aprovação explícita.
+* Nunca expor dados privados em página pública sem plano aprovado.
+
+Pontuação:
+
+* Nunca alterar pontuação oficial sem aprovação explícita.
+* Nunca alterar `src/utils/calcularPontuacao.js` sem necessidade aprovada.
+* Nunca alterar `src/utils/calcularPontuacaoMataMata.js` sem necessidade aprovada.
+
+Fluxo Codex:
+
+* O Codex é usado para codar.
+* Sempre gerar mensagem pronta para enviar ao Codex.
+* A mensagem deve conter objetivo, regras, arquivos afetados, como testar, build e Git.
+
+Fluxo de validação:
+
+1. Plano técnico.
+2. Aprovação.
+3. Implementação.
+4. Testes.
+5. Build.
+6. Git.
+7. Deploy somente se autorizado.
 
 ---
 
@@ -30,26 +85,47 @@ Status atual:
 * Firestore
 * Firebase Hosting
 * GitHub
+* React Router DOM
 
-Comando obrigatorio apos implementacoes:
+Comando obrigatório após implementações:
 
 ```bash
 npm.cmd run build
 ```
 
-Nao executar deploy sem pedido explicito:
+---
 
-```bash
-firebase deploy
+## Rotas atuais
+
+Área pública:
+
+```txt
+/         -> Landing Page pública
+/regras   -> Página pública de regras
+/login    -> Login
+/cadastro -> Cadastro
 ```
+
+Área autenticada:
+
+```txt
+/app      -> área autenticada atual
+```
+
+Observação:
+
+* O fluxo interno autenticado ainda usa estado `tela` dentro do app.
+* Não converter todas as telas internas para rotas sem plano técnico específico.
 
 ---
 
-## Estrutura Atual
-
-Arquivos principais:
+## Arquivos principais
 
 * `src/App.jsx`
+* `src/pages/LandingPage.jsx`
+* `src/pages/LandingPage.css`
+* `src/pages/RegrasPage.jsx`
+* `src/pages/RegrasPage.css`
 * `src/components/Login.jsx`
 * `src/components/Cadastro.jsx`
 * `src/pages/Dashboard.jsx`
@@ -71,13 +147,12 @@ Arquivos principais:
 * `src/index.css`
 * `firestore.rules`
 * `firebase.json`
-* `docs/PROJECT_STATUS.md`
-* `docs/CONTINUAR_PROJETO.md`
-* `docs/CODEX_CONTEXT.md`
+* `package.json`
+* `package-lock.json`
 
 ---
 
-## Colecoes Firestore
+## Coleções Firestore
 
 ### `usuarios/{uid}`
 
@@ -91,7 +166,7 @@ Campos conhecidos:
 * `pontos`
 * `dataCadastro`
 
-Valores validos de `tipoUsuario`:
+Valores válidos de `tipoUsuario`:
 
 * `participante`
 * `admin`
@@ -112,7 +187,7 @@ Uso:
 
 * palpites do Mata-Mata;
 * resumo Mata-Mata;
-* comparacao de palpites;
+* comparação de palpites;
 * ranking;
 * central Mata-Mata.
 
@@ -126,7 +201,7 @@ Campos atuais:
 * `campeao`
 * `atualizadoEm`
 
-Cada jogo em `jogos` contem:
+Cada jogo em `jogos` contém:
 
 * `id`
 * `fase`
@@ -142,9 +217,9 @@ Cada jogo em `jogos` contem:
 Uso:
 
 * resultados oficiais da fase de grupos;
-* calculo do ranking geral.
+* cálculo do ranking geral.
 
-O Ranking deve funcionar mesmo se este documento nao existir.
+O Ranking deve funcionar mesmo se este documento não existir.
 
 ### `resultados/mataMata`
 
@@ -152,7 +227,7 @@ Uso:
 
 * resultados oficiais do Mata-Mata;
 * indicadores visuais;
-* calculo do ranking.
+* cálculo do ranking.
 
 Jogo encerrado visualmente apenas quando possui:
 
@@ -165,8 +240,8 @@ Jogo encerrado visualmente apenas quando possui:
 Uso:
 
 * confrontos oficiais do Mata-Mata;
-* datas e horarios dos jogos;
-* travamento automatico.
+* datas e horários dos jogos;
+* travamento automático.
 
 ### `configuracoes/geral`
 
@@ -177,24 +252,24 @@ Uso:
 
 ---
 
-## Permissoes
+## Permissões
 
 ### Participante
 
 Pode:
 
-* fazer seus proprios palpites;
+* fazer seus próprios palpites;
 * ver seus palpites;
 * ver ranking;
-* ver comparacao de palpites.
+* ver comparação de palpites.
 
-Nao pode:
+Não pode:
 
 * alterar pagamento;
 * alterar perfil;
 * alterar resultados;
-* alterar configuracoes;
-* alterar dados de outros usuarios.
+* alterar configurações;
+* alterar dados de outros usuários.
 
 ### Admin
 
@@ -204,13 +279,13 @@ Pode:
 * confirmar pagamento;
 * marcar pagamento como pendente.
 
-Nao pode:
+Não pode:
 
 * promover Admin;
 * remover Admin;
 * excluir participante;
 * alterar resultados;
-* alterar configuracoes.
+* alterar configurações.
 
 ### SuperAdmin
 
@@ -222,124 +297,223 @@ Pode:
 * remover Admin;
 * excluir participante;
 * alterar resultados oficiais;
-* alterar configuracoes do bolao;
+* alterar configurações do bolão;
 * zerar todos os documentos de `palpites` e `palpitesMataMata`.
 
-Padrao atual:
+Padrão atual:
 
 ```js
 tipoUsuario: "superadmin"
 ```
 
-Nao usar e-mail hardcoded para permissao.
+Não usar e-mail hardcoded para permissão.
 
 ---
 
-## Pontuacao Oficial
+## Pontuação Oficial
 
-Nao alterar sem aprovacao explicita.
+Não alterar sem aprovação explícita.
 
 Mata-Mata:
 
 * placar exato = +10;
 * resultado do jogo correto = +5;
 * classificado correto = +5;
-* penaltis correto = +3;
-* bonus de acerto total = +2;
-* maximo por jogo = 22 sem penaltis e 25 com penaltis.
+* pênaltis correto = +3;
+* bônus de acerto total = +2;
+* máximo por jogo = 22 sem pênaltis e 25 com pênaltis.
 
-Arquivos de pontuacao:
+Arquivos de pontuação:
 
 * `src/utils/calcularPontuacao.js`
 * `src/utils/calcularPontuacaoMataMata.js`
 
 ---
 
-## Concluido
+## Versões concluídas
 
-Versoes antigas concluidas:
+### Núcleo privado
 
-* V36 Permissoes Admin.
+* V36 Permissões Admin.
 * V37 Responsividade.
-* V38 Seguranca Firestore.
+* V38 Segurança Firestore.
 * V38.1 SuperAdmin padronizado.
 * V39 Mata-Mata por jogo.
 * V40 Resultados oficiais por jogo.
-* V41 Pontuacao do Mata-Mata por jogo.
-* V41.1 Botao seguro para zerar resultados de teste.
+* V41 Pontuação do Mata-Mata por jogo.
+* V41.1 Botão seguro para zerar resultados de teste.
 * V42 Ranking exclusivo Mata-Mata.
-* V42.1 ate V42.8 refinamentos do Ranking.
+* V42.1 até V42.8 refinamentos do Ranking.
 * V43 Confrontos oficiais do Mata-Mata.
-* V43.1 Penaltis.
-* V43.2 Resultado do jogo e bonus de acerto total.
-* V43.4 reorganizacao visual e foco Mata-Mata.
-* V44 Travamento automatico.
+* V43.1 Pênaltis.
+* V43.2 Resultado do jogo e bônus de acerto total.
+* V43.4 reorganização visual e foco Mata-Mata.
+* V44 Travamento automático.
 * V44.1 Contagem regressiva.
-* V45 Estatisticas Mata-Mata.
-* V45.1 Estatisticas por fase.
+* V45 Estatísticas Mata-Mata.
+* V45.1 Estatísticas por fase.
 * V45.2 Destaques do Mata-Mata.
-* V45.3 Correcao da premiacao e detalhamento por jogo.
-* V45.4 Detalhamento compacto e recolhivel.
-
-Versoes recentes concluidas:
-
-* V46 Comparacao de Palpites.
+* V45.3 Correção da premiação e detalhamento por jogo.
+* V45.4 Detalhamento compacto e recolhível.
+* V46 Comparação de Palpites.
 * V46.1 Comparador de Participantes.
 * V47.0 Indicadores no Resumo Mata-Mata.
 * V47.0.1 Limpeza visual dos indicadores.
-* V47.1 Indicadores na Comparacao de Palpites.
+* V47.1 Indicadores na Comparação de Palpites.
 * V47.2 Indicadores no Detalhe do Participante.
 * V48 Destaques Mata-Mata no Dashboard.
-* V48.0.1 Correcao da contagem de palpites enviados.
-* V48.0.2 Acao SuperAdmin para zerar todos os palpites.
-* V49.1 Correcoes criticas da auditoria.
+* V48.0.1 Correção da contagem de palpites enviados.
+* V48.0.2 Ação SuperAdmin para zerar todos os palpites.
+* V49.1 Correções críticas da auditoria.
 * V49.2.1 Helpers visuais compartilhados.
-* V49.2.2 Comparacao usando helpers.
+* V49.2.2 Comparação usando helpers.
 * V49.2.3 Detalhe do participante usando helpers.
 * V49.2.4 Dashboard usando helpers.
 * V49.2.5 Performance do Ranking.
 
+### Fase 2 - Área Pública
+
+* V50 Landing Page Pública.
+  * Adicionado `react-router-dom`.
+  * Rotas públicas `/`, `/login`, `/cadastro` e `/app`.
+  * Landing Page pública estática.
+* V50.1 Retorno para Landing.
+  * Login e Cadastro receberam link `Voltar para início`.
+* V51 Hero Copa Profissional.
+  * Hero e cards de destaque na Landing.
+* V52 Página Pública de Regras.
+  * Criada rota `/regras`.
+  * Criados `RegrasPage.jsx` e `RegrasPage.css`.
+* V52.2 Correção visual da Landing.
+  * Removida tentativa de taça/bola complexa.
+  * Criado painel limpo do participante.
+  * Layout equilibrado desktop/mobile.
+* V52.3 Polimento Premium da Landing.
+  * Headline: `Palpite. Dispute. Conquiste o topo.`
+  * Menu: `Início`, `Como Funciona`, `Regras`, `Premiação`.
+  * Removidas pontuações fictícias e mini ranking fake.
+  * Painel mostra benefícios reais: ranking ao vivo, mata-mata completo, comparação, premiação, estatísticas e histórico.
+  * Removidas siglas dos cards.
+  * Removido contador completamente.
+  * Criada seção real de Premiação com 50% / 30% / 20%.
+  * Ajustados espaçamentos e responsividade.
+
 ---
 
-## Estado Tecnico Atual
+## Estado Técnico Atual
 
-* `Ranking.jsx` carrega `usuarios`, `palpites` e `palpitesMataMata` em colecoes e usa mapas por uid para evitar leituras sequenciais.
+* `Ranking.jsx` carrega `usuarios`, `palpites` e `palpitesMataMata` em coleções e usa mapas por uid para evitar leituras sequenciais.
 * `ResumoMataMata.jsx`, `ComparacaoPalpites.jsx`, `DetalheParticipante.jsx` e `Dashboard.jsx` usam helpers visuais compartilhados de `src/utils/mataMataVisual.js`.
 * Dashboard possui cards de Destaques Mata-Mata.
-* SuperAdmin pode zerar todos os palpites com confirmacao forte digitando `ZERAR PALPITES`.
-* Acesso a comparacao de palpites permanece liberado para usuarios autenticados.
-* `firestore.rules` nao foi alterado nas versoes recentes.
+* SuperAdmin pode zerar todos os palpites com confirmação forte digitando `ZERAR PALPITES`.
+* Acesso à comparação de palpites permanece liberado para usuários autenticados.
+* `firestore.rules` não foi alterado nas versões recentes.
+* Landing e Regras não leem Firestore.
+* Área pública ainda é estática.
+* `.firebase/hosting.ZGlzdA.cache` pode aparecer modificado após deploy/build e não deve ser commitado sem necessidade.
 
 ---
 
-## Roadmap
+## Roadmap Atualizado
 
-### FASE 1 - Concluida
+### FASE 1 - Concluída
 
-* V46 Comparacao de Palpites.
+* V46 Comparação de Palpites.
 * V47 Indicadores Visuais de Jogos Encerrados.
 * V48 Destaques Dashboard.
 * V49 Auditoria Final.
 
-### FASE 2 - Proxima
+### FASE 2 - Em andamento
 
-* V50 Landing Page Publica.
-* V51 Hero Copa.
-* V52 Pagina de Regras.
-* V53 Pagina de Premiacao.
-* V54 Destaques Publicos.
+* V50 Landing Page Pública. Concluída.
+* V51 Hero Copa. Concluída.
+* V52 Página de Regras. Concluída.
+* V52.3 Polimento Premium da Landing. Concluída.
+* V52.4 Polimento Final da Landing. Próxima.
+* V53 Página/Seção Pública de Premiação. Avaliar se ainda precisa, pois a Landing já tem seção de premiação.
+* V54 Destaques Públicos.
 
 ### FASE 3 - Planejada
 
 * V55 Perfil Completo.
-* V56 Historico do Ranking.
+* V56 Histórico do Ranking.
 * V57 Timeline da Copa.
-* V58 Feed de Atualizacoes.
-* V59 Refatoracao Visual Completa.
+* V58 Feed de Atualizações.
+* V59 Refatoração Visual Completa.
 
 ---
 
-## Instrucoes Para Novo Chat
+## Próxima Tarefa Recomendada
+
+### V52.4 - Polimento Final da Landing
+
+Objetivo:
+
+* Corrigir acentuação e textos finais.
+* Padronizar:
+  * Premiação.
+  * Comparação.
+  * Histórico.
+  * Campeão.
+  * arrecadação.
+* Manter headline:
+  * `Palpite. Dispute. Conquiste o topo.`
+* Melhorar seção Premiação:
+  * 🥇 Campeão — 50% da arrecadação.
+  * 🥈 Vice-campeão — 30% da arrecadação.
+  * 🥉 Terceiro lugar — 20% da arrecadação.
+* Melhorar benefícios rápidos:
+  * Ranking ao vivo.
+  * Mata-Mata completo.
+  * Comparação de palpites.
+  * Premiação automática.
+* Revisar textos dos cards para ficarem mais profissionais.
+* Não alterar layout principal.
+* Não alterar rotas.
+* Não alterar regras, pontuação, ranking, autenticação ou área privada.
+
+Arquivos previstos:
+
+* `src/pages/LandingPage.jsx`
+* `src/pages/LandingPage.css`
+
+---
+
+## Git recomendado antes de continuar amanhã
+
+Se V52, V52.2 e V52.3 ainda não foram salvas em commits separados, salvar juntas:
+
+```bash
+git status
+git add src/App.jsx src/pages/RegrasPage.jsx src/pages/RegrasPage.css src/pages/LandingPage.jsx src/pages/LandingPage.css
+git commit -m "Implementa V52 regras publicas e polimento da landing"
+git push origin main
+```
+
+Não adicionar:
+
+```txt
+.firebase/hosting.ZGlzdA.cache
+```
+
+Se já salvou V52 e só falta V52.3:
+
+```bash
+git status
+git add src/pages/LandingPage.jsx src/pages/LandingPage.css
+git commit -m "Implementa V52.3 polimento premium da landing"
+git push origin main
+```
+
+Deploy somente se autorizado:
+
+```bash
+firebase deploy --only hosting
+```
+
+---
+
+## Instruções Para Novo Chat
 
 Ao iniciar um novo chat, enviar:
 
@@ -351,38 +525,46 @@ Leia obrigatoriamente:
 - docs/CONTINUAR_PROJETO.md
 - docs/CODEX_CONTEXT.md
 
-Versao atual: V49.2.5
-Proxima fase: FASE 2 - Landing Page Publica
-Proxima versao planejada: V50 Landing Page Publica
+Versão atual: V52.3
+Fase atual: FASE 2 - Área Pública
+Próxima versão planejada: V52.4 - Polimento Final da Landing
 
-Nao altere codigo antes de gerar plano tecnico.
-Nao faça deploy sem autorizacao.
+Não altere código antes de gerar plano técnico.
+Não faça deploy sem autorização.
+Não altere firestore.rules.
+Não altere pontuação oficial.
 ```
 
 ---
 
-## Regras Permanentes Para Codex
+## Mensagem rápida para Codex amanhã
 
-* Sempre gerar plano tecnico antes de implementar.
-* Nao alterar `firestore.rules` sem aprovacao.
-* Nao alterar pontuacao oficial sem aprovacao.
-* Nao alterar `calcularPontuacaoMataMata.js` sem aprovacao.
-* Nao fazer deploy sem autorizacao explicita.
-* Rodar `npm.cmd run build` depois de alteracoes.
-* Informar arquivos alterados.
-* Informar o que mudou.
-* Informar como testar.
-* Informar resultado do build.
-* Informar comandos Git.
-* Informar se precisa deploy.
-* Trabalhar em etapas pequenas.
-* Manter instrucoes claras para Codex.
+```text
+Projeto: Terceirizados Mil Grau
 
----
+Continuar a partir da V52.3 concluída.
 
-## Observacoes Importantes Para Fase 2
+Antes de implementar, leia:
+- docs/PROJECT_STATUS.md
+- docs/CONTINUAR_PROJETO.md
+- docs/CODEX_CONTEXT.md
 
-* A Landing Page Publica nao deve expor dados privados diretamente.
-* Antes de abrir dados sem login, avaliar impacto em `firestore.rules`.
-* O app atual usa navegacao por estado em `App.jsx`; para paginas publicas pode ser necessario plano de roteamento.
-* Deploy esta autorizado somente apos salvar Git, mas nao deve ser executado automaticamente.
+Próxima versão:
+V52.4 - Polimento Final da Landing.
+
+Regras:
+- Não alterar firestore.rules.
+- Não alterar calcularPontuacao.js.
+- Não alterar calcularPontuacaoMataMata.js.
+- Não alterar pontuação oficial.
+- Não alterar Ranking, Dashboard, Administração, SuperAdmin, Login, Cadastro, RegrasPage ou rotas.
+- Não fazer deploy.
+- Rodar npm.cmd run build depois de alterar.
+
+Objetivo:
+Apenas polir textos e detalhes finais da Landing.
+
+Arquivos previstos:
+- src/pages/LandingPage.jsx
+- src/pages/LandingPage.css
+```
