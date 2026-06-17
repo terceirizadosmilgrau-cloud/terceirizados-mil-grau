@@ -28,15 +28,17 @@ function LandingPage() {
       <section className="landing-v50-hero">
         <div className="landing-v50-hero-content">
           <p className="landing-v50-kicker">
-            Bolao Copa 2026
+            Bolao Copa do Mundo 2026
           </p>
 
           <h1>Terceirizados Mil Grau</h1>
 
+          <h2>Bolao Copa do Mundo 2026</h2>
+
           <p className="landing-v50-hero-text">
-            O bolao da galera para acompanhar a Copa,
-            disputar rodada por rodada e ver quem chega
-            inteiro ate a final.
+            Entre na disputa, registre seus palpites e
+            acompanhe cada fase da Copa com ranking,
+            mata-mata e comparacoes entre participantes.
           </p>
 
           <div className="landing-v50-actions">
@@ -53,29 +55,46 @@ function LandingPage() {
               Criar Conta
             </Link>
           </div>
+
+          <div className="landing-v50-hero-notes">
+            <span>Fase de grupos</span>
+            <span>Mata-Mata</span>
+            <span>Ranking oficial</span>
+          </div>
         </div>
 
         <div
-          className="landing-v50-scoreboard"
-          aria-label="Resumo do bolao"
+          className="landing-v50-hero-panel"
+          aria-label="Destaques do bolao"
         >
-          <div className="landing-v50-scoreboard-top">
-            <span>COPA</span>
-            <strong>2026</strong>
+          <div className="landing-v50-cup-card">
+            <span className="landing-v50-cup-label">
+              Copa 2026
+            </span>
+            <strong>Palpite ate o apito final</strong>
+            <p>
+              Da primeira rodada aos jogos decisivos, tudo
+              centralizado na area do participante.
+            </p>
           </div>
 
-          <div className="landing-v50-match">
-            <span>Fase de Grupos</span>
-            <strong>Palpites</strong>
-          </div>
-
-          <div className="landing-v50-match">
-            <span>Mata-Mata</span>
-            <strong>Decisao</strong>
-          </div>
-
-          <div className="landing-v50-scoreboard-footer">
-            Ranking oficial atualizado no app
+          <div className="landing-v50-mini-grid">
+            <div>
+              <span>Modo</span>
+              <strong>Grupos</strong>
+            </div>
+            <div>
+              <span>Fase</span>
+              <strong>Mata-Mata</strong>
+            </div>
+            <div>
+              <span>Disputa</span>
+              <strong>Ranking</strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong>Ao vivo</strong>
+            </div>
           </div>
         </div>
       </section>
@@ -83,10 +102,10 @@ function LandingPage() {
       <section className="landing-v50-sections">
         <article className="landing-v50-card">
           <span className="landing-v50-card-icon">01</span>
-          <h2>Como funciona</h2>
+          <h2>Fase de grupos</h2>
           <p>
-            Crie sua conta, registre seus palpites e acompanhe
-            sua disputa dentro da area autenticada do bolao.
+            Palpites organizados por jogo para acompanhar o
+            comeco da Copa sem bagunca.
           </p>
         </article>
 
@@ -101,15 +120,24 @@ function LandingPage() {
 
         <article className="landing-v50-card">
           <span className="landing-v50-card-icon">03</span>
-          <h2>Ranking</h2>
+          <h2>Ranking ao vivo</h2>
           <p>
-            A classificacao oficial fica protegida no app e
-            mostra a pontuacao dos participantes logados.
+            A classificacao oficial mostra quem esta subindo,
+            tropecando e brigando pelo topo.
           </p>
         </article>
 
         <article className="landing-v50-card">
           <span className="landing-v50-card-icon">04</span>
+          <h2>Comparacao</h2>
+          <p>
+            Compare palpites lado a lado e veja onde cada
+            participante apostou diferente.
+          </p>
+        </article>
+
+        <article className="landing-v50-card">
+          <span className="landing-v50-card-icon">05</span>
           <h2>Premiacao</h2>
           <p>
             A premiacao acompanha as regras do bolao e sera
