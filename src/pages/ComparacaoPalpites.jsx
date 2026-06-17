@@ -77,6 +77,43 @@ const temConteudoJogo = (jogo) =>
   normalizarTexto(jogo?.classificado) ||
   jogo?.decididoNosPenaltis;
 
+const jogoEncerrado = (jogo) =>
+  placarPreenchido(jogo) &&
+  Boolean(
+    normalizarChave(jogo?.classificado)
+  );
+
+const placarExato = (
+  palpite,
+  resultado
+) =>
+  placarPreenchido(palpite) &&
+  jogoEncerrado(resultado) &&
+  String(palpite.placarA).trim() ===
+    String(resultado.placarA).trim() &&
+  String(palpite.placarB).trim() ===
+    String(resultado.placarB).trim();
+
+const classificadoCorreto = (
+  palpite,
+  resultado
+) =>
+  Boolean(
+    normalizarChave(palpite?.classificado)
+  ) &&
+  jogoEncerrado(resultado) &&
+  normalizarChave(palpite.classificado) ===
+    normalizarChave(
+      resultado.classificado
+    );
+
+const penaltisCorreto = (
+  palpite,
+  resultado
+) =>
+  resultado?.decididoNosPenaltis === true &&
+  palpite?.decididoNosPenaltis === true;
+
 const normalizarConfrontosOficiais = (
   dados = {}
 ) => {
@@ -690,7 +727,8 @@ function ComparacaoPalpites({ voltar }) {
 
   const renderPalpite = (
     participante,
-    jogo
+    jogo,
+    resultado
   ) => (
     <div style={palpiteCardStyle}>
       <strong style={participanteNomeStyle}>
@@ -722,10 +760,106 @@ function ComparacaoPalpites({ voltar }) {
               ? "Penaltis"
               : "Sem penaltis"}
           </span>
+
+          {jogoEncerrado(resultado) && (
+            <div style={chipsStyle}>
+              {renderBadge(
+                `${
+                  placarExato(
+                    jogo,
+                    resultado
+                  )
+                    ? "OK"
+                    : "X"
+                } Placar`,
+                placarExato(
+                  jogo,
+                  resultado
+                )
+                  ? chipAcertoStyle
+                  : chipErroStyle
+              )}
+
+              {renderBadge(
+                `${
+                  classificadoCorreto(
+                    jogo,
+                    resultado
+                  )
+                    ? "OK"
+                    : "X"
+                } Classificado`,
+                classificadoCorreto(
+                  jogo,
+                  resultado
+                )
+                  ? chipAcertoStyle
+                  : chipErroStyle
+              )}
+
+              {resultado.decididoNosPenaltis ===
+                true &&
+                renderBadge(
+                  `${
+                    penaltisCorreto(
+                      jogo,
+                      resultado
+                    )
+                      ? "OK"
+                      : "X"
+                  } Penaltis`,
+                  penaltisCorreto(
+                    jogo,
+                    resultado
+                  )
+                    ? chipAcertoStyle
+                    : chipErroStyle
+                )}
+            </div>
+          )}
         </>
       )}
     </div>
   );
+
+  const renderBadge = (
+    texto,
+    estilo
+  ) => <span style={estilo}>{texto}</span>;
+
+  const renderStatusJogo = (resultado) => {
+    if (!jogoEncerrado(resultado)) {
+      return (
+        <div style={statusBlocoStyle}>
+          {renderBadge(
+            "Pendente",
+            statusPendenteStyle
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div style={statusBlocoStyle}>
+        {renderBadge(
+          "Encerrado",
+          statusEncerradoStyle
+        )}
+
+        <span style={resultadoOficialStyle}>
+          Resultado oficial:{" "}
+          <strong>
+            {resultado.placarA} x{" "}
+            {resultado.placarB}
+          </strong>{" "}
+          |{" "}
+          <strong>
+            {resultado.classificado}
+          </strong>
+        </span>
+      </div>
+    );
+  };
 
   const renderResultadoComparacao = (
     comparacao
@@ -800,6 +934,10 @@ function ComparacaoPalpites({ voltar }) {
                       jogoA,
                       jogoB
                     );
+                  const resultado =
+                    resultados?.[
+                      fase.chave
+                    ]?.[index] || {};
 
                   return (
                     <div
@@ -832,6 +970,10 @@ function ComparacaoPalpites({ voltar }) {
                         </strong>
                       </div>
 
+                      {renderStatusJogo(
+                        resultado
+                      )}
+
                       <div
                         style={
                           ladoALadoStyle
@@ -839,11 +981,13 @@ function ComparacaoPalpites({ voltar }) {
                       >
                         {renderPalpite(
                           participanteA,
-                          jogoA
+                          jogoA,
+                          resultado
                         )}
                         {renderPalpite(
                           participanteB,
-                          jogoB
+                          jogoB,
+                          resultado
                         )}
                       </div>
 
@@ -1052,22 +1196,10 @@ function ComparacaoPalpites({ voltar }) {
                 {jogoBase.timeA || "Time A"} x{" "}
                 {jogoBase.timeB || "Time B"}
               </strong>
-              {resultadoAtual &&
-                temConteudoJogo(
-                  resultadoAtual
-                ) && (
-                  <span
-                    style={resultadoStyle}
-                  >
-                    Oficial:{" "}
-                    {formatarPlacar(
-                      resultadoAtual
-                    )}{" "}
-                    | Classificado:{" "}
-                    {resultadoAtual.classificado ||
-                      "-"}
-                  </span>
-                )}
+
+              {renderStatusJogo(
+                resultadoAtual || {}
+              )}
             </div>
 
             <div style={resumoGridStyle}>
@@ -1327,6 +1459,71 @@ const palpiteCardStyle = {
   minWidth: 0,
 };
 
+const statusBlocoStyle = {
+  borderTop: "1px solid #242424",
+  paddingTop: "10px",
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "8px",
+  alignItems: "center",
+};
+
+const statusBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  lineHeight: 1.2,
+};
+
+const statusPendenteStyle = {
+  ...statusBaseStyle,
+  backgroundColor: "#262626",
+  border: "1px solid #3a3a3a",
+  color: "#cfcfcf",
+};
+
+const statusEncerradoStyle = {
+  ...statusBaseStyle,
+  backgroundColor: "#1d2a22",
+  border: "1px solid #34513c",
+  color: "#bfe7c9",
+};
+
+const resultadoOficialStyle = {
+  color: "#cfcfcf",
+  fontSize: "13px",
+  lineHeight: 1.4,
+};
+
+const chipsStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "6px",
+  paddingTop: "4px",
+};
+
+const chipBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  lineHeight: 1.2,
+};
+
+const chipAcertoStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#17251b",
+  border: "1px solid #2d5a38",
+  color: "#a9d8b5",
+};
+
+const chipErroStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#2a1719",
+  border: "1px solid #5b3035",
+  color: "#e6a8ae",
+};
+
 const participanteNomeStyle = {
   color: "#ffd76a",
   overflowWrap: "anywhere",
@@ -1438,11 +1635,6 @@ const jogoAtualStyle = {
   display: "grid",
   gap: "7px",
   marginBottom: "14px",
-};
-
-const resultadoStyle = {
-  color: "#9fe6b8",
-  fontWeight: "bold",
 };
 
 const tendenciaCardStyle = {
