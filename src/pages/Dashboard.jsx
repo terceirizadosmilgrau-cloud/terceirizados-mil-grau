@@ -12,6 +12,12 @@ import {
 
 import { db } from "../firebase";
 import ParticipantesTable from "../components/admin/ParticipantesTable";
+import {
+  formatarConfronto,
+  jogoEncerrado,
+  textoPreenchido,
+  valorPreenchido,
+} from "../utils/mataMataVisual";
 
 const destaquesMataMataPadrao = {
   palpitesEnviados: 0,
@@ -28,23 +34,11 @@ const fasesMataMata = [
   "final",
 ];
 
-const textoPreenchido = (valor) =>
-  String(valor || "").trim();
-
 const valorValido = (valor) => {
   const texto = textoPreenchido(valor);
 
-  return texto && texto !== "-";
+  return valorPreenchido(texto) && texto !== "-";
 };
-
-const jogoEncerrado = (jogo) =>
-  jogo?.placarA !== undefined &&
-  jogo?.placarA !== "" &&
-  jogo?.placarB !== undefined &&
-  jogo?.placarB !== "" &&
-  Boolean(
-    textoPreenchido(jogo?.classificado)
-  );
 
 const listarJogos = (dados = {}) =>
   fasesMataMata.flatMap((fase) =>
@@ -105,9 +99,9 @@ const formatarProximoJogo = (jogo) => {
       })
     : "Data a definir";
 
-  return `${jogo.timeA || "Time A"} x ${
-    jogo.timeB || "Time B"
-  } - ${quando}`;
+  return `${formatarConfronto(
+    jogo
+  )} - ${quando}`;
 };
 
 const contarCampeoes = (docs = []) => {

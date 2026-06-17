@@ -186,9 +186,35 @@ function Ranking({ voltar }) {
           ? resultadoSnapshot.data()
           : {};
 
-      const usuariosSnapshot =
-        await getDocs(
-          collection(db, "usuarios")
+      const [
+        usuariosSnapshot,
+        palpitesSnapshot,
+        palpitesMataMataSnapshot,
+      ] = await Promise.all([
+        getDocs(collection(db, "usuarios")),
+        getDocs(collection(db, "palpites")),
+        getDocs(
+          collection(db, "palpitesMataMata")
+        ),
+      ]);
+
+      const palpitesPorUid = new Map(
+        palpitesSnapshot.docs.map(
+          (palpiteDoc) => [
+            palpiteDoc.id,
+            palpiteDoc.data(),
+          ]
+        )
+      );
+
+      const palpitesMataMataPorUid =
+        new Map(
+          palpitesMataMataSnapshot.docs.map(
+            (palpiteDoc) => [
+              palpiteDoc.id,
+              palpiteDoc.data(),
+            ]
+          )
         );
 
       const listaRanking = [];
@@ -205,25 +231,20 @@ function Ranking({ voltar }) {
           arrecadacaoTotal += 20;
         }
 
-        const palpiteSnapshot =
-          await getDoc(
-            doc(
-              db,
-              "palpites",
-              usuarioDoc.id
-            )
-          );
-
         let pontosGrupos = 0;
         let pontosMataMata = 0;
         let detalhesMataMata = null;
         let palpiteMataMata = null;
+        const temPalpiteGrupos =
+          palpitesPorUid.has(usuarioDoc.id);
         const palpites =
-          palpiteSnapshot.exists()
-            ? palpiteSnapshot.data()
+          temPalpiteGrupos
+            ? palpitesPorUid.get(
+                usuarioDoc.id
+              )
             : {};
 
-        if (palpiteSnapshot.exists()) {
+        if (temPalpiteGrupos) {
           comPalpite++;
 
           Object.keys(resultados).forEach(
@@ -237,22 +258,15 @@ function Ranking({ voltar }) {
           );
         }
 
-        const mataMataSnapshot =
-          await getDoc(
-            doc(
-              db,
-              "palpitesMataMata",
-              usuarioDoc.id
-            )
-          );
+        palpiteMataMata =
+          palpitesMataMataPorUid.get(
+            usuarioDoc.id
+          ) || null;
 
         if (
-          mataMataSnapshot.exists() &&
+          palpiteMataMata &&
           resultadoMataMata
         ) {
-          palpiteMataMata =
-            mataMataSnapshot.data();
-
           detalhesMataMata =
             calcularDetalhesPontuacaoMataMata(
               palpiteMataMata,
