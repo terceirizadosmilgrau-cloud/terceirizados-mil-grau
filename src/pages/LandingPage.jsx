@@ -2,29 +2,21 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
 
-const finalCopa2026 = new Date(
-  "2026-07-19T16:00:00-03:00"
+const inicioCopa2026 = new Date(
+  "2026-06-11T16:00:00-03:00"
 );
 
 const calcularContagem = () => {
   const distancia =
-    finalCopa2026.getTime() - Date.now();
+    inicioCopa2026.getTime() - Date.now();
   const restante = Math.max(0, distancia);
 
-  const dias = Math.floor(
-    restante / (1000 * 60 * 60 * 24)
-  );
-  const horas = Math.floor(
-    (restante / (1000 * 60 * 60)) % 24
-  );
-  const minutos = Math.floor(
-    (restante / (1000 * 60)) % 60
-  );
-  const segundos = Math.floor(
-    (restante / 1000) % 60
-  );
-
-  return { dias, horas, minutos, segundos };
+  return {
+    dias: Math.floor(restante / (1000 * 60 * 60 * 24)),
+    horas: Math.floor((restante / (1000 * 60 * 60)) % 24),
+    minutos: Math.floor((restante / (1000 * 60)) % 60),
+    segundos: Math.floor((restante / 1000) % 60),
+  };
 };
 
 const cards = [
@@ -32,31 +24,31 @@ const cards = [
     sigla: "FG",
     titulo: "Fase de Grupos",
     texto:
-      "Palpite todos os jogos da primeira fase e some pontos importantes logo no comeco.",
+      "Registre seus palpites jogo a jogo e comece a somar pontos desde a primeira rodada.",
   },
   {
     sigla: "MM",
     titulo: "Mata-Mata",
     texto:
-      "Acerte placares, classificados e avance na disputa pelos jogos decisivos.",
+      "Acompanhe os confrontos decisivos, classificados e campeao apostado.",
   },
   {
     sigla: "RK",
-    titulo: "Ranking ao Vivo",
+    titulo: "Ranking",
     texto:
-      "Acompanhe a classificacao oficial e veja sua posicao na briga pelo topo.",
+      "Veja a classificacao oficial e acompanhe quem esta liderando a disputa.",
   },
   {
     sigla: "CP",
-    titulo: "Compare",
+    titulo: "Comparacao",
     texto:
-      "Veja diferencas entre palpites e acompanhe onde cada participante arriscou.",
+      "Compare palpites lado a lado e descubra onde cada participante arriscou.",
   },
   {
     sigla: "PR",
     titulo: "Premiacao",
     texto:
-      "Os melhores colocados seguem na disputa pela premiacao combinada do bolao.",
+      "Mantenha a disputa organizada do primeiro palpite ate a premiacao final.",
   },
 ];
 
@@ -74,31 +66,25 @@ function LandingPage() {
   }, []);
 
   return (
-    <main className="landing-v521">
-      <header className="landing-v521-header">
-        <Link className="landing-v521-brand" to="/">
-          <span className="landing-v521-shield">
-            TMG
-          </span>
-          <span>
-            Terceirizados
-            <strong>Mil Grau</strong>
-          </span>
+    <main className="landing-v522">
+      <header className="landing-v522-header">
+        <Link className="landing-v522-brand" to="/">
+          <span className="landing-v522-brand-badge">2026</span>
+          <span>Terceirizados Mil Grau</span>
         </Link>
 
-        <nav className="landing-v521-nav">
+        <nav className="landing-v522-nav">
           <Link to="/">Inicio</Link>
-          <a href="#como-funciona">Como funciona</a>
           <Link to="/regras">Regras</Link>
           <a href="#premiacao">Premiacao</a>
         </nav>
 
-        <div className="landing-v521-header-actions">
-          <Link className="landing-v521-login" to="/login">
+        <div className="landing-v522-header-actions">
+          <Link className="landing-v522-login" to="/login">
             Entrar
           </Link>
           <Link
-            className="landing-v521-create"
+            className="landing-v522-create"
             to="/cadastro"
           >
             Criar conta
@@ -106,73 +92,124 @@ function LandingPage() {
         </div>
       </header>
 
-      <section className="landing-v521-hero">
-        <div className="landing-v521-copy">
-          <p className="landing-v521-kicker">
+      <section className="landing-v522-hero">
+        <div className="landing-v522-copy">
+          <p className="landing-v522-kicker">
             Copa do Mundo 2026
           </p>
 
           <h1>
-            O bolao mais emocionante da
-            <span>Copa 2026</span>
+            O bolao da Copa 2026 para disputar com os amigos
           </h1>
 
-          <p className="landing-v521-lead">
-            Participe, envie seus palpites e dispute com
-            amigos o titulo de campeao do bolao Terceirizados
-            Mil Grau.
+          <p className="landing-v522-lead">
+            Registre seus palpites, acompanhe o ranking e veja
+            quem manda melhor na fase de grupos e no mata-mata.
           </p>
 
-          <div className="landing-v521-actions">
+          <div className="landing-v522-actions">
             <Link
-              className="landing-v521-primary"
+              className="landing-v522-primary"
               to="/cadastro"
             >
-              Criar conta e participar
+              Criar conta
             </Link>
             <Link
-              className="landing-v521-secondary"
+              className="landing-v522-secondary"
               to="/login"
             >
-              Ja tenho conta
+              Entrar
             </Link>
           </div>
 
-          <div className="landing-v521-trust">
+          <div className="landing-v522-trust">
             <span>Acesso seguro</span>
             <span>Ranking atualizado</span>
             <span>Disputa entre amigos</span>
           </div>
         </div>
 
-        <div
-          className="landing-v521-visual"
-          aria-label="Ilustracao generica de bola e estadio"
+        <aside
+          className="landing-v522-panel"
+          aria-label="Painel demonstrativo do participante"
         >
-          <div className="landing-v521-lights" />
-          <div className="landing-v521-trophy">
-            <span />
+          <div className="landing-v522-panel-head">
+            <div>
+              <span>Painel do Participante</span>
+              <strong>Bolao Copa 2026</strong>
+            </div>
+            <em>ao vivo</em>
           </div>
-          <div className="landing-v521-ball">
-            <span />
+
+          <div className="landing-v522-score">
+            <div>
+              <span>Voce</span>
+              <strong>128 pts</strong>
+            </div>
+            <div>
+              <span>Lider</span>
+              <strong>142 pts</strong>
+            </div>
           </div>
-          <div className="landing-v521-field">
-            <span />
-            <span />
-            <span />
+
+          <div className="landing-v522-panel-grid">
+            <article>
+              <span>01</span>
+              <strong>Ranking ao vivo</strong>
+              <div className="landing-v522-bar">
+                <i style={{ width: "82%" }} />
+              </div>
+            </article>
+            <article>
+              <span>02</span>
+              <strong>Mata-Mata</strong>
+              <div className="landing-v522-bar">
+                <i style={{ width: "64%" }} />
+              </div>
+            </article>
+            <article>
+              <span>03</span>
+              <strong>Comparacao</strong>
+              <div className="landing-v522-bar">
+                <i style={{ width: "74%" }} />
+              </div>
+            </article>
+            <article>
+              <span>04</span>
+              <strong>Premiacao</strong>
+              <div className="landing-v522-bar">
+                <i style={{ width: "58%" }} />
+              </div>
+            </article>
           </div>
-        </div>
+
+          <div className="landing-v522-mini-ranking">
+            <div>
+              <span>1</span>
+              <strong>Campeao da rodada</strong>
+              <em>142</em>
+            </div>
+            <div>
+              <span>2</span>
+              <strong>Voce</strong>
+              <em>128</em>
+            </div>
+            <div>
+              <span>3</span>
+              <strong>Briga pelo topo</strong>
+              <em>121</em>
+            </div>
+          </div>
+        </aside>
       </section>
 
       <section
-        className="landing-v521-cards"
+        className="landing-v522-cards"
         id="como-funciona"
       >
         {cards.map((card) => (
           <article key={card.titulo}>
-            <span className="landing-v521-card-icon">
-              {card.sigla}
-            </span>
+            <span>{card.sigla}</span>
             <h2>{card.titulo}</h2>
             <p>{card.texto}</p>
           </article>
@@ -180,37 +217,37 @@ function LandingPage() {
       </section>
 
       <section
-        className="landing-v521-countdown"
+        className="landing-v522-countdown"
         id="premiacao"
       >
-        <div className="landing-v521-countdown-copy">
+        <div>
           <span>Copa do Mundo 2026</span>
           <h2>
             A maior competicao do planeta esta chegando!
           </h2>
           <p>
-            Prepare seus palpites, chame os amigos e venha
-            ser Mil Grau nessa disputa.
+            Prepare seus palpites e entre na disputa do
+            Terceirizados Mil Grau.
           </p>
         </div>
 
-        <div className="landing-v521-time">
-          <div>
+        <div className="landing-v522-time">
+          <article>
             <strong>{contagem.dias}</strong>
             <span>Dias</span>
-          </div>
-          <div>
+          </article>
+          <article>
             <strong>{contagem.horas}</strong>
             <span>Horas</span>
-          </div>
-          <div>
+          </article>
+          <article>
             <strong>{contagem.minutos}</strong>
             <span>Minutos</span>
-          </div>
-          <div>
+          </article>
+          <article>
             <strong>{contagem.segundos}</strong>
             <span>Segundos</span>
-          </div>
+          </article>
         </div>
       </section>
     </main>
