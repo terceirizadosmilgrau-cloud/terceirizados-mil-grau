@@ -6,10 +6,146 @@ import {
   deleteDoc,
   onSnapshot,
   getDoc,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 
 import { db } from "../firebase";
 import ParticipantesTable from "../components/admin/ParticipantesTable";
+
+const destaquesMataMataPadrao = {
+  palpitesEnviados: 0,
+  jogosEncerrados: 0,
+  totalJogosConfigurados: 0,
+  proximoJogo: null,
+  campeaoMaisApostado: null,
+};
+
+const fasesMataMata = [
+  "oitavas",
+  "quartas",
+  "semifinal",
+  "final",
+];
+
+const textoPreenchido = (valor) =>
+  String(valor || "").trim();
+
+const valorValido = (valor) => {
+  const texto = textoPreenchido(valor);
+
+  return texto && texto !== "-";
+};
+
+const jogoEncerrado = (jogo) =>
+  jogo?.placarA !== undefined &&
+  jogo?.placarA !== "" &&
+  jogo?.placarB !== undefined &&
+  jogo?.placarB !== "" &&
+  Boolean(
+    textoPreenchido(jogo?.classificado)
+  );
+
+const listarJogos = (dados = {}) =>
+  fasesMataMata.flatMap((fase) =>
+    Array.isArray(dados.jogos?.[fase])
+      ? dados.jogos[fase].map(
+          (jogo, index) => ({
+            ...jogo,
+            fase,
+            index,
+          })
+        )
+      : []
+  );
+
+const palpiteMataMataPreenchido = (
+  dados = {}
+) => {
+  if (valorValido(dados.campeao)) {
+    return true;
+  }
+
+  return fasesMataMata.some((fase) =>
+    (dados.jogos?.[fase] || []).some(
+      (jogo) =>
+        valorValido(jogo?.placarA) ||
+        valorValido(jogo?.placarB) ||
+        valorValido(jogo?.classificado)
+    )
+  );
+};
+
+const obterDataDoJogo = (jogo) => {
+  if (!jogo?.data || !jogo?.horario) {
+    return null;
+  }
+
+  const data = new Date(
+    `${jogo.data}T${jogo.horario}:00`
+  );
+
+  if (Number.isNaN(data.getTime())) {
+    return null;
+  }
+
+  return data;
+};
+
+const formatarProximoJogo = (jogo) => {
+  if (!jogo) return "A definir";
+
+  const data = obterDataDoJogo(jogo);
+  const quando = data
+    ? data.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Data a definir";
+
+  return `${jogo.timeA || "Time A"} x ${
+    jogo.timeB || "Time B"
+  } - ${quando}`;
+};
+
+const contarCampeoes = (docs = []) => {
+  const contagem = {};
+
+  docs.forEach((palpiteDoc) => {
+    const campeao = textoPreenchido(
+      palpiteDoc.data().campeao
+    );
+
+    if (!valorValido(campeao)) return;
+
+    const chave = campeao.toLowerCase();
+
+    if (!contagem[chave]) {
+      contagem[chave] = {
+        nome: campeao,
+        quantidade: 0,
+      };
+    }
+
+    contagem[chave].quantidade += 1;
+  });
+
+  return (
+    Object.values(contagem).sort((a, b) => {
+      if (
+        b.quantidade !== a.quantidade
+      ) {
+        return (
+          b.quantidade - a.quantidade
+        );
+      }
+
+      return a.nome.localeCompare(b.nome);
+    })[0] || null
+  );
+};
 
 function Dashboard({
   usuario,
@@ -28,6 +164,10 @@ function Dashboard({
   const [participantes, setParticipantes] = useState([]);
   const [palpitesLiberados, setPalpitesLiberados] =
     useState(true);
+  const [
+    destaquesMataMata,
+    setDestaquesMataMata,
+  ] = useState(destaquesMataMataPadrao);
 
     const [busca, setBusca] =
   useState("");
@@ -44,6 +184,7 @@ const [filtro, setFiltro] =
     window.scrollTo(0, 0);
 
     carregarConfiguracoes();
+    carregarDestaquesMataMata();
 
     const unsubscribe = onSnapshot(
       collection(db, "usuarios"),
@@ -132,6 +273,102 @@ const [filtro, setFiltro] =
       }
     };
 
+  const carregarDestaquesMataMata =
+    async () => {
+      try {
+        const [
+          palpitesSnapshot,
+          resultadoSnapshot,
+          configuracaoSnapshot,
+        ] = await Promise.all([
+          getDocs(
+            collection(
+              db,
+              "palpitesMataMata"
+            )
+          ),
+          getDoc(
+            doc(
+              db,
+              "resultados",
+              "mataMata"
+            )
+          ),
+          getDoc(
+            doc(
+              db,
+              "configuracoes",
+              "mataMata"
+            )
+          ),
+        ]);
+
+        const jogosResultados =
+          resultadoSnapshot.exists()
+            ? listarJogos(
+                resultadoSnapshot.data()
+              )
+            : [];
+
+        const jogosConfigurados =
+          configuracaoSnapshot.exists()
+            ? listarJogos(
+                configuracaoSnapshot.data()
+              ).filter(
+                (jogo) =>
+                  jogo.timeA ||
+                  jogo.timeB ||
+                  jogo.data ||
+                  jogo.horario
+              )
+            : [];
+
+        const agora = new Date();
+        const proximoJogo =
+          jogosConfigurados
+            .map((jogo) => ({
+              ...jogo,
+              inicio:
+                obterDataDoJogo(jogo),
+            }))
+            .filter(
+              (jogo) =>
+                jogo.inicio &&
+                jogo.inicio > agora
+            )
+            .sort(
+              (a, b) =>
+                a.inicio - b.inicio
+            )[0] || null;
+
+        setDestaquesMataMata({
+          palpitesEnviados:
+            palpitesSnapshot.docs.filter(
+              (palpiteDoc) =>
+                palpiteMataMataPreenchido(
+                  palpiteDoc.data()
+                )
+            ).length,
+          jogosEncerrados:
+            jogosResultados.filter(
+              jogoEncerrado
+            ).length,
+          totalJogosConfigurados:
+            jogosConfigurados.length,
+          proximoJogo,
+          campeaoMaisApostado:
+            contarCampeoes(
+              palpitesSnapshot.docs
+            ),
+        });
+      } catch (error) {
+        console.error(error);
+        setDestaquesMataMata(
+          destaquesMataMataPadrao
+        );
+      }
+    };
+
   const alterarStatusPalpites =
     async (status) => {
       try {
@@ -197,6 +434,72 @@ const [filtro, setFiltro] =
       );
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const apagarColecaoEmBatches = async (
+    nomeColecao
+  ) => {
+    const snapshot = await getDocs(
+      collection(db, nomeColecao)
+    );
+
+    const tamanhoBatch = 450;
+
+    for (
+      let inicio = 0;
+      inicio < snapshot.docs.length;
+      inicio += tamanhoBatch
+    ) {
+      const batch = writeBatch(db);
+
+      snapshot.docs
+        .slice(
+          inicio,
+          inicio + tamanhoBatch
+        )
+        .forEach((documento) => {
+          batch.delete(documento.ref);
+        });
+
+      await batch.commit();
+    }
+
+    return snapshot.docs.length;
+  };
+
+  const zerarTodosPalpites = async () => {
+    if (!isSuperAdmin) return;
+
+    const confirmar = window.confirm(
+      "Tem certeza que deseja apagar TODOS os palpites de Grupos e Mata-Mata? Essa acao nao apaga usuarios, resultados, configuracoes ou pagamentos."
+    );
+
+    if (!confirmar) return;
+
+    try {
+      const [
+        totalGrupos,
+        totalMataMata,
+      ] = await Promise.all([
+        apagarColecaoEmBatches(
+          "palpites"
+        ),
+        apagarColecaoEmBatches(
+          "palpitesMataMata"
+        ),
+      ]);
+
+      await carregarDestaquesMataMata();
+
+      alert(
+        `Palpites apagados com sucesso. Grupos: ${totalGrupos}. Mata-Mata: ${totalMataMata}.`
+      );
+    } catch (error) {
+      console.error(error);
+      alert(
+        "Erro ao apagar todos os palpites."
+      );
     }
   };
 
@@ -427,6 +730,82 @@ participantes.length > 0
         </button>
       </section>
 
+      <section style={destaquesMataMataStyle}>
+        <h2 style={destaquesTituloStyle}>
+          Destaques Mata-Mata
+        </h2>
+
+        <div style={destaquesGridStyle}>
+          <div style={destaqueCardStyle}>
+            <span style={destaqueLabelStyle}>
+              Palpites enviados
+            </span>
+            <strong style={destaqueNumeroStyle}>
+              {
+                destaquesMataMata
+                  .palpitesEnviados
+              }
+            </strong>
+            <small style={destaqueTextoStyle}>
+              Palpites Mata-Mata registrados
+            </small>
+          </div>
+
+          <div style={destaqueCardStyle}>
+            <span style={destaqueLabelStyle}>
+              Jogos encerrados
+            </span>
+            <strong style={destaqueNumeroStyle}>
+              {
+                destaquesMataMata
+                  .jogosEncerrados
+              }
+            </strong>
+            <small style={destaqueTextoStyle}>
+              de{" "}
+              {
+                destaquesMataMata
+                  .totalJogosConfigurados
+              }{" "}
+              jogos configurados
+            </small>
+          </div>
+
+          <div style={destaqueCardStyle}>
+            <span style={destaqueLabelStyle}>
+              Proximo jogo
+            </span>
+            <strong style={destaqueNomeStyle}>
+              {formatarProximoJogo(
+                destaquesMataMata.proximoJogo
+              )}
+            </strong>
+            <small style={destaqueTextoStyle}>
+              Pela configuracao do Mata-Mata
+            </small>
+          </div>
+
+          <div style={destaqueCardStyle}>
+            <span style={destaqueLabelStyle}>
+              Campeao mais apostado
+            </span>
+            <strong style={destaqueNomeStyle}>
+              {destaquesMataMata
+                .campeaoMaisApostado
+                ? destaquesMataMata
+                    .campeaoMaisApostado.nome
+                : "Sem dados"}
+            </strong>
+            <small style={destaqueTextoStyle}>
+              {destaquesMataMata
+                .campeaoMaisApostado
+                ? `${destaquesMataMata.campeaoMaisApostado.quantidade} aposta(s)`
+                : "Nenhum campeao informado"}
+            </small>
+          </div>
+        </div>
+      </section>
+
       <div
         className="dashboard-v37-card"
         style={{
@@ -512,6 +891,16 @@ participantes.length > 0
                 style={botaoEncerrar}
               >
                 🔒 Encerrar Palpites
+              </button>
+            </div>
+
+            <div style={adminDangerZoneStyle}>
+              <button
+                className="dashboard-v37-button"
+                onClick={zerarTodosPalpites}
+                style={botaoZerarPalpites}
+              >
+                Zerar todos os palpites
               </button>
             </div>
           </>
@@ -824,6 +1213,64 @@ const botaoRankingOficialStyle = {
   minWidth: "180px",
 };
 
+const destaquesMataMataStyle = {
+  backgroundColor: "#181818",
+  border: "1px solid #2c2c2c",
+  borderRadius: "8px",
+  padding: "clamp(16px, 4vw, 20px)",
+  margin: "0 auto 20px",
+  width: "min(100%, 980px)",
+  boxSizing: "border-box",
+};
+
+const destaquesTituloStyle = {
+  margin: "0 0 14px",
+  color: "#ffd76a",
+  fontSize: "22px",
+  textAlign: "left",
+};
+
+const destaquesGridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: "12px",
+};
+
+const destaqueCardStyle = {
+  backgroundColor: "#111",
+  border: "1px solid #333",
+  borderRadius: "8px",
+  padding: "14px",
+  display: "grid",
+  gap: "6px",
+  minWidth: 0,
+  textAlign: "left",
+};
+
+const destaqueLabelStyle = {
+  color: "#cfcfcf",
+  fontSize: "13px",
+};
+
+const destaqueNumeroStyle = {
+  color: "#ffd76a",
+  fontSize: "clamp(26px, 5vw, 34px)",
+  lineHeight: 1,
+};
+
+const destaqueNomeStyle = {
+  color: "white",
+  fontSize: "16px",
+  lineHeight: 1.3,
+  overflowWrap: "anywhere",
+};
+
+const destaqueTextoStyle = {
+  color: "#999",
+  lineHeight: 1.35,
+};
+
 const botaoLiberar = {
   backgroundColor: "#198754",
   color: "white",
@@ -841,6 +1288,25 @@ const botaoEncerrar = {
   padding: "10px 15px",
   borderRadius: "8px",
   cursor: "pointer",
+};
+
+const adminDangerZoneStyle = {
+  marginTop: "14px",
+  paddingTop: "14px",
+  borderTop: "1px solid #3a1d1d",
+  display: "flex",
+  justifyContent: "center",
+};
+
+const botaoZerarPalpites = {
+  backgroundColor: "#7f1d1d",
+  color: "white",
+  border: "1px solid #dc3545",
+  padding: "10px 15px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  maxWidth: "100%",
 };
 
 const botaoFiltro = {
