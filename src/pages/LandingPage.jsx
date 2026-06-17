@@ -1,70 +1,44 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
 
-const inicioCopa2026 = new Date(
-  "2026-06-11T16:00:00-03:00"
-);
-
-const calcularContagem = () => {
-  const distancia =
-    inicioCopa2026.getTime() - Date.now();
-  const restante = Math.max(0, distancia);
-
-  return {
-    dias: Math.floor(restante / (1000 * 60 * 60 * 24)),
-    horas: Math.floor((restante / (1000 * 60 * 60)) % 24),
-    minutos: Math.floor((restante / (1000 * 60)) % 60),
-    segundos: Math.floor((restante / 1000) % 60),
-  };
-};
-
 const cards = [
   {
-    sigla: "FG",
     titulo: "Fase de Grupos",
     texto:
-      "Registre seus palpites jogo a jogo e comece a somar pontos desde a primeira rodada.",
+      "Registre seus palpites jogo a jogo e acompanhe a primeira etapa com clareza.",
   },
   {
-    sigla: "MM",
     titulo: "Mata-Mata",
     texto:
-      "Acompanhe os confrontos decisivos, classificados e campeao apostado.",
+      "Palpite nos confrontos decisivos, classificados e campeao da competicao.",
   },
   {
-    sigla: "RK",
     titulo: "Ranking",
     texto:
-      "Veja a classificacao oficial e acompanhe quem esta liderando a disputa.",
+      "Acompanhe a classificacao oficial e veja a disputa evoluir rodada a rodada.",
   },
   {
-    sigla: "CP",
     titulo: "Comparacao",
     texto:
-      "Compare palpites lado a lado e descubra onde cada participante arriscou.",
+      "Compare palpites lado a lado e veja onde cada participante apostou diferente.",
   },
   {
-    sigla: "PR",
     titulo: "Premiacao",
     texto:
-      "Mantenha a disputa organizada do primeiro palpite ate a premiacao final.",
+      "Veja a divisao da premiacao e mantenha a disputa transparente ate o fim.",
   },
 ];
 
+const beneficios = [
+  "Ranking ao vivo",
+  "Mata-Mata completo",
+  "Comparacao de palpites",
+  "Premiacao automatica",
+  "Estatisticas dos participantes",
+  "Historico das apostas",
+];
+
 function LandingPage() {
-  const [contagem, setContagem] = useState(
-    calcularContagem
-  );
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setContagem(calcularContagem());
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
   return (
     <main className="landing-v522">
       <header className="landing-v522-header">
@@ -75,6 +49,7 @@ function LandingPage() {
 
         <nav className="landing-v522-nav">
           <Link to="/">Inicio</Link>
+          <a href="#como-funciona">Como Funciona</a>
           <Link to="/regras">Regras</Link>
           <a href="#premiacao">Premiacao</a>
         </nav>
@@ -99,7 +74,7 @@ function LandingPage() {
           </p>
 
           <h1>
-            O bolao da Copa 2026 para disputar com os amigos
+            Palpite. Dispute. Conquiste o topo.
           </h1>
 
           <p className="landing-v522-lead">
@@ -136,68 +111,32 @@ function LandingPage() {
           <div className="landing-v522-panel-head">
             <div>
               <span>Painel do Participante</span>
-              <strong>Bolao Copa 2026</strong>
+              <strong>Controle completo do bolao</strong>
             </div>
-            <em>ao vivo</em>
-          </div>
-
-          <div className="landing-v522-score">
-            <div>
-              <span>Voce</span>
-              <strong>128 pts</strong>
-            </div>
-            <div>
-              <span>Lider</span>
-              <strong>142 pts</strong>
-            </div>
+            <em>publico</em>
           </div>
 
           <div className="landing-v522-panel-grid">
-            <article>
-              <span>01</span>
-              <strong>Ranking ao vivo</strong>
-              <div className="landing-v522-bar">
-                <i style={{ width: "82%" }} />
-              </div>
-            </article>
-            <article>
-              <span>02</span>
-              <strong>Mata-Mata</strong>
-              <div className="landing-v522-bar">
-                <i style={{ width: "64%" }} />
-              </div>
-            </article>
-            <article>
-              <span>03</span>
-              <strong>Comparacao</strong>
-              <div className="landing-v522-bar">
-                <i style={{ width: "74%" }} />
-              </div>
-            </article>
-            <article>
-              <span>04</span>
-              <strong>Premiacao</strong>
-              <div className="landing-v522-bar">
-                <i style={{ width: "58%" }} />
-              </div>
-            </article>
+            {beneficios.map((beneficio) => (
+              <article key={beneficio}>
+                <span aria-hidden="true">✓</span>
+                <strong>{beneficio}</strong>
+              </article>
+            ))}
           </div>
 
-          <div className="landing-v522-mini-ranking">
+          <div className="landing-v522-panel-note">
             <div>
-              <span>1</span>
-              <strong>Campeao da rodada</strong>
-              <em>142</em>
+              <span>Fase de grupos</span>
+              <strong>Palpites organizados por jogo</strong>
             </div>
             <div>
-              <span>2</span>
-              <strong>Voce</strong>
-              <em>128</em>
+              <span>Mata-Mata</span>
+              <strong>Confrontos e campeao em um so lugar</strong>
             </div>
             <div>
-              <span>3</span>
-              <strong>Briga pelo topo</strong>
-              <em>121</em>
+              <span>Disputa</span>
+              <strong>Ranking, comparacao e premiacao</strong>
             </div>
           </div>
         </aside>
@@ -209,7 +148,6 @@ function LandingPage() {
       >
         {cards.map((card) => (
           <article key={card.titulo}>
-            <span>{card.sigla}</span>
             <h2>{card.titulo}</h2>
             <p>{card.texto}</p>
           </article>
@@ -217,36 +155,33 @@ function LandingPage() {
       </section>
 
       <section
-        className="landing-v522-countdown"
+        className="landing-v522-premios"
         id="premiacao"
       >
-        <div>
+        <div className="landing-v522-premios-copy">
           <span>Copa do Mundo 2026</span>
-          <h2>
-            A maior competicao do planeta esta chegando!
-          </h2>
+          <h2>Premiacao do bolao</h2>
           <p>
-            Prepare seus palpites e entre na disputa do
-            Terceirizados Mil Grau.
+            A premiacao e calculada automaticamente com base
+            no total arrecadado pelos participantes.
           </p>
         </div>
 
-        <div className="landing-v522-time">
+        <div className="landing-v522-premios-grid">
           <article>
-            <strong>{contagem.dias}</strong>
-            <span>Dias</span>
+            <span>1o Lugar</span>
+            <strong>50%</strong>
+            <p>da arrecadacao</p>
           </article>
           <article>
-            <strong>{contagem.horas}</strong>
-            <span>Horas</span>
+            <span>2o Lugar</span>
+            <strong>30%</strong>
+            <p>da arrecadacao</p>
           </article>
           <article>
-            <strong>{contagem.minutos}</strong>
-            <span>Minutos</span>
-          </article>
-          <article>
-            <strong>{contagem.segundos}</strong>
-            <span>Segundos</span>
+            <span>3o Lugar</span>
+            <strong>20%</strong>
+            <p>da arrecadacao</p>
           </article>
         </div>
       </section>

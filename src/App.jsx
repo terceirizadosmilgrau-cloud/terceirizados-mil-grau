@@ -13,6 +13,7 @@ import Cadastro from "./components/Cadastro";
 import { db } from "./firebase";
 
 import LandingPage from "./pages/LandingPage";
+import RegrasPage from "./pages/RegrasPage";
 import Dashboard from "./pages/Dashboard";
 import Palpites from "./pages/Palpites";
 import ResumoPalpites from "./pages/ResumoPalpites";
@@ -271,6 +272,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/regras" element={<RegrasPage />} />
       <Route
         path="/login"
         element={
