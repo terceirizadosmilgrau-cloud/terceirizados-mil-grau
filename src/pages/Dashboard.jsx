@@ -471,11 +471,11 @@ const [filtro, setFiltro] =
   const zerarTodosPalpites = async () => {
     if (!isSuperAdmin) return;
 
-    const confirmar = window.confirm(
-      "Tem certeza que deseja apagar TODOS os palpites de Grupos e Mata-Mata? Essa acao nao apaga usuarios, resultados, configuracoes ou pagamentos."
+    const confirmar = window.prompt(
+      'Digite exatamente "ZERAR PALPITES" para apagar TODOS os palpites de Grupos e Mata-Mata. Essa acao nao apaga usuarios, resultados, configuracoes ou pagamentos.'
     );
 
-    if (!confirmar) return;
+    if (confirmar !== "ZERAR PALPITES") return;
 
     try {
       const [

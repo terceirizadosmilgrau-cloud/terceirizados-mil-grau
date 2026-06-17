@@ -167,10 +167,6 @@ function Ranking({ voltar }) {
           doc(db, "resultados", "grupos")
         );
 
-      if (!resultadoSnapshot.exists()) {
-        return;
-      }
-
       const resultadoMataMataSnapshot =
         await getDoc(
           doc(
@@ -186,7 +182,9 @@ function Ranking({ voltar }) {
           : null;
 
       const resultados =
-        resultadoSnapshot.data();
+        resultadoSnapshot.exists()
+          ? resultadoSnapshot.data()
+          : {};
 
       const usuariosSnapshot =
         await getDocs(
