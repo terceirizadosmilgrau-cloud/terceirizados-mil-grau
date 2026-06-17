@@ -174,6 +174,10 @@ const calcularDetalheJogoMataMata = (
   };
 };
 
+const renderBadge = (texto, estilo) => (
+  <span style={estilo}>{texto}</span>
+);
+
 function DetalheParticipante({
   participante,
   fechar,
@@ -230,6 +234,104 @@ function DetalheParticipante({
   const temJogosMataMata =
     palpiteMataMata?.jogos &&
     resultadoMataMata?.jogos;
+
+  const renderIndicadoresMataMata = (
+    jogoPalpite,
+    jogoResultado,
+    detalhe
+  ) => {
+    if (!detalhe.resultadoCompleto) {
+      return (
+        <div style={statusBlocoStyle}>
+          {renderBadge(
+            "Pendente",
+            statusPendenteStyle
+          )}
+        </div>
+      );
+    }
+
+    const placarOk =
+      placarPreenchido(jogoPalpite) &&
+      String(jogoPalpite.placarA).trim() ===
+        String(
+          jogoResultado.placarA
+        ).trim() &&
+      String(jogoPalpite.placarB).trim() ===
+        String(
+          jogoResultado.placarB
+        ).trim();
+
+    const classificadoOk =
+      normalizarTexto(
+        jogoPalpite.classificado
+      ) &&
+      normalizarTexto(
+        jogoPalpite.classificado
+      ) ===
+        normalizarTexto(
+          jogoResultado.classificado
+        );
+
+    const comparaPenaltis =
+      jogoResultado.decididoNosPenaltis ===
+      true;
+    const penaltisOk =
+      comparaPenaltis &&
+      jogoPalpite.decididoNosPenaltis ===
+        true;
+
+    return (
+      <div style={indicadoresMataMataStyle}>
+        <div style={statusBlocoStyle}>
+          {renderBadge(
+            "Encerrado",
+            statusEncerradoStyle
+          )}
+        </div>
+
+        <div style={resultadoOficialStyle}>
+          Resultado oficial:{" "}
+          <strong>
+            {jogoResultado.placarA} x{" "}
+            {jogoResultado.placarB}
+          </strong>{" "}
+          |{" "}
+          <strong>
+            {jogoResultado.classificado}
+          </strong>
+        </div>
+
+        <div style={chipsStyle}>
+          {renderBadge(
+            `${placarOk ? "OK" : "X"} Placar`,
+            placarOk
+              ? chipAcertoStyle
+              : chipErroStyle
+          )}
+
+          {renderBadge(
+            `${
+              classificadoOk ? "OK" : "X"
+            } Classificado`,
+            classificadoOk
+              ? chipAcertoStyle
+              : chipErroStyle
+          )}
+
+          {comparaPenaltis &&
+            renderBadge(
+              `${
+                penaltisOk ? "OK" : "X"
+              } Penaltis`,
+              penaltisOk
+                ? chipAcertoStyle
+                : chipErroStyle
+            )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -531,17 +633,6 @@ function DetalheParticipante({
                                     jogoPalpite,
                                     jogoResultado
                                   );
-                                const acertos =
-                                  detalhe.criterios.filter(
-                                    (criterio) =>
-                                      criterio.acertou
-                                  );
-                                const penaltis =
-                                  detalhe.criterios.find(
-                                    (criterio) =>
-                                      criterio.label ===
-                                      "Penaltis correto"
-                                  );
 
                                 return (
                                   <div
@@ -566,76 +657,35 @@ function DetalheParticipante({
                                         "Time B"}
                                     </strong>
 
-                                    {!detalhe.resultadoCompleto ? (
+                                    <p>
+                                      Palpite:{" "}
+                                      {formatarPlacar(
+                                        jogoPalpite
+                                      )}
+                                    </p>
+                                    <p>
+                                      Classificado:{" "}
+                                      <strong>
+                                        {jogoPalpite.classificado ||
+                                          "-"}
+                                      </strong>
+                                    </p>
+
+                                    {renderIndicadoresMataMata(
+                                      jogoPalpite,
+                                      jogoResultado,
+                                      detalhe
+                                    )}
+
+                                    {detalhe.resultadoCompleto && (
                                       <p
                                         style={
-                                          semResultadoStyle
+                                          pontosJogoStyle
                                         }
                                       >
-                                        Resultado ainda
-                                        nao informado.
+                                        Pontos:{" "}
+                                        {detalhe.pontos}
                                       </p>
-                                    ) : (
-                                      <>
-                                        <p>
-                                          Palpite:{" "}
-                                          {formatarPlacar(
-                                            jogoPalpite
-                                          )}
-                                        </p>
-                                        <p>
-                                          Oficial:{" "}
-                                          {formatarPlacar(
-                                            jogoResultado
-                                          )}
-                                        </p>
-                                        <p>
-                                          Classif.:{" "}
-                                          <strong>
-                                            {jogoPalpite.classificado ||
-                                              "-"}
-                                          </strong>{" "}
-                                          /{" "}
-                                          <strong>
-                                            {jogoResultado.classificado ||
-                                              "-"}
-                                          </strong>
-                                        </p>
-                                        <p
-                                          style={
-                                            pontosJogoStyle
-                                          }
-                                        >
-                                          Pontos:{" "}
-                                          {detalhe.pontos}
-                                        </p>
-                                        <p
-                                          style={
-                                            criteriosCompactosStyle
-                                          }
-                                        >
-                                          Acertos:{" "}
-                                          {acertos.length >
-                                          0
-                                            ? acertos
-                                                .map(
-                                                  (
-                                                    criterio
-                                                  ) =>
-                                                    `${criterio.label.replace(
-                                                      " correto",
-                                                      ""
-                                                    )} +${criterio.pontos}`
-                                                )
-                                                .join(
-                                                  " | "
-                                                )
-                                            : "nenhum"}
-                                          {penaltis?.aplicavel &&
-                                            !penaltis.acertou &&
-                                            " | Penaltis: nao"}
-                                        </p>
-                                      </>
                                     )}
                                   </div>
                                 );
@@ -1030,29 +1080,73 @@ const pontosJogoStyle = {
   fontWeight: "bold",
 };
 
-const criteriosStyle = {
+const indicadoresMataMataStyle = {
+  borderTop: "1px solid #242424",
+  paddingTop: "10px",
   display: "grid",
+  gap: "8px",
+};
+
+const statusBlocoStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "6px",
+  alignItems: "center",
+};
+
+const statusBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  fontWeight: "bold",
+  lineHeight: 1.2,
+};
+
+const statusPendenteStyle = {
+  ...statusBaseStyle,
+  backgroundColor: "#262626",
+  border: "1px solid #3a3a3a",
+  color: "#cfcfcf",
+};
+
+const statusEncerradoStyle = {
+  ...statusBaseStyle,
+  backgroundColor: "#1d2a22",
+  border: "1px solid #34513c",
+  color: "#bfe7c9",
+};
+
+const resultadoOficialStyle = {
+  color: "#cfcfcf",
+  fontSize: "13px",
+  lineHeight: 1.4,
+};
+
+const chipsStyle = {
+  display: "flex",
+  flexWrap: "wrap",
   gap: "6px",
 };
 
-const criteriosCompactosStyle = {
-  color: "#ddd",
-  fontSize: "13px",
-  lineHeight: 1.35,
+const chipBaseStyle = {
+  borderRadius: "6px",
+  padding: "4px 7px",
+  fontSize: "12px",
+  lineHeight: 1.2,
 };
 
-const criterioOkStyle = {
-  color: "#9be59b",
-  fontWeight: "bold",
+const chipAcertoStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#17251b",
+  border: "1px solid #2d5a38",
+  color: "#a9d8b5",
 };
 
-const criterioErroStyle = {
-  color: "#ff9b9b",
-};
-
-const semResultadoStyle = {
-  color: "#bbb",
-  fontStyle: "italic",
+const chipErroStyle = {
+  ...chipBaseStyle,
+  backgroundColor: "#2a1719",
+  border: "1px solid #5b3035",
+  color: "#e6a8ae",
 };
 
 const medalhaStyle = {
