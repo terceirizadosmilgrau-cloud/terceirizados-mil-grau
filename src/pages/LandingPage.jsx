@@ -5,37 +5,35 @@ const cards = [
   {
     titulo: "Fase de Grupos",
     texto:
-      "Registre seus palpites jogo a jogo e acompanhe a primeira etapa com clareza.",
+      "Organize seus palpites por partida e acompanhe a primeira fase com uma visão clara da disputa.",
   },
   {
     titulo: "Mata-Mata",
     texto:
-      "Palpite nos confrontos decisivos, classificados e campeao da competicao.",
+      "Registre placares, classificados e campeão nos confrontos mais decisivos do bolão.",
   },
   {
     titulo: "Ranking",
     texto:
-      "Acompanhe a classificacao oficial e veja a disputa evoluir rodada a rodada.",
+      "Acompanhe a classificação oficial e veja a briga pelo topo evoluir rodada a rodada.",
   },
   {
-    titulo: "Comparacao",
+    titulo: "Comparação",
     texto:
-      "Compare palpites lado a lado e veja onde cada participante apostou diferente.",
+      "Compare palpites lado a lado e entenda onde cada participante arriscou diferente.",
   },
   {
-    titulo: "Premiacao",
+    titulo: "Premiação",
     texto:
-      "Veja a divisao da premiacao e mantenha a disputa transparente ate o fim.",
+      "Consulte a divisão dos prêmios e mantenha a disputa transparente até o fim.",
   },
 ];
 
 const beneficios = [
   "Ranking ao vivo",
   "Mata-Mata completo",
-  "Comparacao de palpites",
-  "Premiacao automatica",
-  "Estatisticas dos participantes",
-  "Historico das apostas",
+  "Comparação de palpites",
+  "Premiação automática",
 ];
 
 function LandingPage() {
@@ -48,10 +46,10 @@ function LandingPage() {
         </Link>
 
         <nav className="landing-v522-nav">
-          <Link to="/">Inicio</Link>
+          <Link to="/">Início</Link>
           <a href="#como-funciona">Como Funciona</a>
           <Link to="/regras">Regras</Link>
-          <a href="#premiacao">Premiacao</a>
+          <a href="#premiacao">Premiação</a>
         </nav>
 
         <div className="landing-v522-header-actions">
