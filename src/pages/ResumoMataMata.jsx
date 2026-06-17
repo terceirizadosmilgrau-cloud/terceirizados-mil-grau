@@ -5,6 +5,11 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 
 import { db } from "../firebase";
+import {
+  formatarResultadoOficial,
+  jogoEncerrado,
+  obterIndicadoresJogo,
+} from "../utils/mataMataVisual";
 
 const fases = [
   {
@@ -166,9 +171,9 @@ const mesclarJogosComConfrontos = (
         return {
           ...jogoBase,
           placarA:
-            jogoSalvo.placarA || "",
+            jogoSalvo.placarA ?? "",
           placarB:
-            jogoSalvo.placarB || "",
+            jogoSalvo.placarB ?? "",
           decididoNosPenaltis: Boolean(
             jogoSalvo.decididoNosPenaltis
           ),
@@ -183,54 +188,6 @@ const mesclarJogosComConfrontos = (
     return acc;
   }, {});
 };
-
-const normalizarTexto = (valor) =>
-  String(valor || "")
-    .toLowerCase()
-    .trim();
-
-const placarPreenchido = (jogo) =>
-  jogo?.placarA !== undefined &&
-  jogo?.placarA !== "" &&
-  jogo?.placarB !== undefined &&
-  jogo?.placarB !== "";
-
-const jogoEncerrado = (jogo) =>
-  placarPreenchido(jogo) &&
-  Boolean(
-    normalizarTexto(jogo?.classificado)
-  );
-
-const placarExato = (
-  palpite,
-  resultado
-) =>
-  placarPreenchido(palpite) &&
-  jogoEncerrado(resultado) &&
-  String(palpite.placarA).trim() ===
-    String(resultado.placarA).trim() &&
-  String(palpite.placarB).trim() ===
-    String(resultado.placarB).trim();
-
-const classificadoCorreto = (
-  palpite,
-  resultado
-) =>
-  Boolean(
-    normalizarTexto(palpite?.classificado)
-  ) &&
-  jogoEncerrado(resultado) &&
-  normalizarTexto(palpite.classificado) ===
-    normalizarTexto(
-      resultado.classificado
-    );
-
-const penaltisCorreto = (
-  palpite,
-  resultado
-) =>
-  resultado?.decididoNosPenaltis === true &&
-  palpite?.decididoNosPenaltis === true;
 
 function ResumoMataMata({
   usuario,
@@ -368,18 +325,12 @@ function ResumoMataMata({
       );
     }
 
-    const acertouPlacar =
-      placarExato(jogo, resultado);
-    const acertouClassificado =
-      classificadoCorreto(
-        jogo,
+    const indicadores =
+      obterIndicadoresJogo(jogo, resultado);
+    const resultadoOficial =
+      formatarResultadoOficial(
         resultado
       );
-    const deveCompararPenaltis =
-      resultado.decididoNosPenaltis ===
-      true;
-    const acertouPenaltis =
-      penaltisCorreto(jogo, resultado);
 
     return (
       <div style={indicadoresStyle}>
@@ -392,43 +343,40 @@ function ResumoMataMata({
 
         <div style={resultadoOficialStyle}>
           Resultado oficial:{" "}
-          <strong>
-            {resultado.placarA} x{" "}
-            {resultado.placarB}
-          </strong>{" "}
-          |{" "}
-          <strong>
-            {resultado.classificado}
-          </strong>
+          <strong>{resultadoOficial}</strong>
         </div>
 
         <div style={chipsStyle}>
           {renderBadge(
-            `${acertouPlacar ? "OK" : "X"} Placar`,
-            acertouPlacar
+            `${
+              indicadores.placar
+                ? "OK"
+                : "X"
+            } Placar`,
+            indicadores.placar
               ? chipAcertoStyle
               : chipErroStyle
           )}
 
           {renderBadge(
             `${
-              acertouClassificado
+              indicadores.classificado
                 ? "OK"
                 : "X"
             } Classificado`,
-            acertouClassificado
+            indicadores.classificado
               ? chipAcertoStyle
               : chipErroStyle
           )}
 
-          {deveCompararPenaltis &&
+          {indicadores.compararPenaltis &&
             renderBadge(
               `${
-                acertouPenaltis
+                indicadores.penaltis
                   ? "OK"
                   : "X"
               } Penaltis`,
-              acertouPenaltis
+              indicadores.penaltis
                 ? chipAcertoStyle
                 : chipErroStyle
             )}
