@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+import {
+  formatarResultadoOficial,
+  jogoEncerrado,
+  obterIndicadoresJogo,
+  placarPreenchido,
+  textoPreenchido,
+} from "../utils/mataMataVisual";
+
 const fasesMataMata = [
   ["Oitavas", "oitavas"],
   ["Quartas", "quartas"],
@@ -7,16 +15,8 @@ const fasesMataMata = [
   ["Final", "final"],
 ];
 
-const placarPreenchido = (jogo) =>
-  jogo?.placarA !== undefined &&
-  jogo?.placarA !== "" &&
-  jogo?.placarB !== undefined &&
-  jogo?.placarB !== "";
-
-const normalizarTexto = (valor) =>
-  String(valor || "")
-    .toLowerCase()
-    .trim();
+const normalizarChave = (valor) =>
+  textoPreenchido(valor).toLowerCase();
 
 const resultadoDoJogo = (jogo) => {
   if (!placarPreenchido(jogo)) {
@@ -44,7 +44,7 @@ const resultadoDoJogo = (jogo) => {
   return "empate";
 };
 
-const formatarPlacar = (jogo) => {
+const formatarPlacarDetalhado = (jogo) => {
   if (!jogo) return "-";
 
   return `${jogo.timeA || "Time A"} ${
@@ -68,7 +68,7 @@ const calcularDetalheJogoMataMata = (
     placarPreenchido(jogoResultado);
   const temClassificadoOficial =
     Boolean(
-      normalizarTexto(
+      normalizarChave(
         jogoResultado.classificado
       )
     );
@@ -93,13 +93,13 @@ const calcularDetalheJogoMataMata = (
 
   const classificadoCorreto =
     temClassificadoOficial &&
-    normalizarTexto(
+    normalizarChave(
       jogoPalpite.classificado
     ) &&
-    normalizarTexto(
+    normalizarChave(
       jogoPalpite.classificado
     ) ===
-      normalizarTexto(
+      normalizarChave(
         jogoResultado.classificado
       );
 
@@ -237,10 +237,9 @@ function DetalheParticipante({
 
   const renderIndicadoresMataMata = (
     jogoPalpite,
-    jogoResultado,
-    detalhe
+    jogoResultado
   ) => {
-    if (!detalhe.resultadoCompleto) {
+    if (!jogoEncerrado(jogoResultado)) {
       return (
         <div style={statusBlocoStyle}>
           {renderBadge(
@@ -251,35 +250,11 @@ function DetalheParticipante({
       );
     }
 
-    const placarOk =
-      placarPreenchido(jogoPalpite) &&
-      String(jogoPalpite.placarA).trim() ===
-        String(
-          jogoResultado.placarA
-        ).trim() &&
-      String(jogoPalpite.placarB).trim() ===
-        String(
-          jogoResultado.placarB
-        ).trim();
-
-    const classificadoOk =
-      normalizarTexto(
-        jogoPalpite.classificado
-      ) &&
-      normalizarTexto(
-        jogoPalpite.classificado
-      ) ===
-        normalizarTexto(
-          jogoResultado.classificado
-        );
-
-    const comparaPenaltis =
-      jogoResultado.decididoNosPenaltis ===
-      true;
-    const penaltisOk =
-      comparaPenaltis &&
-      jogoPalpite.decididoNosPenaltis ===
-        true;
+    const indicadores =
+      obterIndicadoresJogo(
+        jogoPalpite,
+        jogoResultado
+      );
 
     return (
       <div style={indicadoresMataMataStyle}>
@@ -293,38 +268,43 @@ function DetalheParticipante({
         <div style={resultadoOficialStyle}>
           Resultado oficial:{" "}
           <strong>
-            {jogoResultado.placarA} x{" "}
-            {jogoResultado.placarB}
-          </strong>{" "}
-          |{" "}
-          <strong>
-            {jogoResultado.classificado}
+            {formatarResultadoOficial(
+              jogoResultado
+            )}
           </strong>
         </div>
 
         <div style={chipsStyle}>
           {renderBadge(
-            `${placarOk ? "OK" : "X"} Placar`,
-            placarOk
+            `${
+              indicadores.placar
+                ? "OK"
+                : "X"
+            } Placar`,
+            indicadores.placar
               ? chipAcertoStyle
               : chipErroStyle
           )}
 
           {renderBadge(
             `${
-              classificadoOk ? "OK" : "X"
+              indicadores.classificado
+                ? "OK"
+                : "X"
             } Classificado`,
-            classificadoOk
+            indicadores.classificado
               ? chipAcertoStyle
               : chipErroStyle
           )}
 
-          {comparaPenaltis &&
+          {indicadores.compararPenaltis &&
             renderBadge(
               `${
-                penaltisOk ? "OK" : "X"
+                indicadores.penaltis
+                  ? "OK"
+                  : "X"
               } Penaltis`,
-              penaltisOk
+              indicadores.penaltis
                 ? chipAcertoStyle
                 : chipErroStyle
             )}
@@ -659,7 +639,7 @@ function DetalheParticipante({
 
                                     <p>
                                       Palpite:{" "}
-                                      {formatarPlacar(
+                                      {formatarPlacarDetalhado(
                                         jogoPalpite
                                       )}
                                     </p>
