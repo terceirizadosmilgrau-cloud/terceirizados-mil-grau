@@ -4,57 +4,80 @@ import "./LandingPage.css";
 const etapas = [
   {
     numero: "01",
-    titulo: "Faça seus palpites",
+    titulo: "Crie sua conta",
     texto:
-      "Escolha os resultados dos jogos e avance pelas fases da Copa do Mundo 2026.",
+      "Cadastre-se e acesse a área do participante.",
   },
   {
     numero: "02",
-    titulo: "Ganhe pontos",
+    titulo: "Envie seus palpites",
     texto:
-      "Acerte placares, resultados, classificados e decisões nos pênaltis para somar pontos.",
+      "Registre suas escolhas nas fases disponíveis.",
   },
   {
     numero: "03",
-    titulo: "Suba no ranking",
+    titulo: "Acompanhe a disputa",
     texto:
-      "Acompanhe sua posição e dispute cada rodada até a grande final.",
+      "Veja seus pontos e sua posição no ranking.",
   },
 ];
 
 const diferenciais = [
   {
-    titulo: "Fase de Grupos",
+    titulo: "Palpites por fase",
     texto:
-      "Palpites organizados por partida para acompanhar a primeira fase com clareza.",
+      "Fase de grupos e mata-mata organizados em jornadas claras.",
   },
   {
-    titulo: "Mata-Mata completo",
+    titulo: "Confrontos completos",
     texto:
-      "Placares, classificados e decisões nos pênaltis reunidos nos confrontos decisivos.",
+      "Placares, classificados e decisões nos pênaltis em um só lugar.",
   },
   {
     titulo: "Ranking atualizado",
     texto:
-      "Classificação geral e desempenho no mata-mata para acompanhar a disputa rodada a rodada.",
+      "Classificação geral e desempenho no mata-mata sempre acessíveis.",
   },
   {
-    titulo: "Comparação",
+    titulo: "Comparador de palpites",
     texto:
-      "Compare palpites lado a lado e descubra onde cada participante fez escolhas diferentes.",
-  },
-  {
-    titulo: "Disputa transparente",
-    texto:
-      "Regras, pontuação e divisão dos prêmios apresentadas de forma simples e objetiva.",
+      "Visualização lado a lado das escolhas dos participantes.",
   },
 ];
 
 const beneficios = [
-  "Ranking ao vivo",
-  "Mata-Mata completo",
-  "Comparação de palpites",
-  "Premiação automática",
+  "Palpites organizados",
+  "Resultados oficiais",
+  "Ranking atualizado",
+  "Comparação lado a lado",
+];
+
+const perguntasFrequentes = [
+  {
+    pergunta: "Como faço para participar?",
+    resposta:
+      "Crie sua conta, entre na área do participante e registre seus palpites nas fases disponíveis.",
+  },
+  {
+    pergunta: "Como funciona a pontuação?",
+    resposta:
+      "Os pontos são calculados a partir dos resultados oficiais. Os critérios completos estão disponíveis na página de regras.",
+  },
+  {
+    pergunta: "Posso alterar meus palpites?",
+    resposta:
+      "Sim, enquanto os palpites estiverem liberados e dentro do prazo definido para a fase.",
+  },
+  {
+    pergunta: "Onde acompanho meu desempenho?",
+    resposta:
+      "Na área do participante, pelo ranking e pelas telas de resumo e comparação de palpites.",
+  },
+  {
+    pergunta: "Posso acessar pelo celular?",
+    resposta:
+      "Sim. A experiência é responsiva e se adapta a celulares, tablets e computadores.",
+  },
 ];
 
 function LandingPage() {
@@ -119,7 +142,7 @@ function LandingPage() {
 
           <div className="landing-v522-trust">
             <span>Acesso seguro</span>
-            <span>Pontuação atualizada</span>
+            <span>Experiência responsiva</span>
             <span>Disputa entre amigos</span>
           </div>
         </div>
@@ -145,20 +168,6 @@ function LandingPage() {
             ))}
           </div>
 
-          <div className="landing-v522-panel-note">
-            <div>
-              <span>Fase de grupos</span>
-              <strong>Palpites organizados por partida</strong>
-            </div>
-            <div>
-              <span>Mata-Mata</span>
-              <strong>Confrontos e campeão em um só lugar</strong>
-            </div>
-            <div>
-              <span>Disputa</span>
-              <strong>Ranking, comparação e premiação</strong>
-            </div>
-          </div>
         </aside>
       </section>
 
@@ -170,8 +179,7 @@ function LandingPage() {
           <span>Como funciona</span>
           <h2>Entre na disputa em três passos</h2>
           <p>
-            Crie sua conta, registre seus palpites e acompanhe
-            sua evolução durante toda a Copa do Mundo 2026.
+            Da inscrição ao ranking, o caminho é simples.
           </p>
         </div>
 
@@ -189,10 +197,10 @@ function LandingPage() {
       <section className="landing-v522-diferenciais">
         <div className="landing-v522-section-head">
           <span>Diferenciais do bolão</span>
-          <h2>Uma experiência completa do primeiro palpite à final</h2>
+          <h2>Recursos para acompanhar cada fase</h2>
           <p>
-            Tudo o que você precisa para competir, acompanhar
-            seus resultados e viver cada rodada com mais emoção.
+            Uma experiência organizada para palpitar, comparar
+            escolhas e acompanhar resultados.
           </p>
         </div>
 
@@ -213,14 +221,7 @@ function LandingPage() {
         <div className="landing-v522-premios-copy">
           <span>Copa do Mundo 2026</span>
           <h2>Premiação do bolão</h2>
-          <p>
-            Os melhores participantes serão premiados ao final
-            da competição, conforme a divisão da arrecadação
-            apresentada ao lado.
-          </p>
-          <strong>
-            Quanto maior a disputa, maior a emoção até a final.
-          </strong>
+          <p>Divisão da arrecadação final entre os três primeiros colocados.</p>
         </div>
 
         <div className="landing-v522-premios-grid">
@@ -240,6 +241,30 @@ function LandingPage() {
             <p>da arrecadação</p>
           </article>
         </div>
+      </section>
+
+      <section className="landing-v522-faq">
+        <div className="landing-v522-section-head">
+          <span>Perguntas frequentes</span>
+          <h2>Respostas rápidas antes de começar</h2>
+          <p>
+            Para critérios detalhados, consulte a página pública
+            de regras.
+          </p>
+        </div>
+
+        <div className="landing-v522-faq-list">
+          {perguntasFrequentes.map((item) => (
+            <details key={item.pergunta}>
+              <summary>{item.pergunta}</summary>
+              <p>{item.resposta}</p>
+            </details>
+          ))}
+        </div>
+
+        <Link className="landing-v522-faq-link" to="/regras">
+          Ver regras completas
+        </Link>
       </section>
 
       <section className="landing-v522-final">
