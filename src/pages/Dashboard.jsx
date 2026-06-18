@@ -18,6 +18,7 @@ import {
   textoPreenchido,
   valorPreenchido,
 } from "../utils/mataMataVisual";
+import { atualizarEstatisticasPublicas } from "../utils/atualizarEstatisticasPublicas";
 
 const destaquesMataMataPadrao = {
   palpitesEnviados: 0,
@@ -162,6 +163,10 @@ function Dashboard({
     destaquesMataMata,
     setDestaquesMataMata,
   ] = useState(destaquesMataMataPadrao);
+  const [
+    atualizandoEstatisticas,
+    setAtualizandoEstatisticas,
+  ] = useState(false);
 
     const [busca, setBusca] =
   useState("");
@@ -386,6 +391,32 @@ const [filtro, setFiltro] =
         );
       } catch (error) {
         console.error(error);
+      }
+    };
+
+  const publicarEstatisticas =
+    async () => {
+      if (
+        !isSuperAdmin ||
+        atualizandoEstatisticas
+      ) {
+        return;
+      }
+
+      setAtualizandoEstatisticas(true);
+
+      try {
+        await atualizarEstatisticasPublicas();
+        alert(
+          "Estatísticas públicas atualizadas com sucesso."
+        );
+      } catch (error) {
+        console.error(error);
+        alert(
+          "Erro ao atualizar estatísticas públicas."
+        );
+      } finally {
+        setAtualizandoEstatisticas(false);
       }
     };
 
@@ -886,6 +917,21 @@ participantes.length > 0
               >
                 🔒 Encerrar Palpites
               </button>
+
+              <button
+                className="dashboard-v37-button"
+                onClick={publicarEstatisticas}
+                disabled={
+                  atualizandoEstatisticas
+                }
+                style={
+                  botaoEstatisticasPublicas
+                }
+              >
+                {atualizandoEstatisticas
+                  ? "Atualizando estatísticas..."
+                  : "Atualizar estatísticas públicas"}
+              </button>
             </div>
 
             <div style={adminDangerZoneStyle}>
@@ -1282,6 +1328,17 @@ const botaoEncerrar = {
   padding: "10px 15px",
   borderRadius: "8px",
   cursor: "pointer",
+};
+
+const botaoEstatisticasPublicas = {
+  backgroundColor: "#0d6efd",
+  color: "white",
+  border: "none",
+  padding: "10px 15px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  maxWidth: "100%",
 };
 
 const adminDangerZoneStyle = {

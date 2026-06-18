@@ -21,6 +21,7 @@
 .landing-v522-hero,
 .landing-v522-como,
 .landing-v522-diferenciais,
+.landing-v522-estatisticas,
 .landing-v522-jogos,
 .landing-v522-premios,
 .landing-v522-faq,
@@ -422,6 +423,62 @@
   color: #c9d3cd;
   font-size: 14px;
   line-height: 1.48;
+}
+
+.landing-v522-estatisticas {
+  padding: 58px 0 32px;
+}
+
+.landing-v522-estatisticas-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landing-v522-estatisticas-grid article {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(115, 230, 148, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(17, 34, 23, 0.84), rgba(8, 20, 13, 0.9));
+}
+
+.landing-v522-estatisticas-grid article > span {
+  color: #73e694;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.landing-v522-estatisticas-grid strong {
+  margin-top: 16px;
+  display: block;
+  color: #fff;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1;
+}
+
+.landing-v522-estatisticas-grid strong small {
+  color: #c9d3cd;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.landing-v522-estatisticas-grid article p {
+  margin: 10px 0 0;
+  color: #9eaaa2;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.landing-v522-estatisticas-atualizacao {
+  margin: 14px 0 0;
+  color: #7f8d84;
+  font-size: 12px;
+  text-align: right;
 }
 
 .landing-v522-jogos {
@@ -886,7 +943,8 @@
   }
 
   .landing-v522-etapas,
-  .landing-v522-cards {
+  .landing-v522-cards,
+  .landing-v522-estatisticas-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -909,6 +967,7 @@
   .landing-v522-hero,
   .landing-v522-como,
   .landing-v522-diferenciais,
+  .landing-v522-estatisticas,
   .landing-v522-jogos,
   .landing-v522-premios,
   .landing-v522-faq,
@@ -954,6 +1013,7 @@
   .landing-v522-panel-grid,
   .landing-v522-etapas,
   .landing-v522-cards,
+  .landing-v522-estatisticas-grid,
   .landing-v522-jogos-seguintes,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
@@ -966,6 +1026,7 @@
 
   .landing-v522-como,
   .landing-v522-diferenciais,
+  .landing-v522-estatisticas,
   .landing-v522-jogos,
   .landing-v522-faq {
     padding: 44px 0;
@@ -974,6 +1035,10 @@
   .landing-v522-jogo-meta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .landing-v522-estatisticas-atualizacao {
+    text-align: left;
   }
 
   .landing-v522-jogo-meta strong {

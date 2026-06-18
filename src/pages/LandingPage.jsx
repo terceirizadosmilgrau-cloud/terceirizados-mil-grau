@@ -169,6 +169,61 @@ const normalizarProximosJogos = (
       destaque: index === 0,
     }));
 
+const normalizarEstatisticasPublicas = (
+  dados
+) => {
+  if (!dados) return null;
+
+  const camposNumericos = [
+    "totalParticipantes",
+    "palpitesGruposEnviados",
+    "palpitesMataMataEnviados",
+    "jogosMataMataEncerrados",
+    "jogosMataMataConfigurados",
+  ];
+  const numerosValidos =
+    camposNumericos.every(
+      (campo) =>
+        Number.isInteger(dados[campo]) &&
+        dados[campo] >= 0
+    );
+  const dataAtualizacao = new Date(
+    dados.atualizadoEm
+  );
+
+  if (
+    !numerosValidos ||
+    Number.isNaN(
+      dataAtualizacao.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    totalParticipantes:
+      dados.totalParticipantes,
+    palpitesGruposEnviados:
+      dados.palpitesGruposEnviados,
+    palpitesMataMataEnviados:
+      dados.palpitesMataMataEnviados,
+    jogosMataMataEncerrados:
+      dados.jogosMataMataEncerrados,
+    jogosMataMataConfigurados:
+      dados.jogosMataMataConfigurados,
+    atualizadoEm:
+      dataAtualizacao.toLocaleString(
+        "pt-BR",
+        {
+          day: "2-digit",
+          month: "long",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
+  };
+};
+
 const etapas = [
   {
     numero: "01",
@@ -253,6 +308,10 @@ function LandingPage() {
     jogosPublicos,
     setJogosPublicos,
   ] = useState([]);
+  const [
+    estatisticasPublicas,
+    setEstatisticasPublicas,
+  ] = useState(null);
   const [agora, setAgora] = useState(
     () => new Date()
   );
@@ -294,6 +353,35 @@ function LandingPage() {
       };
 
     carregarProximosJogos();
+
+    const carregarEstatisticas =
+      async () => {
+        try {
+          const snapshot = await getDoc(
+            doc(
+              db,
+              "publico",
+              "estatisticas"
+            )
+          );
+
+          if (!ativo) return;
+
+          setEstatisticasPublicas(
+            snapshot.exists()
+              ? normalizarEstatisticasPublicas(
+                  snapshot.data()
+                )
+              : null
+          );
+        } catch {
+          if (ativo) {
+            setEstatisticasPublicas(null);
+          }
+        }
+      };
+
+    carregarEstatisticas();
 
     return () => {
       ativo = false;
@@ -451,6 +539,77 @@ function LandingPage() {
           ))}
         </div>
       </section>
+
+      {estatisticasPublicas && (
+        <section className="landing-v522-estatisticas">
+          <div className="landing-v522-section-head">
+            <span>Bolão em números</span>
+            <h2>A disputa até agora</h2>
+            <p>
+              Números públicos e agregados, atualizados pelo
+              administrador do bolão.
+            </p>
+          </div>
+
+          <div className="landing-v522-estatisticas-grid">
+            <article>
+              <span>Participantes</span>
+              <strong>
+                {
+                  estatisticasPublicas
+                    .totalParticipantes
+                }
+              </strong>
+              <p>Na disputa pelo topo</p>
+            </article>
+
+            <article>
+              <span>Palpites grupos</span>
+              <strong>
+                {
+                  estatisticasPublicas
+                    .palpitesGruposEnviados
+                }
+              </strong>
+              <p>Palpites registrados</p>
+            </article>
+
+            <article>
+              <span>Palpites mata-mata</span>
+              <strong>
+                {
+                  estatisticasPublicas
+                    .palpitesMataMataEnviados
+                }
+              </strong>
+              <p>Palpites preenchidos</p>
+            </article>
+
+            <article>
+              <span>Jogos encerrados</span>
+              <strong>
+                {
+                  estatisticasPublicas
+                    .jogosMataMataEncerrados
+                }{" "}
+                <small>
+                  de{" "}
+                  {
+                    estatisticasPublicas
+                      .jogosMataMataConfigurados
+                  }
+                </small>
+              </strong>
+              <p>No mata-mata</p>
+            </article>
+          </div>
+
+          <p className="landing-v522-estatisticas-atualizacao">
+            Última atualização:{" "}
+            {estatisticasPublicas.atualizadoEm}
+          </p>
+        </section>
+      )}
 
       <section className="landing-v522-jogos">
         <div className="landing-v522-section-head">
