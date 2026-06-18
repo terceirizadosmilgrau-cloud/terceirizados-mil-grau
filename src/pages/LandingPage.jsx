@@ -1,5 +1,13 @@
+import {
+  useEffect,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
-import { proximosJogosPublicos } from "../data/proximosJogosPublicos";
+import {
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "../firebase";
 import "./LandingPage.css";
 
 const nomesFases = {
@@ -144,8 +152,56 @@ const perguntasFrequentes = [
 ];
 
 function LandingPage() {
+  const [
+    jogosPublicos,
+    setJogosPublicos,
+  ] = useState([]);
+
+  useEffect(() => {
+    let ativo = true;
+
+    const carregarProximosJogos =
+      async () => {
+        try {
+          const snapshot = await getDoc(
+            doc(
+              db,
+              "publico",
+              "proximosJogos"
+            )
+          );
+
+          if (!ativo) return;
+
+          const jogos =
+            snapshot.exists() &&
+            Array.isArray(
+              snapshot.data().jogos
+            )
+              ? snapshot.data().jogos
+              : [];
+
+          setJogosPublicos(jogos);
+        } catch (error) {
+          if (ativo) {
+            setJogosPublicos([]);
+            console.error(
+              "Erro ao carregar próximos jogos públicos.",
+              error
+            );
+          }
+        }
+      };
+
+    carregarProximosJogos();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
   const proximosJogos = normalizarProximosJogos(
-    proximosJogosPublicos
+    jogosPublicos
   );
 
   return (

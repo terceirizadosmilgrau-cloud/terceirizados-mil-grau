@@ -9,6 +9,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  writeBatch,
 } from "firebase/firestore";
 
 const fasesMataMata = [
@@ -275,6 +276,24 @@ const prepararConfrontosParaSalvar = (
     return acc;
   }, {});
 
+const criarProjecaoPublica = (
+  jogos = {}
+) =>
+  fasesMataMata.flatMap((fase) =>
+    (jogos[fase.chave] || []).map(
+      (jogo, index) => ({
+        id:
+          jogo.id ||
+          `${fase.chave}-${index + 1}`,
+        fase: fase.chave,
+        timeA: jogo.timeA || "",
+        timeB: jogo.timeB || "",
+        data: jogo.data || "",
+        horario: jogo.horario || "",
+      })
+    )
+  );
+
 const listarClassificadosMataMata = (
   jogos = []
 ) =>
@@ -502,18 +521,29 @@ function Resultados({
             confrontosOficiais
           );
 
-        await setDoc(
-          doc(
-            db,
-            "configuracoes",
-            "mataMata"
-          ),
+        const projecaoPublica =
+          criarProjecaoPublica(
+            jogosOficiais
+          );
+        const batch = writeBatch(db);
+
+        batch.set(
+          doc(db, "configuracoes", "mataMata"),
           {
             jogos: jogosOficiais,
             atualizadoEm:
               new Date().toISOString(),
           }
         );
+
+        batch.set(
+          doc(db, "publico", "proximosJogos"),
+          {
+            jogos: projecaoPublica,
+          }
+        );
+
+        await batch.commit();
 
         const possuiConfrontos =
           existemConfrontosOficiais(
