@@ -1,21 +1,42 @@
 import { Link } from "react-router-dom";
 import "./LandingPage.css";
 
-const cards = [
+const etapas = [
+  {
+    numero: "01",
+    titulo: "Faça seus palpites",
+    texto:
+      "Escolha os resultados dos jogos e avance pelas fases da Copa do Mundo 2026.",
+  },
+  {
+    numero: "02",
+    titulo: "Ganhe pontos",
+    texto:
+      "Acerte placares, resultados, classificados e decisões nos pênaltis para somar pontos.",
+  },
+  {
+    numero: "03",
+    titulo: "Suba no ranking",
+    texto:
+      "Acompanhe sua posição e dispute cada rodada até a grande final.",
+  },
+];
+
+const diferenciais = [
   {
     titulo: "Fase de Grupos",
     texto:
-      "Faça seus palpites por partida e acompanhe cada rodada da fase de grupos.",
+      "Palpites organizados por partida para acompanhar a primeira fase com clareza.",
   },
   {
-    titulo: "Mata-Mata",
+    titulo: "Mata-Mata completo",
     texto:
-      "Acerte placares, classificados e decisões nos pênaltis nos jogos decisivos da Copa.",
+      "Placares, classificados e decisões nos pênaltis reunidos nos confrontos decisivos.",
   },
   {
-    titulo: "Ranking",
+    titulo: "Ranking atualizado",
     texto:
-      "Acompanhe sua posição e dispute cada rodada até a grande final.",
+      "Classificação geral e desempenho no mata-mata para acompanhar a disputa rodada a rodada.",
   },
   {
     titulo: "Comparação",
@@ -23,9 +44,9 @@ const cards = [
       "Compare palpites lado a lado e descubra onde cada participante fez escolhas diferentes.",
   },
   {
-    titulo: "Premiação",
+    titulo: "Disputa transparente",
     texto:
-      "Consulte a divisão dos prêmios e acompanhe uma disputa transparente até o fim.",
+      "Regras, pontuação e divisão dos prêmios apresentadas de forma simples e objetiva.",
   },
 ];
 
@@ -38,7 +59,7 @@ const beneficios = [
 
 function LandingPage() {
   return (
-    <main className="landing-v522">
+    <main className="landing-v522" id="inicio">
       <header className="landing-v522-header">
         <Link className="landing-v522-brand" to="/">
           <span className="landing-v522-brand-badge">2026</span>
@@ -46,7 +67,7 @@ function LandingPage() {
         </Link>
 
         <nav className="landing-v522-nav">
-          <Link to="/">Início</Link>
+          <a href="#inicio">Início</a>
           <a href="#como-funciona">Como Funciona</a>
           <Link to="/regras">Regras</Link>
           <a href="#premiacao">Premiação</a>
@@ -142,15 +163,47 @@ function LandingPage() {
       </section>
 
       <section
-        className="landing-v522-cards"
+        className="landing-v522-como"
         id="como-funciona"
       >
-        {cards.map((card) => (
-          <article key={card.titulo}>
-            <h2>{card.titulo}</h2>
-            <p>{card.texto}</p>
-          </article>
-        ))}
+        <div className="landing-v522-section-head">
+          <span>Como funciona</span>
+          <h2>Entre na disputa em três passos</h2>
+          <p>
+            Crie sua conta, registre seus palpites e acompanhe
+            sua evolução durante toda a Copa do Mundo 2026.
+          </p>
+        </div>
+
+        <div className="landing-v522-etapas">
+          {etapas.map((etapa) => (
+            <article key={etapa.numero}>
+              <span>{etapa.numero}</span>
+              <h3>{etapa.titulo}</h3>
+              <p>{etapa.texto}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-v522-diferenciais">
+        <div className="landing-v522-section-head">
+          <span>Diferenciais do bolão</span>
+          <h2>Uma experiência completa do primeiro palpite à final</h2>
+          <p>
+            Tudo o que você precisa para competir, acompanhar
+            seus resultados e viver cada rodada com mais emoção.
+          </p>
+        </div>
+
+        <div className="landing-v522-cards">
+          {diferenciais.map((diferencial) => (
+            <article key={diferencial.titulo}>
+              <h3>{diferencial.titulo}</h3>
+              <p>{diferencial.texto}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section
@@ -162,9 +215,12 @@ function LandingPage() {
           <h2>Premiação do bolão</h2>
           <p>
             Os melhores participantes serão premiados ao final
-            da competição. Quanto maior a disputa, maior a
-            emoção até a final.
+            da competição, conforme a divisão da arrecadação
+            apresentada ao lado.
           </p>
+          <strong>
+            Quanto maior a disputa, maior a emoção até a final.
+          </strong>
         </div>
 
         <div className="landing-v522-premios-grid">
@@ -185,6 +241,43 @@ function LandingPage() {
           </article>
         </div>
       </section>
+
+      <section className="landing-v522-final">
+        <div>
+          <span>Pronto para competir?</span>
+          <h2>Faça seu palpite e entre na disputa pelo topo.</h2>
+          <p>
+            Crie sua conta para participar ou entre para
+            acompanhar seus palpites e sua posição no ranking.
+          </p>
+        </div>
+
+        <div className="landing-v522-final-actions">
+          <Link
+            className="landing-v522-primary"
+            to="/cadastro"
+          >
+            Criar conta
+          </Link>
+          <Link
+            className="landing-v522-secondary"
+            to="/login"
+          >
+            Entrar
+          </Link>
+        </div>
+      </section>
+
+      <footer className="landing-v522-footer">
+        <Link className="landing-v522-brand" to="/">
+          <span className="landing-v522-brand-badge">2026</span>
+          <span>Terceirizados Mil Grau</span>
+        </Link>
+        <p>
+          © 2026 Terceirizados Mil Grau. Todos os direitos
+          reservados.
+        </p>
+      </footer>
     </main>
   );
 }

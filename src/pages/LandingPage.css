@@ -19,10 +19,18 @@
 
 .landing-v522-header,
 .landing-v522-hero,
-.landing-v522-cards,
-.landing-v522-premios {
+.landing-v522-como,
+.landing-v522-diferenciais,
+.landing-v522-premios,
+.landing-v522-final,
+.landing-v522-footer {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
+}
+
+.landing-v522-como,
+.landing-v522-premios {
+  scroll-margin-top: 24px;
 }
 
 .landing-v522-header {
@@ -298,8 +306,96 @@
   line-height: 1.25;
 }
 
+.landing-v522-como,
+.landing-v522-diferenciais {
+  padding: 58px 0;
+}
+
+.landing-v522-como {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.landing-v522-section-head {
+  max-width: 720px;
+}
+
+.landing-v522-section-head > span,
+.landing-v522-final > div > span {
+  display: block;
+  color: #73e694;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.landing-v522-section-head h2,
+.landing-v522-final h2 {
+  margin: 8px 0 0;
+  color: #fff;
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.16;
+}
+
+.landing-v522-section-head p,
+.landing-v522-final p {
+  margin: 12px 0 0;
+  color: #c9d3cd;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.landing-v522-etapas {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.landing-v522-etapas article {
+  min-width: 0;
+  min-height: 210px;
+  padding: 24px;
+  border: 1px solid rgba(50, 208, 94, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(10, 40, 20, 0.72), rgba(7, 20, 11, 0.82));
+}
+
+.landing-v522-etapas article > span {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #111;
+  background: #ffc107;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.landing-v522-etapas h3,
+.landing-v522-cards h3 {
+  margin: 20px 0 0;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.landing-v522-etapas p {
+  margin: 10px 0 0;
+  color: #c9d3cd;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.landing-v522-diferenciais {
+  padding-top: 26px;
+}
+
 .landing-v522-cards {
-  padding: 18px 0 32px;
+  margin-top: 28px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
@@ -314,22 +410,21 @@
   background: rgba(255, 255, 255, 0.055);
 }
 
-.landing-v522-cards h2 {
-  margin: 0 0 9px;
-  color: #fff;
-  font-size: 19px;
-  line-height: 1.2;
+.landing-v522-cards h3 {
+  margin-top: 0;
+  font-size: 18px;
 }
 
 .landing-v522-cards p {
-  margin: 0;
+  margin: 10px 0 0;
   color: #c9d3cd;
   font-size: 14px;
   line-height: 1.48;
 }
 
 .landing-v522-premios {
-  margin-bottom: 46px;
+  margin-top: 12px;
+  margin-bottom: 28px;
   padding: 24px;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
@@ -351,6 +446,14 @@
   margin: 8px 0 0;
   color: #cbd4ce;
   line-height: 1.4;
+}
+
+.landing-v522-premios-copy > strong {
+  display: block;
+  margin-top: 14px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .landing-v522-premios-grid {
@@ -381,6 +484,48 @@
   line-height: 1;
 }
 
+.landing-v522-final {
+  margin-bottom: 28px;
+  padding: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border: 1px solid rgba(255, 193, 7, 0.28);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 193, 7, 0.12), transparent 34%),
+    rgba(255, 255, 255, 0.045);
+}
+
+.landing-v522-final > div:first-child {
+  max-width: 720px;
+}
+
+.landing-v522-final-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 12px;
+}
+
+.landing-v522-footer {
+  min-height: 96px;
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.landing-v522-footer p {
+  margin: 0;
+  color: #9eaaa2;
+  font-size: 13px;
+  text-align: right;
+}
+
 @media (max-width: 1080px) {
   .landing-v522-header {
     grid-template-columns: 1fr;
@@ -405,6 +550,7 @@
     max-width: 720px;
   }
 
+  .landing-v522-etapas,
   .landing-v522-cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -412,18 +558,27 @@
   .landing-v522-premios {
     grid-template-columns: 1fr;
   }
+
+  .landing-v522-final {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 720px) {
   .landing-v522-header,
   .landing-v522-hero,
-  .landing-v522-cards,
-  .landing-v522-premios {
+  .landing-v522-como,
+  .landing-v522-diferenciais,
+  .landing-v522-premios,
+  .landing-v522-final,
+  .landing-v522-footer {
     width: min(100% - 24px, 620px);
   }
 
   .landing-v522-header-actions,
-  .landing-v522-actions {
+  .landing-v522-actions,
+  .landing-v522-final-actions {
     width: 100%;
     align-items: stretch;
     flex-direction: column;
@@ -439,7 +594,7 @@
   .landing-v522-nav {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .landing-v522-nav a {
@@ -456,13 +611,33 @@
   }
 
   .landing-v522-panel-grid,
+  .landing-v522-etapas,
   .landing-v522-cards,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
   }
 
+  .landing-v522-etapas article,
   .landing-v522-cards article {
     min-height: auto;
+  }
+
+  .landing-v522-como,
+  .landing-v522-diferenciais {
+    padding: 44px 0;
+  }
+
+  .landing-v522-final {
+    padding: 24px;
+  }
+
+  .landing-v522-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .landing-v522-footer p {
+    text-align: left;
   }
 }
 
