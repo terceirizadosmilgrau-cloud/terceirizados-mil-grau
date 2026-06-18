@@ -5,27 +5,27 @@ const cards = [
   {
     titulo: "Fase de Grupos",
     texto:
-      "Organize seus palpites por partida e acompanhe a primeira fase com uma visão clara da disputa.",
+      "Faça seus palpites por partida e acompanhe cada rodada da fase de grupos.",
   },
   {
     titulo: "Mata-Mata",
     texto:
-      "Registre placares, classificados e campeão nos confrontos mais decisivos do bolão.",
+      "Acerte placares, classificados e decisões nos pênaltis nos jogos decisivos da Copa.",
   },
   {
     titulo: "Ranking",
     texto:
-      "Acompanhe a classificação oficial e veja a briga pelo topo evoluir rodada a rodada.",
+      "Acompanhe sua posição e dispute cada rodada até a grande final.",
   },
   {
     titulo: "Comparação",
     texto:
-      "Compare palpites lado a lado e entenda onde cada participante arriscou diferente.",
+      "Compare palpites lado a lado e descubra onde cada participante fez escolhas diferentes.",
   },
   {
     titulo: "Premiação",
     texto:
-      "Consulte a divisão dos prêmios e mantenha a disputa transparente até o fim.",
+      "Consulte a divisão dos prêmios e acompanhe uma disputa transparente até o fim.",
   },
 ];
 
@@ -76,8 +76,9 @@ function LandingPage() {
           </h1>
 
           <p className="landing-v522-lead">
-            Registre seus palpites, acompanhe o ranking e veja
-            quem manda melhor na fase de grupos e no mata-mata.
+            Faça seus palpites da Copa do Mundo 2026,
+            acompanhe sua pontuação e dispute o topo do ranking
+            do Terceirizados Mil Grau.
           </p>
 
           <div className="landing-v522-actions">
@@ -97,7 +98,7 @@ function LandingPage() {
 
           <div className="landing-v522-trust">
             <span>Acesso seguro</span>
-            <span>Ranking atualizado</span>
+            <span>Pontuação atualizada</span>
             <span>Disputa entre amigos</span>
           </div>
         </div>
@@ -109,9 +110,9 @@ function LandingPage() {
           <div className="landing-v522-panel-head">
             <div>
               <span>Painel do Participante</span>
-              <strong>Controle completo do bolao</strong>
+              <strong>Controle completo do bolão</strong>
             </div>
-            <em>publico</em>
+            <em>público</em>
           </div>
 
           <div className="landing-v522-panel-grid">
@@ -126,15 +127,15 @@ function LandingPage() {
           <div className="landing-v522-panel-note">
             <div>
               <span>Fase de grupos</span>
-              <strong>Palpites organizados por jogo</strong>
+              <strong>Palpites organizados por partida</strong>
             </div>
             <div>
               <span>Mata-Mata</span>
-              <strong>Confrontos e campeao em um so lugar</strong>
+              <strong>Confrontos e campeão em um só lugar</strong>
             </div>
             <div>
               <span>Disputa</span>
-              <strong>Ranking, comparacao e premiacao</strong>
+              <strong>Ranking, comparação e premiação</strong>
             </div>
           </div>
         </aside>
@@ -158,28 +159,29 @@ function LandingPage() {
       >
         <div className="landing-v522-premios-copy">
           <span>Copa do Mundo 2026</span>
-          <h2>Premiacao do bolao</h2>
+          <h2>Premiação do bolão</h2>
           <p>
-            A premiacao e calculada automaticamente com base
-            no total arrecadado pelos participantes.
+            Os melhores participantes serão premiados ao final
+            da competição. Quanto maior a disputa, maior a
+            emoção até a final.
           </p>
         </div>
 
         <div className="landing-v522-premios-grid">
           <article>
-            <span>1o Lugar</span>
+            <span>🥇 1º Lugar</span>
             <strong>50%</strong>
-            <p>da arrecadacao</p>
+            <p>da arrecadação</p>
           </article>
           <article>
-            <span>2o Lugar</span>
+            <span>🥈 2º Lugar</span>
             <strong>30%</strong>
-            <p>da arrecadacao</p>
+            <p>da arrecadação</p>
           </article>
           <article>
-            <span>3o Lugar</span>
+            <span>🥉 3º Lugar</span>
             <strong>20%</strong>
-            <p>da arrecadacao</p>
+            <p>da arrecadação</p>
           </article>
         </div>
       </section>
