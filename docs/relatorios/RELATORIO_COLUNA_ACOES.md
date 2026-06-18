@@ -1,490 +1,135 @@
-# Relatorio - Coluna Acoes Vazia
+# Relatório — Coluna Ações
 
 Projeto: Terceirizados Mil Grau
 
-Data da auditoria: 2026-06-15
+Auditoria original: 15/06/2026
 
-Objetivo: verificar por que a coluna "Acoes" da tabela de participantes pode aparecer vazia.
+Revisão documental: 18/06/2026
 
-Importante: nenhum codigo da aplicacao foi alterado nesta auditoria. Este arquivo e apenas um relatorio.
-
----
-
-## Resumo da causa mais provavel
-
-A coluna "Acoes" fica vazia quando estas duas variaveis chegam como `false` dentro de `ParticipantesTable`:
-
-```js
-isAdmin
-isSuperAdmin
-```
-
-No componente `ParticipantesTable`, todos os botoes da coluna "Acoes" estao dentro deste bloco:
-
-```js
-{(isAdmin || isSuperAdmin) && (
-  <>
-    ...
-  </>
-)}
-```
-
-Ou seja:
-
-- Se `isAdmin` for `false`
-- E `isSuperAdmin` for `false`
-
-Entao nenhum botao aparece.
+Versão de referência: V52.3
 
 ---
 
-## 1. Onde `isAdmin` e calculado
+## Status
 
-Arquivo:
+Problema histórico encerrado.
 
-`src/pages/Dashboard.jsx`
+A coluna **Ações** da lista de participantes segue as permissões do usuário autenticado. Uma coluna sem controles para participante comum é comportamento esperado, não erro.
 
-Trecho:
+---
+
+## Regra atual
+
+O Dashboard calcula:
 
 ```js
 const isAdmin =
   usuario?.tipoUsuario === "admin";
-```
 
-Conclusao:
-
-`isAdmin` depende de `usuario.tipoUsuario`.
-
-Para `isAdmin` ser `true`, o objeto `usuario` precisa estar assim:
-
-```js
-{
-  tipoUsuario: "admin"
-}
-```
-
-Se `usuario.tipoUsuario` vier `undefined`, `"participante"`, `"superadmin"` ou qualquer outro valor, `isAdmin` sera `false`.
-
----
-
-## 2. Onde `isSuperAdmin` e calculado
-
-### Em `Dashboard.jsx`
-
-Arquivo:
-
-`src/pages/Dashboard.jsx`
-
-Trecho:
-
-```js
 const isSuperAdmin =
-  usuario?.email === "ardcost4@icloud.com";
+  usuario?.tipoUsuario === "superadmin";
 ```
 
-Conclusao:
+Esses valores são enviados para:
 
-Dentro do Dashboard, SuperAdmin depende apenas do e-mail.
-
-Para `isSuperAdmin` ser `true`, o usuario logado precisa ter exatamente:
-
-```js
-email: "ardcost4@icloud.com"
+```text
+src/components/admin/ParticipantesTable.jsx
 ```
 
-### Em `App.jsx`
-
-Arquivo:
-
-`src/App.jsx`
-
-Trecho:
-
-```js
-const isSuperAdmin =
-  usuario?.email === "ardcost4@icloud.com";
-```
-
-Conclusao:
-
-O App tambem usa o mesmo criterio por e-mail para liberar telas exclusivas como:
-
-- Central de Palpites
-- Central Mata-Mata
-- Resultados Oficiais
-
----
-
-## 3. Onde `ParticipantesTable` e chamado
-
-Arquivo:
-
-`src/pages/Dashboard.jsx`
-
-O componente e importado no topo:
-
-```js
-import ParticipantesTable from "../components/admin/ParticipantesTable";
-```
-
-E e chamado no final do JSX do Dashboard.
-
----
-
-## 4. Quais props sao enviadas para `ParticipantesTable`
-
-Arquivo:
-
-`src/pages/Dashboard.jsx`
-
-Props enviadas:
-
-```js
-participantes={participantesFiltrados}
-isSuperAdmin={isSuperAdmin}
-isAdmin={isAdmin}
-confirmarPagamento={confirmarPagamento}
-tornarAdmin={tornarAdmin}
-removerAdmin={removerAdmin}
-excluirParticipante={excluirParticipante}
-```
-
-Conclusao:
-
-A chamada esta enviando as props esperadas.
-
-Nao ha erro aparente de nome de prop entre `Dashboard.jsx` e `ParticipantesTable.jsx`.
-
----
-
-## 5. Quais props `ParticipantesTable` espera receber
-
-Arquivo:
-
-`src/components/admin/ParticipantesTable.jsx`
-
-Assinatura do componente:
-
-```js
-function ParticipantesTable({
-  participantes,
-  isSuperAdmin,
-  isAdmin,
-  confirmarPagamento,
-  tornarAdmin,
-  removerAdmin,
-  excluirParticipante,
-}) {
-```
-
-Props esperadas:
-
-- `participantes`
-- `isSuperAdmin`
-- `isAdmin`
-- `confirmarPagamento`
-- `tornarAdmin`
-- `removerAdmin`
-- `excluirParticipante`
-
-Conclusao:
-
-As props esperadas batem com as props enviadas pelo Dashboard.
-
----
-
-## 6. Codigo completo da chamada de `ParticipantesTable`
-
-Arquivo:
-
-`src/pages/Dashboard.jsx`
-
-Codigo:
-
-```jsx
-<ParticipantesTable
-  participantes={
-    participantesFiltrados
-  }
-  isSuperAdmin={isSuperAdmin}
-  isAdmin={isAdmin}
-  confirmarPagamento={confirmarPagamento}
-  tornarAdmin={tornarAdmin}
-  removerAdmin={removerAdmin}
-  excluirParticipante={excluirParticipante}
-/>
-```
-
-Analise:
-
-A chamada esta correta.
-
-Se a coluna "Acoes" esta vazia, o problema provavelmente nao esta na chamada do componente, mas nos valores calculados de:
-
-```js
-isAdmin
-isSuperAdmin
-```
-
----
-
-## 7. Codigo completo do bloco da coluna "Acoes"
-
-Arquivo:
-
-`src/components/admin/ParticipantesTable.jsx`
-
-Codigo:
-
-```jsx
-<td style={td}>
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "6px",
-      minWidth: "120px",
-    }}
-  >
-    {(isAdmin || isSuperAdmin) && (
-      <>
-        {!p.pagamento && (
-          <button
-            style={botaoVerde}
-            onClick={() =>
-              confirmarPagamento(
-                p.id,
-                true
-              )
-            }
-          >
-            Confirmar
-          </button>
-        )}
-
-        {p.pagamento && (
-          <button
-            style={botaoLaranja}
-            onClick={() =>
-              confirmarPagamento(
-                p.id,
-                false
-              )
-            }
-          >
-            Pendente
-          </button>
-        )}
-
-        {isSuperAdmin &&
-          p.tipoUsuario ===
-            "participante" && (
-            <button
-              style={botaoAzul}
-              onClick={() =>
-                tornarAdmin(p.id)
-              }
-            >
-              Tornar Admin
-            </button>
-          )}
-
-        {isSuperAdmin &&
-          p.tipoUsuario ===
-            "admin" && (
-            <button
-              style={botaoVermelho}
-              onClick={() =>
-                removerAdmin(p.id)
-              }
-            >
-              Remover Admin
-            </button>
-          )}
-
-        {isSuperAdmin &&
-          p.tipoUsuario !==
-            "superadmin" && (
-            <button
-              style={botaoExcluir}
-              onClick={() =>
-                excluirParticipante(
-                  p.id,
-                  p.nome
-                )
-              }
-            >
-              Excluir
-            </button>
-          )}
-      </>
-    )}
-  </div>
-</td>
-```
-
-Observacao:
-
-No arquivo real existem alguns emojis e caracteres com encoding quebrado, mas isso nao muda a logica da permissao.
-
----
-
-## Como a coluna "Acoes" decide o que mostrar
-
-### Para participante comum
-
-Se:
-
-```js
-isAdmin === false
-isSuperAdmin === false
-```
-
-Resultado:
-
-Nenhum botao aparece.
-
-A coluna fica vazia.
-
-### Para Admin
-
-Se:
-
-```js
-isAdmin === true
-isSuperAdmin === false
-```
-
-Resultado:
-
-Aparecem apenas botoes de pagamento:
-
-- Confirmar
-- Pendente
-
-Nao aparecem:
-
-- Tornar Admin
-- Remover Admin
-- Excluir
-
-Porque essas acoes dependem especificamente de `isSuperAdmin`.
-
-### Para SuperAdmin
-
-Se:
-
-```js
-isSuperAdmin === true
-```
-
-Resultado:
-
-Aparecem:
-
-- Confirmar ou Pendente
-- Tornar Admin, quando o usuario da linha e participante
-- Remover Admin, quando o usuario da linha e admin
-- Excluir, quando o usuario da linha nao e superadmin
-
----
-
-## Diagnostico principal
-
-A coluna "Acoes" esta vazia porque o bloco que renderiza os botoes depende de:
+As ações de pagamento são exibidas quando:
 
 ```js
 isAdmin || isSuperAdmin
 ```
 
-Se nenhum dos dois for verdadeiro, o React renderiza o `<td>` e a `<div>`, mas nao renderiza nenhum botao dentro.
-
-Entao a investigacao deve focar nestes pontos:
-
-1. O usuario logado realmente tem `tipoUsuario: "admin"` no Firestore?
-2. O login realmente carregou `tipoUsuario` para dentro do objeto `usuario`?
-3. O usuario promovido a Admin saiu e entrou novamente depois da promocao?
-4. O e-mail do SuperAdmin e exatamente `ardcost4@icloud.com`?
-
----
-
-## Pontos especificos encontrados
-
-### A chamada de `ParticipantesTable` esta correta
-
-O Dashboard envia:
+As ações de promover, remover Admin e excluir são exibidas somente quando:
 
 ```js
-isAdmin={isAdmin}
-isSuperAdmin={isSuperAdmin}
-```
-
-E a tabela espera:
-
-```js
-isAdmin,
-isSuperAdmin,
-```
-
-Nao ha divergencia de nomes.
-
-### O Admin depende de `usuario.tipoUsuario`
-
-Se o objeto `usuario` nao contiver `tipoUsuario`, o Admin nao recebe botoes.
-
-Esse era o problema investigado anteriormente: o Firebase Auth sozinho nao traz `tipoUsuario`; esse campo precisa vir do Firestore.
-
-### SuperAdmin nao depende de `tipoUsuario`
-
-Mesmo que um documento no Firestore tenha:
-
-```js
-tipoUsuario: "superadmin"
-```
-
-isso nao torna o usuario SuperAdmin no Dashboard.
-
-O SuperAdmin depende exclusivamente do e-mail:
-
-```js
-usuario?.email === "ardcost4@icloud.com"
+isSuperAdmin
 ```
 
 ---
 
-## Conclusao
+## O que cada perfil visualiza
 
-A coluna "Acoes" fica vazia quando o usuario logado nao e reconhecido nem como Admin nem como SuperAdmin.
+### Participante
 
-O codigo da chamada de `ParticipantesTable` esta consistente com as props esperadas.
+Não visualiza botões administrativos.
 
-O ponto mais sensivel e o calculo:
+### Admin
+
+Visualiza:
+
+- Confirmar pagamento;
+- Marcar pagamento como pendente.
+
+Não visualiza:
+
+- Tornar Admin;
+- Remover Admin;
+- Excluir participante.
+
+### SuperAdmin
+
+Visualiza:
+
+- ações de pagamento;
+- Tornar Admin para participantes;
+- Remover Admin para contas Admin;
+- Excluir contas que não sejam SuperAdmin.
+
+---
+
+## Diferença importante
+
+O perfil mostrado em uma linha usa:
 
 ```js
-const isAdmin =
-  usuario?.tipoUsuario === "admin";
+p.tipoUsuario
 ```
 
-Se `usuario.tipoUsuario` nao estiver carregado no momento em que o Dashboard renderiza, `isAdmin` sera `false` e a coluna "Acoes" ficara vazia para esse usuario.
+Esse valor pertence ao participante listado.
 
-Status:
-
-- Chamada de `ParticipantesTable`: correta.
-- Props enviadas: corretas.
-- Props esperadas: corretas.
-- Bloco da coluna "Acoes": depende corretamente de `isAdmin || isSuperAdmin`.
-- Causa mais provavel da coluna vazia: `isAdmin` e `isSuperAdmin` estao ambos `false`.
-
-Arquivo principal para verificar em runtime:
-
-`src/pages/Dashboard.jsx`
-
-Variaveis criticas:
+As ações disponíveis usam:
 
 ```js
-usuario
-usuario?.tipoUsuario
-usuario?.email
 isAdmin
 isSuperAdmin
 ```
+
+Esses valores pertencem ao usuário autenticado.
+
+Portanto, uma linha mostrar “Admin” não significa que o usuário atualmente conectado tenha permissão administrativa.
+
+---
+
+## Correções consolidadas
+
+Desde a investigação original:
+
+- o SuperAdmin deixou de depender de e-mail hardcoded;
+- `tipoUsuario` tornou-se a fonte única de perfil;
+- o usuário autenticado passou a ser sincronizado com `usuarios/{uid}` por `onSnapshot`;
+- `firestore.rules` passou a estar versionado e a validar as permissões;
+- os logs temporários de diagnóstico foram removidos;
+- a tabela possui apresentação desktop e cards mobile com as mesmas regras de autorização.
+
+---
+
+## Checklist em caso de regressão
+
+1. Confirmar o `uid` da conta autenticada.
+2. Verificar `usuarios/{uid}.tipoUsuario`.
+3. Confirmar que o valor é exatamente `participante`, `admin` ou `superadmin`.
+4. Verificar os valores de `isAdmin` e `isSuperAdmin` no Dashboard.
+5. Confirmar que as props chegam à `ParticipantesTable`.
+6. Testar a tabela desktop e os cards mobile.
+7. Confirmar que o Firestore aceita somente a operação correspondente ao perfil.
+
+---
+
+## Conclusão
+
+A renderização da coluna **Ações** está coerente com o modelo atual de permissões. O diagnóstico antigo de SuperAdmin por e-mail e perfil desatualizado não corresponde ao código da V52.3.
+
+Este arquivo permanece como documentação de comportamento e roteiro para investigar uma possível regressão futura.
