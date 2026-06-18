@@ -1,5 +1,68 @@
 import { Link } from "react-router-dom";
+import { proximosJogosPublicos } from "../data/proximosJogosPublicos";
 import "./LandingPage.css";
+
+const nomesFases = {
+  oitavas: "Oitavas de final",
+  quartas: "Quartas de final",
+  semifinal: "Semifinal",
+  final: "Final",
+};
+
+const criarDataJogo = (data, horario) => {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(data) ||
+    !/^\d{2}:\d{2}$/.test(horario)
+  ) {
+    return null;
+  }
+
+  const dataJogo = new Date(`${data}T${horario}:00`);
+
+  return Number.isNaN(dataJogo.getTime())
+    ? null
+    : dataJogo;
+};
+
+const normalizarProximosJogos = (jogos = []) =>
+  jogos
+    .map((jogo) => {
+      const dataJogo = criarDataJogo(
+        jogo.data,
+        jogo.horario
+      );
+
+      if (
+        !jogo.id ||
+        !jogo.fase ||
+        !jogo.timeA?.trim() ||
+        !jogo.timeB?.trim() ||
+        !dataJogo
+      ) {
+        return null;
+      }
+
+      return {
+        ...jogo,
+        faseFormatada:
+          nomesFases[jogo.fase] || jogo.fase,
+        dataFormatada: new Intl.DateTimeFormat(
+          "pt-BR",
+          {
+            day: "2-digit",
+            month: "long",
+          }
+        ).format(dataJogo),
+        horarioFormatado: jogo.horario,
+        dataJogo,
+      };
+    })
+    .filter(Boolean)
+    .sort(
+      (jogoA, jogoB) =>
+        jogoA.dataJogo - jogoB.dataJogo
+    )
+    .slice(0, 4);
 
 const etapas = [
   {
@@ -81,6 +144,10 @@ const perguntasFrequentes = [
 ];
 
 function LandingPage() {
+  const proximosJogos = normalizarProximosJogos(
+    proximosJogosPublicos
+  );
+
   return (
     <main className="landing-v522" id="inicio">
       <header className="landing-v522-header">
@@ -212,6 +279,53 @@ function LandingPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="landing-v522-jogos">
+        <div className="landing-v522-section-head">
+          <span>Agenda da Copa</span>
+          <h2>Próximos jogos</h2>
+          <p>
+            Acompanhe os próximos confrontos publicados pelo
+            bolão.
+          </p>
+        </div>
+
+        {proximosJogos.length > 0 ? (
+          <div className="landing-v522-jogos-grid">
+            {proximosJogos.map((jogo) => (
+              <article key={jogo.id}>
+                <div className="landing-v522-jogo-meta">
+                  <span>{jogo.faseFormatada}</span>
+                  <strong>
+                    {jogo.dataFormatada} •{" "}
+                    {jogo.horarioFormatado}
+                  </strong>
+                </div>
+
+                <div className="landing-v522-confronto">
+                  <strong>{jogo.timeA}</strong>
+                  <span aria-hidden="true">×</span>
+                  <strong>{jogo.timeB}</strong>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="landing-v522-jogos-vazio">
+            <span aria-hidden="true">2026</span>
+            <div>
+              <strong>
+                Os próximos confrontos serão divulgados em
+                breve.
+              </strong>
+              <p>
+                Assim que a agenda oficial estiver definida,
+                os jogos aparecerão aqui.
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       <section

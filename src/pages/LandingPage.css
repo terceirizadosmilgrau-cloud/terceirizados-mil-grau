@@ -21,6 +21,7 @@
 .landing-v522-hero,
 .landing-v522-como,
 .landing-v522-diferenciais,
+.landing-v522-jogos,
 .landing-v522-premios,
 .landing-v522-faq,
 .landing-v522-final,
@@ -423,6 +424,121 @@
   line-height: 1.48;
 }
 
+.landing-v522-jogos {
+  padding: 26px 0 58px;
+}
+
+.landing-v522-jogos-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landing-v522-jogos-grid article,
+.landing-v522-jogos-vazio {
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(25, 27, 17, 0.86), rgba(10, 18, 12, 0.9));
+}
+
+.landing-v522-jogos-grid article {
+  min-width: 0;
+  padding: 20px;
+}
+
+.landing-v522-jogo-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.landing-v522-jogo-meta span {
+  color: #73e694;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.landing-v522-jogo-meta strong {
+  color: #c9d3cd;
+  font-size: 13px;
+  text-align: right;
+}
+
+.landing-v522-confronto {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.landing-v522-confronto strong {
+  min-width: 0;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.landing-v522-confronto strong:last-child {
+  text-align: right;
+}
+
+.landing-v522-confronto span {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #111;
+  background: #ffc107;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.landing-v522-jogos-vazio {
+  margin-top: 28px;
+  min-height: 150px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.landing-v522-jogos-vazio > span {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 193, 7, 0.56);
+  border-radius: 8px;
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.08);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.landing-v522-jogos-vazio strong {
+  display: block;
+  color: #fff;
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.landing-v522-jogos-vazio p {
+  margin: 8px 0 0;
+  color: #c9d3cd;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .landing-v522-premios {
   margin-top: 12px;
   margin-bottom: 28px;
@@ -649,6 +765,7 @@
   .landing-v522-hero,
   .landing-v522-como,
   .landing-v522-diferenciais,
+  .landing-v522-jogos,
   .landing-v522-premios,
   .landing-v522-faq,
   .landing-v522-final,
@@ -693,6 +810,7 @@
   .landing-v522-panel-grid,
   .landing-v522-etapas,
   .landing-v522-cards,
+  .landing-v522-jogos-grid,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
   }
@@ -704,8 +822,23 @@
 
   .landing-v522-como,
   .landing-v522-diferenciais,
+  .landing-v522-jogos,
   .landing-v522-faq {
     padding: 44px 0;
+  }
+
+  .landing-v522-jogo-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .landing-v522-jogo-meta strong {
+    text-align: left;
+  }
+
+  .landing-v522-jogos-vazio {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .landing-v522-final {
