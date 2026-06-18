@@ -729,10 +729,10 @@ function LandingPage() {
         <section className="landing-v522-ranking-publico">
           <div className="landing-v522-section-head">
             <span>Pódio atual</span>
-            <h2>Quem está no topo</h2>
+            <h2>Pódio Atual</h2>
             <p>
-              As primeiras posições do ranking geral,
-              publicadas pelo administrador do bolão.
+              Confira os participantes que ocupam as primeiras
+              posições do ranking geral.
             </p>
           </div>
 
@@ -744,8 +744,12 @@ function LandingPage() {
                     key={participante.posicao}
                     className={`landing-v522-podio-posicao-${participante.posicao}`}
                   >
-                    <span>
-                      {participante.posicao}º lugar
+                    <span className="landing-v522-podio-selo">
+                      {participante.posicao === 1
+                        ? "👑 LÍDER ATUAL"
+                        : participante.posicao === 2
+                          ? "🥈 VICE-LÍDER"
+                          : "🥉 TERCEIRO LUGAR"}
                     </span>
                     <strong>
                       {participante.nomeExibicao}

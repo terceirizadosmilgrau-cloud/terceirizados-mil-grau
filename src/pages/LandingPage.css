@@ -489,7 +489,7 @@
 .landing-v522-podio-grid {
   margin-top: 28px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -511,7 +511,6 @@
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .landing-v522-podio-grid article strong {
@@ -523,6 +522,10 @@
 }
 
 .landing-v522-podio-posicao-1 {
+  min-height: 156px !important;
+  grid-column: 1 / -1;
+  align-items: center !important;
+  text-align: center;
   border-color: rgba(255, 193, 7, 0.5) !important;
   background:
     linear-gradient(180deg, rgba(55, 44, 8, 0.72), rgba(21, 19, 9, 0.88)) !important;
@@ -530,6 +533,18 @@
 
 .landing-v522-podio-posicao-1 > span {
   color: #ffd76a;
+}
+
+.landing-v522-podio-posicao-1 strong {
+  font-size: clamp(26px, 4vw, 34px) !important;
+}
+
+.landing-v522-podio-posicao-2 {
+  grid-column: 1 / 2;
+}
+
+.landing-v522-podio-posicao-3 {
+  grid-column: 2 / 3;
 }
 
 .landing-v522-podio-posicao-2 > span {
@@ -1094,6 +1109,16 @@
   .landing-v522-jogos-seguintes,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
+  }
+
+  .landing-v522-podio-posicao-1,
+  .landing-v522-podio-posicao-2,
+  .landing-v522-podio-posicao-3 {
+    grid-column: 1;
+  }
+
+  .landing-v522-podio-posicao-1 {
+    min-height: 140px !important;
   }
 
   .landing-v522-etapas article,
