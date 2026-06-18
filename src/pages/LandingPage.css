@@ -22,6 +22,7 @@
 .landing-v522-como,
 .landing-v522-diferenciais,
 .landing-v522-estatisticas,
+.landing-v522-ranking-publico,
 .landing-v522-jogos,
 .landing-v522-premios,
 .landing-v522-faq,
@@ -475,6 +476,80 @@
 }
 
 .landing-v522-estatisticas-atualizacao {
+  margin: 14px 0 0;
+  color: #7f8d84;
+  font-size: 12px;
+  text-align: right;
+}
+
+.landing-v522-ranking-publico {
+  padding: 32px 0 40px;
+}
+
+.landing-v522-podio-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landing-v522-podio-grid article {
+  min-width: 0;
+  min-height: 128px;
+  padding: 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.landing-v522-podio-grid article > span {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.landing-v522-podio-grid article strong {
+  max-width: 100%;
+  color: #fff;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.landing-v522-podio-posicao-1 {
+  border-color: rgba(255, 193, 7, 0.5) !important;
+  background:
+    linear-gradient(180deg, rgba(55, 44, 8, 0.72), rgba(21, 19, 9, 0.88)) !important;
+}
+
+.landing-v522-podio-posicao-1 > span {
+  color: #ffd76a;
+}
+
+.landing-v522-podio-posicao-2 > span {
+  color: #d9e0e8;
+}
+
+.landing-v522-podio-posicao-3 > span {
+  color: #e0a66c;
+}
+
+.landing-v522-podio-vazio {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #c9d3cd;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.landing-v522-ranking-atualizacao {
   margin: 14px 0 0;
   color: #7f8d84;
   font-size: 12px;
@@ -968,6 +1043,7 @@
   .landing-v522-como,
   .landing-v522-diferenciais,
   .landing-v522-estatisticas,
+  .landing-v522-ranking-publico,
   .landing-v522-jogos,
   .landing-v522-premios,
   .landing-v522-faq,
@@ -1014,6 +1090,7 @@
   .landing-v522-etapas,
   .landing-v522-cards,
   .landing-v522-estatisticas-grid,
+  .landing-v522-podio-grid,
   .landing-v522-jogos-seguintes,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
@@ -1027,6 +1104,7 @@
   .landing-v522-como,
   .landing-v522-diferenciais,
   .landing-v522-estatisticas,
+  .landing-v522-ranking-publico,
   .landing-v522-jogos,
   .landing-v522-faq {
     padding: 44px 0;
@@ -1037,7 +1115,8 @@
     flex-direction: column;
   }
 
-  .landing-v522-estatisticas-atualizacao {
+  .landing-v522-estatisticas-atualizacao,
+  .landing-v522-ranking-atualizacao {
     text-align: left;
   }
 

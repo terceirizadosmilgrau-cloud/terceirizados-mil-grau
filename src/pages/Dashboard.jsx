@@ -19,6 +19,7 @@ import {
   valorPreenchido,
 } from "../utils/mataMataVisual";
 import { atualizarEstatisticasPublicas } from "../utils/atualizarEstatisticasPublicas";
+import { atualizarRankingPublico } from "../utils/atualizarRankingPublico";
 
 const destaquesMataMataPadrao = {
   palpitesEnviados: 0,
@@ -166,6 +167,10 @@ function Dashboard({
   const [
     atualizandoEstatisticas,
     setAtualizandoEstatisticas,
+  ] = useState(false);
+  const [
+    atualizandoRankingPublico,
+    setAtualizandoRankingPublico,
   ] = useState(false);
 
     const [busca, setBusca] =
@@ -417,6 +422,32 @@ const [filtro, setFiltro] =
         );
       } finally {
         setAtualizandoEstatisticas(false);
+      }
+    };
+
+  const publicarRanking =
+    async () => {
+      if (
+        !isSuperAdmin ||
+        atualizandoRankingPublico
+      ) {
+        return;
+      }
+
+      setAtualizandoRankingPublico(true);
+
+      try {
+        await atualizarRankingPublico();
+        alert(
+          "Ranking público atualizado com sucesso."
+        );
+      } catch (error) {
+        console.error(error);
+        alert(
+          "Erro ao atualizar ranking público."
+        );
+      } finally {
+        setAtualizandoRankingPublico(false);
       }
     };
 
@@ -932,6 +963,19 @@ participantes.length > 0
                   ? "Atualizando estatísticas..."
                   : "Atualizar estatísticas públicas"}
               </button>
+
+              <button
+                className="dashboard-v37-button"
+                onClick={publicarRanking}
+                disabled={
+                  atualizandoRankingPublico
+                }
+                style={botaoRankingPublico}
+              >
+                {atualizandoRankingPublico
+                  ? "Atualizando ranking..."
+                  : "Atualizar ranking público"}
+              </button>
             </div>
 
             <div style={adminDangerZoneStyle}>
@@ -1339,6 +1383,11 @@ const botaoEstatisticasPublicas = {
   cursor: "pointer",
   fontWeight: "bold",
   maxWidth: "100%",
+};
+
+const botaoRankingPublico = {
+  ...botaoEstatisticasPublicas,
+  backgroundColor: "#6f42c1",
 };
 
 const adminDangerZoneStyle = {

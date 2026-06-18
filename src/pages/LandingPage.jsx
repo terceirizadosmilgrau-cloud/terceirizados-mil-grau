@@ -224,6 +224,84 @@ const normalizarEstatisticasPublicas = (
   };
 };
 
+const normalizarRankingPublico = (
+  dados
+) => {
+  if (
+    !dados ||
+    dados.modalidade !== "geral" ||
+    !Array.isArray(dados.podio)
+  ) {
+    return null;
+  }
+
+  const podio = dados.podio
+    .slice(0, 3)
+    .map((participante) => {
+      const posicao =
+        participante?.posicao;
+      const nomeExibicao = String(
+        participante?.nomeExibicao || ""
+      )
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 40);
+
+      if (
+        !Number.isInteger(posicao) ||
+        posicao < 1 ||
+        posicao > 3 ||
+        !nomeExibicao
+      ) {
+        return null;
+      }
+
+      return {
+        posicao,
+        nomeExibicao,
+      };
+    })
+    .filter(Boolean)
+    .sort(
+      (participanteA, participanteB) =>
+        participanteA.posicao -
+        participanteB.posicao
+    );
+  const posicoesUnicas =
+    new Set(
+      podio.map(
+        (participante) =>
+          participante.posicao
+      )
+    ).size === podio.length;
+  const dataAtualizacao = new Date(
+    dados.atualizadoEm
+  );
+
+  if (
+    !posicoesUnicas ||
+    Number.isNaN(
+      dataAtualizacao.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    podio,
+    atualizadoEm:
+      dataAtualizacao.toLocaleString(
+        "pt-BR",
+        {
+          day: "2-digit",
+          month: "long",
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
+  };
+};
+
 const etapas = [
   {
     numero: "01",
@@ -312,6 +390,10 @@ function LandingPage() {
     estatisticasPublicas,
     setEstatisticasPublicas,
   ] = useState(null);
+  const [
+    rankingPublico,
+    setRankingPublico,
+  ] = useState(null);
   const [agora, setAgora] = useState(
     () => new Date()
   );
@@ -382,6 +464,35 @@ function LandingPage() {
       };
 
     carregarEstatisticas();
+
+    const carregarRankingPublico =
+      async () => {
+        try {
+          const snapshot = await getDoc(
+            doc(
+              db,
+              "publico",
+              "rankingResumo"
+            )
+          );
+
+          if (!ativo) return;
+
+          setRankingPublico(
+            snapshot.exists()
+              ? normalizarRankingPublico(
+                  snapshot.data()
+                )
+              : null
+          );
+        } catch {
+          if (ativo) {
+            setRankingPublico(null);
+          }
+        }
+      };
+
+    carregarRankingPublico();
 
     return () => {
       ativo = false;
@@ -560,7 +671,7 @@ function LandingPage() {
                     .totalParticipantes
                 }
               </strong>
-              <p>Na disputa pelo topo</p>
+              <p>Participantes ativos</p>
             </article>
 
             <article>
@@ -571,7 +682,12 @@ function LandingPage() {
                     .palpitesGruposEnviados
                 }
               </strong>
-              <p>Palpites registrados</p>
+              <p>
+                {estatisticasPublicas
+                  .palpitesGruposEnviados === 0
+                  ? "Aguardando envios"
+                  : "Palpites registrados"}
+              </p>
             </article>
 
             <article>
@@ -592,21 +708,61 @@ function LandingPage() {
                   estatisticasPublicas
                     .jogosMataMataEncerrados
                 }{" "}
-                <small>
-                  de{" "}
-                  {
-                    estatisticasPublicas
-                      .jogosMataMataConfigurados
-                  }
-                </small>
+                <small>/</small>{" "}
+                {
+                  estatisticasPublicas
+                    .jogosMataMataConfigurados
+                }
               </strong>
-              <p>No mata-mata</p>
+              <p>Concluídos</p>
             </article>
           </div>
 
           <p className="landing-v522-estatisticas-atualizacao">
             Última atualização:{" "}
             {estatisticasPublicas.atualizadoEm}
+          </p>
+        </section>
+      )}
+
+      {rankingPublico && (
+        <section className="landing-v522-ranking-publico">
+          <div className="landing-v522-section-head">
+            <span>Pódio atual</span>
+            <h2>Quem está no topo</h2>
+            <p>
+              As primeiras posições do ranking geral,
+              publicadas pelo administrador do bolão.
+            </p>
+          </div>
+
+          {rankingPublico.podio.length > 0 ? (
+            <div className="landing-v522-podio-grid">
+              {rankingPublico.podio.map(
+                (participante) => (
+                  <article
+                    key={participante.posicao}
+                    className={`landing-v522-podio-posicao-${participante.posicao}`}
+                  >
+                    <span>
+                      {participante.posicao}º lugar
+                    </span>
+                    <strong>
+                      {participante.nomeExibicao}
+                    </strong>
+                  </article>
+                )
+              )}
+            </div>
+          ) : (
+            <div className="landing-v522-podio-vazio">
+              O pódio será publicado em breve.
+            </div>
+          )}
+
+          <p className="landing-v522-ranking-atualizacao">
+            Última atualização:{" "}
+            {rankingPublico.atualizadoEm}
           </p>
         </section>
       )}
