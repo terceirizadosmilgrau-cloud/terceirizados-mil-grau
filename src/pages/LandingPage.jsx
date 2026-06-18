@@ -17,6 +17,12 @@ const nomesFases = {
   final: "Final",
 };
 
+const formatadorDataAbsoluta =
+  new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+  });
+
 const criarDataJogo = (data, horario) => {
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(data) ||
@@ -32,7 +38,74 @@ const criarDataJogo = (data, horario) => {
     : dataJogo;
 };
 
-const normalizarProximosJogos = (jogos = []) =>
+const limparNomeTime = (nome = "") =>
+  nome
+    .trim()
+    .replace(/^[^\p{L}\p{N}]+/u, "")
+    .trim();
+
+const inicioDoDia = (data) =>
+  new Date(
+    data.getFullYear(),
+    data.getMonth(),
+    data.getDate()
+  );
+
+const formatarDataAmigavel = (
+  dataJogo,
+  agora
+) => {
+  const diferencaEmDias = Math.round(
+    (inicioDoDia(dataJogo) -
+      inicioDoDia(agora)) /
+      86400000
+  );
+
+  if (diferencaEmDias === 0) {
+    return "Hoje";
+  }
+
+  if (diferencaEmDias === 1) {
+    return "Amanhã";
+  }
+
+  return `Em ${diferencaEmDias} dias`;
+};
+
+const formatarContagemRegressiva = (
+  dataJogo,
+  agora
+) => {
+  const diferencaEmMinutos = Math.max(
+    1,
+    Math.ceil(
+      (dataJogo.getTime() - agora.getTime()) /
+        60000
+    )
+  );
+  const dias = Math.floor(
+    diferencaEmMinutos / 1440
+  );
+  const horas = Math.floor(
+    (diferencaEmMinutos % 1440) / 60
+  );
+  const minutos = diferencaEmMinutos % 60;
+
+  if (dias > 0) {
+    return `Começa em ${dias}d ${horas}h`;
+  }
+
+  if (horas > 0) {
+    return `Começa em ${horas}h ${minutos}min`;
+  }
+
+  return `Começa em ${minutos}min`;
+};
+
+const normalizarProximosJogos = (
+  jogos = [],
+  agora = new Date()
+) =>
   jogos
     .map((jogo) => {
       const dataJogo = criarDataJogo(
@@ -50,27 +123,51 @@ const normalizarProximosJogos = (jogos = []) =>
         return null;
       }
 
+      const timeA = limparNomeTime(
+        jogo.timeA
+      );
+      const timeB = limparNomeTime(
+        jogo.timeB
+      );
+
       return {
         ...jogo,
+        timeA,
+        timeB,
         faseFormatada:
           nomesFases[jogo.fase] || jogo.fase,
-        dataFormatada: new Intl.DateTimeFormat(
-          "pt-BR",
-          {
-            day: "2-digit",
-            month: "long",
-          }
-        ).format(dataJogo),
+        dataAmigavel: formatarDataAmigavel(
+          dataJogo,
+          agora
+        ),
+        dataFormatada:
+          formatadorDataAbsoluta.format(
+            dataJogo
+          ),
         horarioFormatado: jogo.horario,
+        contagemRegressiva:
+          formatarContagemRegressiva(
+            dataJogo,
+            agora
+          ),
         dataJogo,
       };
     })
-    .filter(Boolean)
+    .filter(
+      (jogo) =>
+        jogo &&
+        jogo.dataJogo.getTime() >
+          agora.getTime()
+    )
     .sort(
       (jogoA, jogoB) =>
         jogoA.dataJogo - jogoB.dataJogo
     )
-    .slice(0, 4);
+    .slice(0, 4)
+    .map((jogo, index) => ({
+      ...jogo,
+      destaque: index === 0,
+    }));
 
 const etapas = [
   {
@@ -156,6 +253,9 @@ function LandingPage() {
     jogosPublicos,
     setJogosPublicos,
   ] = useState([]);
+  const [agora, setAgora] = useState(
+    () => new Date()
+  );
 
   useEffect(() => {
     let ativo = true;
@@ -200,9 +300,24 @@ function LandingPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const intervalo = window.setInterval(
+      () => setAgora(new Date()),
+      60000
+    );
+
+    return () => {
+      window.clearInterval(intervalo);
+    };
+  }, []);
+
   const proximosJogos = normalizarProximosJogos(
-    jogosPublicos
+    jogosPublicos,
+    agora
   );
+  const proximoJogo = proximosJogos[0];
+  const jogosSeguintes =
+    proximosJogos.slice(1);
 
   return (
     <main className="landing-v522" id="inicio">
@@ -347,25 +462,82 @@ function LandingPage() {
           </p>
         </div>
 
-        {proximosJogos.length > 0 ? (
-          <div className="landing-v522-jogos-grid">
-            {proximosJogos.map((jogo) => (
-              <article key={jogo.id}>
-                <div className="landing-v522-jogo-meta">
-                  <span>{jogo.faseFormatada}</span>
+        {proximoJogo ? (
+          <div className="landing-v522-agenda">
+            <article className="landing-v522-jogo-destaque">
+              <div className="landing-v522-destaque-topo">
+                <span className="landing-v522-jogo-selo">
+                  Próximo jogo
+                </span>
+                <span>
+                  {proximoJogo.faseFormatada}
+                </span>
+              </div>
+
+              <div className="landing-v522-destaque-data">
+                <strong>
+                  {proximoJogo.dataAmigavel}
+                </strong>
+                <span>
+                  {proximoJogo.dataFormatada}
+                </span>
+              </div>
+
+              <div className="landing-v522-destaque-confronto">
+                <div className="landing-v522-time">
+                  <strong>{proximoJogo.timeA}</strong>
+                </div>
+
+                <div className="landing-v522-destaque-centro">
+                  <span aria-hidden="true">×</span>
                   <strong>
-                    {jogo.dataFormatada} •{" "}
-                    {jogo.horarioFormatado}
+                    {
+                      proximoJogo.horarioFormatado
+                    }
                   </strong>
                 </div>
 
-                <div className="landing-v522-confronto">
-                  <strong>{jogo.timeA}</strong>
-                  <span aria-hidden="true">×</span>
-                  <strong>{jogo.timeB}</strong>
+                <div className="landing-v522-time landing-v522-time-direita">
+                  <strong>{proximoJogo.timeB}</strong>
                 </div>
-              </article>
-            ))}
+              </div>
+
+              <p className="landing-v522-contagem">
+                {proximoJogo.contagemRegressiva}
+              </p>
+            </article>
+
+            {jogosSeguintes.length > 0 && (
+              <div className="landing-v522-jogos-seguintes">
+                {jogosSeguintes.map((jogo) => (
+                  <article key={jogo.id}>
+                    <div className="landing-v522-jogo-meta">
+                      <span>
+                        {jogo.faseFormatada}
+                      </span>
+                      <strong>
+                        {jogo.dataAmigavel} •{" "}
+                        {jogo.horarioFormatado}
+                      </strong>
+                    </div>
+
+                    <p className="landing-v522-jogo-data-absoluta">
+                      {jogo.dataFormatada}
+                    </p>
+
+                    <div className="landing-v522-confronto">
+                      <strong>{jogo.timeA}</strong>
+                      <span aria-hidden="true">×</span>
+                      <strong>{jogo.timeB}</strong>
+                    </div>
+
+                    <p className="landing-v522-contagem landing-v522-contagem-menor">
+                      {jogo.contagemRegressiva}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="landing-v522-jogos-vazio">

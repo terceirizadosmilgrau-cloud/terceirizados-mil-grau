@@ -428,22 +428,149 @@
   padding: 26px 0 58px;
 }
 
-.landing-v522-jogos-grid {
+.landing-v522-agenda {
   margin-top: 28px;
+}
+
+.landing-v522-jogo-destaque,
+.landing-v522-jogos-seguintes article,
+.landing-v522-jogos-vazio {
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(25, 27, 17, 0.92), rgba(10, 18, 12, 0.94));
+}
+
+.landing-v522-jogo-destaque {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(22px, 3vw, 30px);
+  border-color: rgba(255, 193, 7, 0.38);
+  background:
+    linear-gradient(180deg, rgba(24, 31, 20, 0.94), rgba(10, 18, 12, 0.94));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.landing-v522-destaque-topo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #9fada4;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.landing-v522-jogo-selo {
+  padding: 7px 11px;
+  border-radius: 999px;
+  color: #171707;
+  background: #ffc107;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+}
+
+.landing-v522-destaque-data {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.landing-v522-destaque-data strong {
+  color: #73e694;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.15;
+}
+
+.landing-v522-destaque-data span {
+  color: #c9d3cd;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.landing-v522-destaque-confronto {
+  position: relative;
+  z-index: 1;
+  margin-top: 26px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(12px, 3vw, 28px);
+}
+
+.landing-v522-time {
+  min-width: 0;
+}
+
+.landing-v522-time-direita {
+  text-align: right;
+}
+
+.landing-v522-time strong {
+  min-width: 0;
+  color: #fff;
+  font-size: clamp(20px, 3vw, 28px);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.landing-v522-destaque-centro {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.landing-v522-destaque-centro span {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #111;
+  background: #ffc107;
+  font-size: 19px;
+  font-weight: 950;
+}
+
+.landing-v522-destaque-centro strong {
+  color: #fff;
+  font-size: 16px;
+}
+
+.landing-v522-contagem {
+  position: relative;
+  z-index: 1;
+  width: fit-content;
+  margin: 24px auto 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(115, 230, 148, 0.32);
+  border-radius: 999px;
+  color: #bff4cd;
+  background: rgba(50, 208, 94, 0.08);
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+
+.landing-v522-jogos-seguintes {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
-.landing-v522-jogos-grid article,
-.landing-v522-jogos-vazio {
-  border: 1px solid rgba(255, 193, 7, 0.2);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(25, 27, 17, 0.86), rgba(10, 18, 12, 0.9));
-}
-
-.landing-v522-jogos-grid article {
+.landing-v522-jogos-seguintes article {
   min-width: 0;
   padding: 20px;
 }
@@ -468,6 +595,13 @@
   text-align: right;
 }
 
+.landing-v522-jogo-data-absoluta {
+  margin: 8px 0 0;
+  color: #7f8d84;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .landing-v522-confronto {
   margin-top: 22px;
   display: grid;
@@ -479,7 +613,7 @@
 .landing-v522-confronto strong {
   min-width: 0;
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
@@ -499,6 +633,12 @@
   background: #ffc107;
   font-size: 17px;
   font-weight: 900;
+}
+
+.landing-v522-contagem-menor {
+  margin: 20px 0 0;
+  padding: 7px 11px;
+  font-size: 12px;
 }
 
 .landing-v522-jogos-vazio {
@@ -750,6 +890,10 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .landing-v522-jogos-seguintes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .landing-v522-premios {
     grid-template-columns: 1fr;
   }
@@ -810,7 +954,7 @@
   .landing-v522-panel-grid,
   .landing-v522-etapas,
   .landing-v522-cards,
-  .landing-v522-jogos-grid,
+  .landing-v522-jogos-seguintes,
   .landing-v522-premios-grid {
     grid-template-columns: 1fr;
   }
@@ -834,6 +978,25 @@
 
   .landing-v522-jogo-meta strong {
     text-align: left;
+  }
+
+  .landing-v522-destaque-data {
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .landing-v522-destaque-confronto {
+    grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .landing-v522-time,
+  .landing-v522-time-direita {
+    text-align: center;
+  }
+
+  .landing-v522-time strong {
+    font-size: clamp(18px, 5vw, 22px);
   }
 
   .landing-v522-jogos-vazio {
@@ -868,5 +1031,28 @@
   .landing-v522-panel-head,
   .landing-v522-panel-note div {
     align-items: flex-start;
+  }
+
+  .landing-v522-jogo-destaque {
+    padding: 20px 16px;
+  }
+
+  .landing-v522-destaque-topo {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .landing-v522-destaque-confronto {
+    grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .landing-v522-destaque-centro span {
+    width: 34px;
+    height: 34px;
+  }
+
+  .landing-v522-destaque-centro strong {
+    font-size: 15px;
   }
 }
